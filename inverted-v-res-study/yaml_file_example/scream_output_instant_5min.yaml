@@ -114,9 +114,6 @@ Fields:
 #    - w3_horiz_avg
 #    - w_variance_horiz_avg    
     # cloud-top diagnostics take 1
-    - LiqWaterPath
-    - LiqNumberPath
-    - IceWaterPath
     - cldfrac_tot_at_cldtop
     - cldfrac_ice_at_cldtop
     - cldfrac_liq_at_cldtop
