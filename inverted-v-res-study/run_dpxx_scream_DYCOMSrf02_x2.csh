@@ -29,10 +29,10 @@
   setenv casedirectory $PSCRATCH/dp_screamxx_inverted_v
 
   # Directory where code lives
-  setenv code_dir /pscratch/sd/m/mahf708/e3sm-repo
+  setenv code_dir /global/homes/m/mahf708
 
   # Code tag name
-  setenv code_tag test-pr
+  setenv code_tag E3SM
 
   # Name of machine you are running on (i.e. pm-cpu, anvil, etc)
   setenv machine pm-gpu

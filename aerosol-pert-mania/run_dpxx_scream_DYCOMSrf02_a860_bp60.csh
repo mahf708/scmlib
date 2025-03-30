@@ -45,13 +45,13 @@
   setenv casename scream_dpxx_DYCOMSrf01_a${aero_a1}_${tmp}
 
   # Set the case directory here
-  setenv casedirectory $PSCRATCH/dp_screamxx_aero_pert
+  setenv casedirectory $PSCRATCH/dp_screamxx_aero_pert/extra_0ps
 
   # Directory where code lives
-  setenv code_dir /pscratch/sd/m/mahf708/e3sm-repo
+  setenv code_dir /global/homes/m/mahf708
 
   # Code tag name
-  setenv code_tag test-pr
+  setenv code_tag E3SM
 
   # Name of machine you are running on (i.e. pm-cpu, anvil, etc)
   setenv machine pm-gpu

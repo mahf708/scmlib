@@ -22,11 +22,30 @@
 ####### See the example yaml file in the DPxx_SCREAM_SCRIPTS/yaml_file_example
 #######  of the scmlib repo to get you started.
 
-  # Set the name of your case here
-  setenv casename scream_dpxx_DYCOMSrf02_100m
+#     \begin{tabular}{ l l }
+#     \tophline
+#     SPA activation & ERFaer (W m$^{-2}$) \\
+#     \middlehline
+#     $\alpha = \left(N_\text{ccn} C_\text{f}\right)^{0.50} \times 4654$ & $-1.03$ \\
+#     $\alpha = \left(N_\text{ccn} C_\text{f}\right)^{0.55} \times 2000$ & $-1.16$ \\
+#     $\alpha = \left(N_\text{ccn} C_\text{f}\right)^{0.60} \times  860$ & $-1.25$ \\
+#     $\alpha = \left(N_\text{ccn} C_\text{f}\right)^{0.80} \times   30$ & $-1.70$ \\
+#     $\alpha = \left(N_\text{ccn} C_\text{f}\right)^{1.00} \times    1$ & $-2.12$ \\
+#     \bottomhline
+#     \end{tabular}
+#     % \belowtable{
+#     %
+#     % }
+# \end{table}
+
+  set env aero_a1 = 1
+  set env aero_b1 = 1.0
+  # change 0.?? to p?? by replacing
+  set tmp = `echo $aero_b1 | sed 's/0./p/'`
+  setenv casename scream_dpxx_DYCOMSrf01_a1_1_0ps
 
   # Set the case directory here
-  setenv casedirectory $PSCRATCH/dp_screamxx_inverted_v
+  setenv casedirectory $PSCRATCH/dp_screamxx_aero_pert/extra_0ps
 
   # Directory where code lives
   setenv code_dir /global/homes/m/mahf708
@@ -62,10 +81,10 @@
   #   to the total number of elements in your domain.  Note that if you are running
   #   on pm-gpu you will want to set this to either "4" or "8" if running the standard
   #   domain size and resolution (RCE excluded).
-  set num_procs = 16
+  set num_procs = 1
 
   # set walltime
-  set walltime = '00:30:00'
+  set walltime = '00:20:00'
 
   ## SET DOMAIN SIZE AND DYNAMICS RESOLUTION:
   # - Note that these scripts are set to run with dx=dy=3.33 km
@@ -76,12 +95,12 @@
   # (there are 3x3 unique dynamics columns per element, hence the "3" factor)
 
   # Set number of elements in the x&y directions
-  set num_ne_x = 50
-  set num_ne_y = 50
+  set num_ne_x = 5
+  set num_ne_y = 5
 
   # Set domain length [m] in x&y direction
-  set domain_size_x = 15000
-  set domain_size_y = 15000
+  set domain_size_x = 50000
+  set domain_size_y = 50000
 
   # BELOW SETS RESOLUTION DEPENDENT SETTINGS
   # (Note that all default values below are appropriate for dx=dy=3.33 km and do not
@@ -95,12 +114,12 @@
   # model/physics time step [s]:
   #  As a rule, a factor of 2 increase in resolution should equate to a factor of 2
   #  decrease of the model/physics step.  This needs to be an integer number.
-  set model_dtime = 5
+  set model_dtime = 100
 
   # dynamics time step [s]:
   #  should divide evenly into model_dtime.  As a general rule of thumb, divide
   #   model_dtime by 12 to get your dynamics time step.
-  set dyn_dtime = 0.2083333333333
+  set dyn_dtime = 8.3333333333333
 
   # SET SECOND ORDER VISCOSITY NEAR MODEL TOP
   #  NOTE that if you decrease resolution you will also need to reduce
@@ -108,8 +127,8 @@
   #  Rule of thumb is that a factor of 2 increase in resolution should equate to a
   #  factor of 2 decrease for this value
 
-  # second order viscosity near model top [m2/s]
-  set nu_top_dyn = 138.889
+  # second order visocosity near model top [m2/s]
+  set nu_top_dyn = 1e4
 
 ####### END (mandatory) USER DEFINED SETTINGS, but see above about output
 ###########################################################################
@@ -238,6 +257,11 @@
   ./atmchange iop_nudge_tq=$do_iop_nudge_tq
   ./atmchange iop_coriolis=$do_iop_nudge_coriolis
   ./atmchange extra_shoc_diags=true
+# spa params
+  ./atmchange spa_ccn_to_nc_factor=$aero_a1
+  ./atmchange spa_ccn_to_nc_exponent=$aero_b1
+  ./atmchange autoconversion_nc_exponent=0.0
+  ./atmchange autoconversion_prefactor=4.0
 
 # Allow for the computation of tendencies for output purposes
   ./atmchange physics::mac_aero_mic::shoc::compute_tendencies=T_mid,qv

@@ -1,0 +1,8 @@
+#!/bin/bash -e
+
+# go through files in aerosol-pert-mania dir that end with "0ps.csh" and echo them
+
+for file in aerosol-pert-mania/*0ps.csh; do
+    module load python
+    $file &
+done
