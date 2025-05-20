@@ -2,7 +2,22 @@
 
 # go through files in aerosol-pert-mania dir that end with "0ps.csh" and echo them
 
-for file in aerosol-pert-mania/*0ps.csh; do
+failed=(\
+_a1_1_0ps \
+_a2000_p55_0ps \
+_a300_p80_0ps \
+_a30_p80_0ps \
+_a4000_p55_0ps \
+)
+for fail in "${failed[@]}"; do
+    echo "failed: $fail"
+    # replace _p with _bp
+    fail2=${fail/_p/_bp}
+    echo ${fail2}
+    ls /pscratch/sd/m/mahf708/dp_screamxx_aero_pert/extra_0ps/scream_dpxx_DYCOMSrf01${fail}/
+    ls /pscratch/sd/m/mahf708/scmlib/aerosol-pert-mania/run_dpxx_scream_DYCOMSrf02${fail2}.csh
     module load python
-    $file &
+    rm -rf /pscratch/sd/m/mahf708/dp_screamxx_aero_pert/extra_0ps/scream_dpxx_DYCOMSrf01${fail}
+    /pscratch/sd/m/mahf708/scmlib/aerosol-pert-mania/run_dpxx_scream_DYCOMSrf02${fail2}.csh &
+    sleep 180
 done
