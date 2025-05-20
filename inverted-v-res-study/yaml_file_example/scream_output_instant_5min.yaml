@@ -1,11 +1,11 @@
 %YAML 1.1
 ---
-Averaging Type: Instant
-Max Snapshots Per File: 10000000
+averaging_type: instant
+max_snapshots_per_file: 10000000
 filename_prefix: ${CASE}.scream.h
-Fields:
-  Physics PG2:
-    Field Names:
+fields:
+  physics_pg2:
+    field_names:
     - z_mid
     - p_mid
     # HOMME
@@ -125,7 +125,7 @@ Fields:
     - AeroComCldTop
     - AeroComCldBot
 output_control:
-  Frequency: 5
+  frequency: 5
   frequency_units: nmins
-Restart:
+restart:
   force_new_file: true
