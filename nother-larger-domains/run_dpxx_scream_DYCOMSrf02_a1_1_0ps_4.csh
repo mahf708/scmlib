@@ -42,10 +42,11 @@
   set env aero_b1 = 1.0
   # change 0.?? to p?? by replacing
   set tmp = `echo $aero_b1 | sed 's/0./p/'`
-  setenv casename scream_dpxx_DYCOMSrf01_a1_1_0ps
+  set domain_x = 4
+  setenv casename scream_dpxx_DYCOMSrf01_a1_1_0ps_x${domain_x}
 
   # Set the case directory here
-  setenv casedirectory $PSCRATCH/dp_screamxx_aero_pert/larger_domains
+  setenv casedirectory $PSCRATCH/dp_screamxx_aero_pert/another_larger_domains
 
   # Directory where code lives
   setenv code_dir /global/homes/m/mahf708
@@ -95,12 +96,12 @@
   # (there are 3x3 unique dynamics columns per element, hence the "3" factor)
 
   # Set number of elements in the x&y directions
-  set num_ne_x = 10
-  set num_ne_y = 10
+  set num_ne_x = `expr 10 \* $domain_x`
+  set num_ne_y = `expr 10 \* $domain_x`
 
   # Set domain length [m] in x&y direction
-  set domain_size_x = 100000
-  set domain_size_y = 100000
+  set domain_size_x = `expr 100000 \* $domain_x`
+  set domain_size_y = `expr 100000 \* $domain_x`
 
   # BELOW SETS RESOLUTION DEPENDENT SETTINGS
   # (Note that all default values below are appropriate for dx=dy=3.33 km and do not
