@@ -23,7 +23,7 @@
 #######  of the scmlib repo to get you started.
 
   # Set the name of your case here
-  setenv casename scream_dpxx_DYCOMSrf02_100m
+  setenv casename scream_dpxx_DYCOMSrf02_100m_new_test
 
   # Set the case directory here
   setenv casedirectory $PSCRATCH/dp_screamxx_inverted_v
@@ -80,8 +80,8 @@
   set num_ne_y = 50
 
   # Set domain length [m] in x&y direction
-  set domain_size_x = 15000
-  set domain_size_y = 15000
+  set domain_size_x = 50000
+  set domain_size_y = 50000
 
   # BELOW SETS RESOLUTION DEPENDENT SETTINGS
   # (Note that all default values below are appropriate for dx=dy=3.33 km and do not
