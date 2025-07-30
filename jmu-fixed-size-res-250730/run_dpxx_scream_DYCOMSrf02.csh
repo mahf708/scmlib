@@ -23,24 +23,24 @@
 #######  of the scmlib repo to get you started.
 
   # Set the name of your case here
-  setenv casename scream_dpxx_DYCOMSrf02_100m_new_test
+  setenv casename scream_dpxx_DYCOMSrf02
 
   # Set the case directory here
-  setenv casedirectory $PSCRATCH/dp_screamxx_inverted_v
+  setenv casedirectory /pscratch/sd/b/bogensch/dp_screamxx
 
   # Directory where code lives
-  setenv code_dir /global/homes/m/mahf708
+  setenv code_dir /pscratch/sd/b/bogensch/dp_scream/codes
 
   # Code tag name
-  setenv code_tag E3SM
+  setenv code_tag E3SM_master
 
   # Name of machine you are running on (i.e. pm-cpu, anvil, etc)
-  setenv machine pm-gpu
+  setenv machine pm-cpu
 
   # Compiler (pm-cpu should use "gnu"; pm-gpu should use "gnugpu"; LC should use "intel";
   #           frontier should use "craycray-mphipcc")
   #   more machine compiler defaults will be added as they are tested/validated.
-  setenv compiler gnugpu
+  setenv compiler gnu
 
   # Name of project to run on, if submitting to queue
   setenv projectname e3sm
@@ -49,7 +49,7 @@
   #  See example files in DPxx_SCREAM_SCRIPTS/yaml_file_example to get you started.
   # NOTE, you will likely need to edit the section of the script where the yaml files
   #  are appended to your case.  Do a search for "yamlpath" to find this location.
-  setenv yamlpath $PSCRATCH/scmlib/inverted-v-res-study/yaml_file_example
+  setenv yamlpath /pscratch/sd/b/bogensch/dp_scream/codes/scmlib/DPxx_SCREAM_SCRIPTS/yaml_file_example
 
 
   # Set to debug queue?
@@ -62,7 +62,7 @@
   #   to the total number of elements in your domain.  Note that if you are running
   #   on pm-gpu you will want to set this to either "4" or "8" if running the standard
   #   domain size and resolution (RCE excluded).
-  set num_procs = 16
+  set num_procs = 24
 
   # set walltime
   set walltime = '00:30:00'
@@ -76,8 +76,8 @@
   # (there are 3x3 unique dynamics columns per element, hence the "3" factor)
 
   # Set number of elements in the x&y directions
-  set num_ne_x = 50
-  set num_ne_y = 50
+  set num_ne_x = 5
+  set num_ne_y = 5
 
   # Set domain length [m] in x&y direction
   set domain_size_x = 50000
@@ -95,12 +95,12 @@
   # model/physics time step [s]:
   #  As a rule, a factor of 2 increase in resolution should equate to a factor of 2
   #  decrease of the model/physics step.  This needs to be an integer number.
-  set model_dtime = 5
+  set model_dtime = 100
 
   # dynamics time step [s]:
   #  should divide evenly into model_dtime.  As a general rule of thumb, divide
   #   model_dtime by 12 to get your dynamics time step.
-  set dyn_dtime = 0.2083333333333
+  set dyn_dtime = 8.3333333333333
 
   # SET SECOND ORDER VISCOSITY NEAR MODEL TOP
   #  NOTE that if you decrease resolution you will also need to reduce
@@ -108,8 +108,8 @@
   #  Rule of thumb is that a factor of 2 increase in resolution should equate to a
   #  factor of 2 decrease for this value
 
-  # second order viscosity near model top [m2/s]
-  set nu_top_dyn = 138.889
+  # second order visocosity near model top [m2/s]
+  set nu_top_dyn = 1e4
 
 ####### END (mandatory) USER DEFINED SETTINGS, but see above about output
 ###########################################################################
@@ -120,7 +120,7 @@
   set lat = 31.5 # latitude
   set lon = 238.500 # longitude
   set do_iop_srf_prop = true # Use surface fluxes in IOP file?
-  set do_iop_nudge_tq = false # Relax T&Q to observations?
+  set do_iop_nudge_tq = true # Relax T&Q to observations?
   set do_iop_nudge_uv = false # Relax U&V to observations?
   set do_iop_nudge_coriolis = false # Nudge to geostrophic winds?
   set do_iop_subsidence = true # compute LS vertical transport?
@@ -234,26 +234,28 @@
   ./atmchange rad_frequency=3
   ./atmchange iop_srf_prop=$do_iop_srf_prop
   ./atmchange iop_dosubsidence=$do_iop_subsidence
-  ./atmchange iop_nudge_uv=$do_iop_nudge_uv
-  ./atmchange iop_nudge_tq=$do_iop_nudge_tq
   ./atmchange iop_coriolis=$do_iop_nudge_coriolis
   ./atmchange extra_shoc_diags=true
+  ./atmchange iop_nudge_uv=$do_iop_nudge_uv
+  ./atmchange iop_nudge_tq=$do_iop_nudge_tq
+  ./atmchange iop_nudge_tq_low=650
+  ./atmchange iop_nudge_tq_high=0
+  ./atmchange iop_nudge_tscale=3600
 
 # Allow for the computation of tendencies for output purposes
   ./atmchange physics::mac_aero_mic::shoc::compute_tendencies=T_mid,qv
   ./atmchange physics::mac_aero_mic::p3::compute_tendencies=T_mid,qv
   ./atmchange physics::rrtmgp::compute_tendencies=T_mid
   ./atmchange homme::compute_tendencies=T_mid,qv
+  ./atmchange physics::iop_forcing::compute_tendencies=T_mid,qv
   
  # configure yaml output
  # See the example yaml files in the DPxx_SCREAM_SCRIPTS/yaml_file_example
  # Note that you can have as many output streams (yaml files) as you want!
 cp ${yamlpath}/scream_output_avg_1hour.yaml .
 cp ${yamlpath}/scream_horiz_avg_output_15min.yaml .
-cp ${yamlpath}/scream_output_instant_5min.yaml .
 ./atmchange output_yaml_files="./scream_output_avg_1hour.yaml"
 ./atmchange output_yaml_files+="./scream_horiz_avg_output_15min.yaml"
-./atmchange output_yaml_files+="./scream_output_instant_5min.yaml"
 
 # avoid the monthly cice file from writing as this
 #   appears to be currently broken for SCM
