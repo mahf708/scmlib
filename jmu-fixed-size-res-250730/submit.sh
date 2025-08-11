@@ -6,10 +6,10 @@ module load python
 cd "$(dirname "$0")"
 
 # submit run_dpxx_scream_DYCOMSrf02_a1_1_0ps_copy.csh 
-for i in {100,50,25,20,10,5,2}
+for i in {1,2,4,5,10,20,40}
 do
     echo "Submitting run_dpxx_scream_DYCOMSrf02_a1_1_0ps_copy.csh with argument $i"
-    ./run_dpxx_scream_DYCOMSrf02_a1_1_0ps_copy.csh $i &
+    ./test.csh $i &
     # sleep for 100 seconds to avoid overloading the system
-    sleep 100
+    sleep 200
 done
