@@ -23,24 +23,24 @@
 #######  of the scmlib repo to get you started.
 
   # Set the name of your case here
-  setenv casename scream_dpxx_DYCOMSrf02
+  setenv casename scream_dpxx_DYCOMSrf02_pblediags_vary
 
   # Set the case directory here
-  setenv casedirectory /pscratch/sd/b/bogensch/dp_screamxx
+  setenv casedirectory $PSCRATCH/dp_screamxx
 
   # Directory where code lives
-  setenv code_dir /pscratch/sd/b/bogensch/dp_scream/codes
+  setenv code_dir $PSCRATCH/e3sm-repo/test-pr
 
   # Code tag name
-  setenv code_tag E3SM_master
+  setenv code_tag ""
 
   # Name of machine you are running on (i.e. pm-cpu, anvil, etc)
-  setenv machine pm-cpu
+  setenv machine pm-gpu
 
   # Compiler (pm-cpu should use "gnu"; pm-gpu should use "gnugpu"; LC should use "intel";
   #           frontier should use "craycray-mphipcc")
   #   more machine compiler defaults will be added as they are tested/validated.
-  setenv compiler gnu
+  setenv compiler gnugpu
 
   # Name of project to run on, if submitting to queue
   setenv projectname e3sm
@@ -49,7 +49,7 @@
   #  See example files in DPxx_SCREAM_SCRIPTS/yaml_file_example to get you started.
   # NOTE, you will likely need to edit the section of the script where the yaml files
   #  are appended to your case.  Do a search for "yamlpath" to find this location.
-  setenv yamlpath /pscratch/sd/b/bogensch/dp_scream/codes/scmlib/DPxx_SCREAM_SCRIPTS/yaml_file_example
+  setenv yamlpath /pscratch/sd/m/mahf708/scmlib/DPxx_SCREAM_SCRIPTS/yaml_file_example
 
 
   # Set to debug queue?
@@ -62,10 +62,10 @@
   #   to the total number of elements in your domain.  Note that if you are running
   #   on pm-gpu you will want to set this to either "4" or "8" if running the standard
   #   domain size and resolution (RCE excluded).
-  set num_procs = 24
+  set num_procs = 4
 
   # set walltime
-  set walltime = '00:30:00'
+  set walltime = '00:10:00'
 
   ## SET DOMAIN SIZE AND DYNAMICS RESOLUTION:
   # - Note that these scripts are set to run with dx=dy=3.33 km
@@ -246,7 +246,7 @@
   ./atmchange physics::mac_aero_mic::shoc::compute_tendencies=T_mid,qv
   ./atmchange physics::mac_aero_mic::p3::compute_tendencies=T_mid,qv
   ./atmchange physics::rrtmgp::compute_tendencies=T_mid
-  ./atmchange homme::compute_tendencies=T_mid,qv
+  ./atmchange homme::compute_tendencies=T_mid,qv,qc,qi
   ./atmchange physics::iop_forcing::compute_tendencies=T_mid,qv
   
  # configure yaml output
