@@ -6,6 +6,10 @@ filename_prefix: ${CASE}.fullfield
 fields:
   physics_pg2:
     field_names:
+    - PBLEntrainmentBudget
+    - PBLEntrainmentBudget_tt
+    - PBLEntrainmentBudget_qt
+    - PBLEntrainmentBudget_tl
     - z_mid
     - p_mid
     # HOMME

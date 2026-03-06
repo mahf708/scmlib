@@ -6,6 +6,10 @@ filename_prefix: ${CASE}.horiz_avg
 fields:
   physics_pg2:
     field_names:
+    - PBLEntrainmentBudget
+    - PBLEntrainmentBudget_tt
+    - PBLEntrainmentBudget_qt
+    - PBLEntrainmentBudget_tl
     - z_mid_horiz_avg
     - p_mid_horiz_avg
     # HOMME
