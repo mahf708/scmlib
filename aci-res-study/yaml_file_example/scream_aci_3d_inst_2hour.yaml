@@ -1,0 +1,25 @@
+%YAML 1.1
+---
+# Trimmed 3D snapshots.  At 156 m (ne512, ~1M physics columns) each 3D field
+# is ~0.5 GB per snapshot, so keep this list short.
+averaging_type: instant
+max_snapshots_per_file: 100000
+filename_prefix: ${CASE}.aci3d
+fields:
+  physics_pg2:
+    field_names:
+    - z_mid
+    - p_mid
+    - T_mid
+    - qv
+    - qc
+    - nc
+    - qr
+    - nr
+    - cldfrac_liq
+    - eff_radius_qc
+    - tke
+    - omega
+output_control:
+  frequency: 2
+  frequency_units: nhours

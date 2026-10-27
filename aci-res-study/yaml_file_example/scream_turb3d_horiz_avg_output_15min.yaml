@@ -1,0 +1,15 @@
+%YAML 1.1
+---
+# Fields that only exist with ./atmchange ctl_nl::do_3d_turbulence=true
+averaging_type: average
+max_snapshots_per_file: 100000
+filename_prefix: ${CASE}.turb3d_horiz_avg
+fields:
+  physics_pg2:
+    field_names:
+    - eddy_diff_heat_horiz_horiz_avg
+    - eddy_diff_mom_horiz_horiz_avg
+    - tke_shear_strain3d_horiz_avg
+output_control:
+  frequency: 15
+  frequency_units: nmins
