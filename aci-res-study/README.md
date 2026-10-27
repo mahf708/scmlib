@@ -87,7 +87,7 @@ This study applies the same recipe below 1 km (`dyn_ratio` = `model_dtime/se_tst
 | 5km    | 240 | 16  | 7.5   | 1,024     | 100 | 12 | 8.333 | 1.67 | 1.5e4 | 216   | 4 (1 node)     | measured 24 s |
 | 2p5km  | 240 | 32  | 3.75  | 4,096     | 75  | 12 | 6.25  | 2.50 | 7500  | 288   | 8 (2 nodes)    | measured 44 s |
 | 1p25km | 240 | 64  | 1.875 | 16,384    | 60  | 24 | 2.5   | 2.00 | 1667  | 360   | 16 (4 nodes)   | measured 2.2 min |
-| 625m   | 240 | 128 | 0.94  | 65,536    | 30  | 24 | 1.25  | 2.00 | 833   | 720   | 16 (4 nodes)   | measured 13.5 min (+9% with 3D turbulence) |
+| 625m   | 240 | 128 | 0.94  | 65,536    | 30  | 24 | 1.25  | 2.00 | 833   | 720   | 16 (4 nodes)   | measured 13.5 min (13.6 min with 3D turbulence) |
 | 312m   | 240 | 256 | 0.47  | 262,144   | 15  | 24 | 0.625 | 2.00 | 417   | 1,440 | 64 (16 nodes)  | ~27 min, extrapolated |
 | 156m   | 240 | 512 | 0.23  | 1,048,576 | 6   | 24 | 0.25  | 1.60 | 208   | 3,600 | 256 (64 nodes) | ~68 min, extrapolated |
 
@@ -96,7 +96,8 @@ about 1.5 min at 1024 elements per GPU, or ~9 min on E3SM master without the
 `perturb` fix described below. The 312 m and 156 m estimates keep 1024 elements
 (4096 physics columns) per GPU, the 625 m load, so they scale with the number
 of physics steps. 4096 elements per GPU does not fit: 312 m on 16 GPUs runs out
-of A100 memory in RRTMGP init, even with `rrtmgp::pool_size_multiplier=0.25`.
+of A100 memory in RRTMGP init, even with `rrtmgp::pool_size_multiplier=0.25`,
+while 1600 elements per GPU runs fine (2.5 km and 1.25 km on a 600 km domain).
 
 Rough budget for the 48 runs:
 
@@ -243,7 +244,9 @@ the current `run_dpxx_scream_DYCOMSrf02_aci.csh`:
 | 625 m, CICE | 16 | 1 h | 520 | 137 | unpatched `perturb` |
 | 625 m, SICE | 16 | 1 h | 88 | 135 | patched `perturb` |
 | 625 m, SICE, 3D turbulence on | 16 | 1 h | 86 | 147 | horizontal Kh up to ~30 m2/s, LWP within 0.5 g/m2 of off |
-| 625 m, SICE, 3D turbulence on | 16 | 5 h 45 min | - | - | killed by an unrelated session end at step 691/720; no NaNs, LWP 131-140 g/m2, Kh 26-30 m2/s |
+| 625 m, SICE, 3D turbulence on | 16 | 6 h | 89 | 816 | stable; no NaNs, LWP 131-140 g/m2, horizontal Kh 26-30 m2/s; ~1 % over 6 x the 1 h off cost |
+| 2.5 km on a 600 km domain (ne 80), SICE | 4 | 1 h | 132 | 52 | 1600 elements per GPU fits |
+| 1.25 km on a 600 km domain (ne 160), SICE | 16 | 1 h | 132 | 112 | 1600 elements per GPU fits |
 | 312 m, SICE, 3D turbulence on | 16 | - | - | - | out of GPU memory in RRTMGP init: needs >= 32 GPUs |
 
 **Initialization bottleneck.** DP perturbs the initial `T_mid` below 900 hPa.
