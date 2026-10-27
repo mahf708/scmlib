@@ -9,7 +9,7 @@ the sub-km answer?
 | Nd (in-cloud, #/cm3) | 20, 50, 100, 200 |
 | dx (dynamics) | 40, 20, 10, 5, 2.5, 1.25 km, 625, 312.5, 156.25 m |
 | 3D turbulence | off everywhere; on *and* off at 625, 312.5, 156.25 m |
-| domain | 240 km x 240 km, fixed |
+| domain | 240 km x 240 km for dx <= 10 km; 300 km at 20 km, 600 km at 40 km |
 
 That is 4 x 9 = 36 runs with 3D turbulence off plus 4 x 3 = 12 with it on:
 48 runs. Each one is the 6 h nocturnal RF02 case (SW off, T/q nudged above
@@ -28,20 +28,37 @@ Before running, set `code_dir`/`code_tag` (E3SM master **at or after PR #8630**,
 merged 2026-09-04, for the 3D turbulence switch) and `yamlpath` at the top of
 the run script. Start with the cheap end, e.g. `./submit_matrix.sh go 40km 20km`.
 
-## Domain and the integer-element constraint
+**One build for everything.** The study uses the DP compset with stub sea ice
+(`..._SICE_...` instead of `CICE%PRES`). CICE compiles the column count into
+the executable (`-DNXGLOB=ICE_NX`, `components/cice/bld/configure`), so with
+CICE every resolution needs its own build. With SICE, one executable runs
+every resolution. This was tested by building for 312 m and running at 40 km.
+There is no sea ice at 31.5N in July, and the SICE and CICE runs cost the same.
+`submit_matrix.sh` builds the first case and points all the others at its
+executable (`ACI_EXEROOT`).
+
+## Domain and the element-count constraints
 
 Resolution follows the scmlib convention `dx = L / (3 * num_ne_x)` (unique
-dynamics GLL points). `num_ne_x` must be an integer, and at L = 200 km,
-dx = 40 km would need `num_ne_x = 1.67`. 240 km is the smallest domain that hits
-40 km exactly (`num_ne_x = 2`) and lets every finer level be an exact halving
-(`num_ne_x` = 2, 4, ..., 512).
+dynamics GLL points), with `num_ne_x` an integer. Two more limits were found by
+running:
 
-At 40 km that is 6 dynamics points but only **4 physics (pg2) columns** per
-direction. The physics grid is 1.5x coarser than the label:
-`dx_phys = L / (2 * num_ne_x)`. SHOC's horizontal length scale (and so the 3D
-turbulence diffusivities) uses the physics-grid spacing. If you want >= 5 physics
-columns per direction at 40 km, use L = 360 km (`num_ne_x` = 3 ... 768). That
-costs 2.25x more at every level.
+- `num_ne_x = 2` aborts in HOMME (`Connectivity::setup_ucon: Element's first
+  four connections are not edges in S, N, W, E order`). On a periodic plane,
+  an element's east and west neighbours are the same element.
+- `num_ne_x < 5` aborts in tracer transport (`SL transport for planar geometry
+  does not support min(ne_x, ne_y) < 5`).
+
+So **num_ne_x >= 5**. A single fixed domain from 40 km to 156 m would need
+600 km at 156 m (~6.5M physics columns), which is not practical. The domain is
+therefore 240 km from 10 km down (`num_ne_x` = 8 ... 512, exact halvings) and
+grows at the coarse end: 300 km at 20 km and 600 km at 40 km (`num_ne_x` = 5).
+The forcing is horizontally uniform, so domain size mainly sets the number of
+columns available for statistics.
+
+The physics grid is 1.5x coarser than the label: `dx_phys = L / (2 *
+num_ne_x)`. SHOC's horizontal length scale, and so the 3D turbulence
+diffusivities, use the physics-grid spacing.
 
 ## Time steps and the sub-800 m CFL fix
 
@@ -62,21 +79,32 @@ upstream rule of thumb (dt halves with dx, `se_tstep = model_dtime/12`,
 
 This study applies the same recipe below 1 km (`dyn_ratio` = `model_dtime/se_tstep`):
 
-| res | num_ne_x | dx_phys (km) | physics cols | model_dtime (s) | dyn_ratio | se_tstep (s) | se_tstep per km dx | nu_top (m2/s) | 6 h phys steps | rel. cost* | ranks (pm-gpu) |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| 40km   | 2   | 60    | 16        | 100 | 12 | 8.333 | 0.21 | 1.2e5 | 216   | 4e-5   | 4 (1 node) |
-| 20km   | 4   | 30    | 64        | 100 | 12 | 8.333 | 0.42 | 6e4   | 216   | 2e-4   | 4 (1 node) |
-| 10km   | 8   | 15    | 256       | 100 | 12 | 8.333 | 0.83 | 3e4   | 216   | 6e-4   | 4 (1 node) |
-| 5km    | 16  | 7.5   | 1,024     | 100 | 12 | 8.333 | 1.67 | 1.5e4 | 216   | 0.003  | 4 (1 node) |
-| 2p5km  | 32  | 3.75  | 4,096     | 75  | 12 | 6.25  | 2.50 | 7500  | 288   | 0.014  | 8 (2 nodes) |
-| 1p25km | 64  | 1.875 | 16,384    | 60  | 24 | 2.5   | 2.00 | 1667  | 360   | 0.14   | 16 (4 nodes) |
-| 625m   | 128 | 0.94  | 65,536    | 30  | 24 | 1.25  | 2.00 | 833   | 720   | 1.1    | 32 (8 nodes) |
-| 312m   | 256 | 0.47  | 262,144   | 15  | 24 | 0.625 | 2.00 | 417   | 1,440 | 8.7    | 64 (16 nodes) |
-| 156m   | 512 | 0.23  | 1,048,576 | 6   | 24 | 0.25  | 1.60 | 208   | 3,600 | 87     | 256 (64 nodes) |
+| res | L (km) | num_ne_x | dx_phys (km) | physics cols | model_dtime (s) | dyn_ratio | se_tstep (s) | se_tstep per km dx | nu_top (m2/s) | 6 h phys steps | ranks (pm-gpu) | 6 h cost |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 40km   | 600 | 5   | 60    | 100       | 100 | 12 | 8.333 | 0.21 | 1.2e5 | 216   | 4 (1 node)     | ~20 s (as 20 km) |
+| 20km   | 300 | 5   | 30    | 100       | 100 | 12 | 8.333 | 0.42 | 6e4   | 216   | 4 (1 node)     | measured 20 s |
+| 10km   | 240 | 8   | 15    | 256       | 100 | 12 | 8.333 | 0.83 | 3e4   | 216   | 4 (1 node)     | measured 21 s |
+| 5km    | 240 | 16  | 7.5   | 1,024     | 100 | 12 | 8.333 | 1.67 | 1.5e4 | 216   | 4 (1 node)     | measured 24 s |
+| 2p5km  | 240 | 32  | 3.75  | 4,096     | 75  | 12 | 6.25  | 2.50 | 7500  | 288   | 8 (2 nodes)    | measured 44 s |
+| 1p25km | 240 | 64  | 1.875 | 16,384    | 60  | 24 | 2.5   | 2.00 | 1667  | 360   | 16 (4 nodes)   | measured 2.2 min |
+| 625m   | 240 | 128 | 0.94  | 65,536    | 30  | 24 | 1.25  | 2.00 | 833   | 720   | 16 (4 nodes)   | measured 13.5 min (+9% with 3D turbulence) |
+| 312m   | 240 | 256 | 0.47  | 262,144   | 15  | 24 | 0.625 | 2.00 | 417   | 1,440 | 64 (16 nodes)  | ~27 min, extrapolated |
+| 156m   | 240 | 512 | 0.23  | 1,048,576 | 6   | 24 | 0.25  | 1.60 | 208   | 3,600 | 256 (64 nodes) | ~68 min, extrapolated |
 
-\* elements x dynamics steps, relative to the `inverted-v-res-study` 100 m run
-(ne 50, dt 5 s, ratio 24, 6 h). Walltimes in the script are rough scalings of that.
-Correct them after the first 625 m run.
+The cost column is model stepping only (CIME "Run Time"). Initialization adds
+about 1.5 min at 1024 elements per GPU, or ~9 min on E3SM master without the
+`perturb` fix described below. The 312 m and 156 m estimates keep 1024 elements
+(4096 physics columns) per GPU, the 625 m load, so they scale with the number
+of physics steps. 4096 elements per GPU does not fit: 312 m on 16 GPUs runs out
+of A100 memory in RRTMGP init, even with `rrtmgp::pool_size_multiplier=0.25`.
+
+Rough budget for the 48 runs:
+
+| res | node-hours |
+|---|---|
+| 156 m (8 runs x 64 nodes x ~1.2 h) | ~600 |
+| 312 m (8 runs x 16 nodes x ~0.55 h) | ~70 |
+| everything else | ~15 |
 
 Choices worth knowing about:
 
@@ -129,6 +157,24 @@ CCN3 changes by about +/-25 % across the cloud layer (7.4e7 to 1.17e8 #/kg,
 higher near cloud base). Nd therefore inherits SPA's vertical shape around these
 means. `nccn_horiz_avg` and `LiqNumberPath` are in the output so you can check.
 
+Test runs gave this median in-cloud Nd (#/cm3), computed as
+`nc * rho / cldfrac_liq` where qc > 1e-5:
+
+| run | target | 2 h | 4 h | 6 h | 10th-90th pct at 6 h | domain LWP at 6 h (g/m2) |
+|---|---|---|---|---|---|---|
+| 40 km  | 100 | 105 | 111 | 112 | 82-162  | 194 |
+| 2.5 km | 20  | 24  | 24  | 23  | 17-33   | 71 |
+| 2.5 km | 50  | 54  | 58  | 55  | 40-75   | 128 |
+| 2.5 km | 100 | 106 | 123 | 122 | 82-145  | 163 |
+| 2.5 km | 200 | 215 | 247 | 247 | 173-283 | 172 |
+
+The factors scale linearly. The medians come out 10-25 % high, settling after
+~2 h as Nd mixes up from the higher-CCN layers near cloud base. Multiply all
+four factors by ~0.83 if you want the medians on target, or keep them and
+analyse against the diagnosed Nd. Either way, the 2.5 km runs already show
+the LWP response the study is after: 71 g/m2 at Nd 20 (drizzle depletion) to
+172 g/m2 at Nd 200.
+
 ## Where the settings are
 
 All of these are in `run_dpxx_scream_DYCOMSrf02_aci.csh`. Each block lists the
@@ -137,12 +183,12 @@ up.
 
 | block | line | namelist group | knobs |
 |---|---|---|---|
-| resolution table | ~103 | `ctl_nl` | `se_ne_x/y`, `se_lx/ly`, `se_tstep`, `nu_top`, `nu` |
-| Nd -> SPA factor table | ~146 | `p3` | per-Nd `spa_ccn_to_nc_factor` |
-| **SPA settings** | ~309 | `p3` (spa process supplies `nccn`) | `do_prescribed_ccn`, `spa_ccn_to_nc_factor`, `spa_ccn_to_nc_exponent` (`spa_data_file` under `spa`) |
-| **P3 settings** | ~318 | `p3` | `autoconversion_*`, `accretion_*`, `set_cld_frac_{l,r}_to_one`, `extra_p3_diags` |
-| **SHOC settings** | ~334 | `shoc` | `length_fac`, `c_diag_3rd_mom`, `lambda_*`, `coeff_kh/km`, `shoc_1p5tke`, `extra_shoc_diags` |
-| **3D turbulence** | ~347 | `ctl_nl` (+ `shoc`) | `ctl_nl::do_3d_turbulence`, `coeff_kh_horiz`, `coeff_km_horiz`, `ctl_nl::horiz_turb_subcycle{,_q}` |
+| resolution table | ~104 | `ctl_nl` | `se_ne_x/y`, `se_lx/ly`, `se_tstep`, `nu_top`, `nu` |
+| Nd -> SPA factor table | ~149 | `p3` | per-Nd `spa_ccn_to_nc_factor` |
+| **SPA settings** | ~318 | `p3` (spa process supplies `nccn`) | `do_prescribed_ccn`, `spa_ccn_to_nc_factor`, `spa_ccn_to_nc_exponent` (`spa_data_file` under `spa`) |
+| **P3 settings** | ~327 | `p3` | `autoconversion_*`, `accretion_*`, `set_cld_frac_{l,r}_to_one`, `extra_p3_diags` |
+| **SHOC settings** | ~343 | `shoc` | `length_fac`, `c_diag_3rd_mom`, `lambda_*`, `coeff_kh/km`, `shoc_1p5tke`, `extra_shoc_diags` |
+| **3D turbulence** | ~356 | `ctl_nl` (+ `shoc`) | `ctl_nl::do_3d_turbulence`, `coeff_kh_horiz`, `coeff_km_horiz`, `ctl_nl::horiz_turb_subcycle{,_q}` |
 
 Run `./atmquery --listall p3` (or `shoc`, `spa`, `ctl_nl`) in a case
 directory to see every option.
@@ -179,6 +225,37 @@ docs in `components/eamxx/docs/user/shoc_homme_3d_turbulence.md`):
 The `PBLEntrainmentBudget*` fields in `DPxx_SCREAM_SCRIPTS/yaml_file_example`
 on this branch are not on E3SM master, so they are not included here.
 
+## Test runs (pm-gpu, 2026-10-26, E3SM master 0f3298812a)
+
+Nd 100, 3D turbulence off unless noted. "SICE" runs used the stub-ice
+executable with the patched `perturb`, and every run after the CICE ones used
+the current `run_dpxx_scream_DYCOMSrf02_aci.csh`:
+
+| run | GPUs | model time | init (s) | stepping (s) | notes |
+|---|---|---|---|---|---|
+| 40 km (600 km, ne 5), SICE | 4 | 6 h | 63 | 214 | executable built for 312 m, so the build is grid-independent; GPUs shared with another run |
+| 20 km (300 km, ne 5), SICE | 4 | 6 h | 13 | 20 | |
+| 10 km, SICE | 4 | 6 h | 12 | 21 | |
+| 5 km, SICE | 4 | 6 h | 16 | 24 | |
+| 2.5 km, CICE | 8 | 6 h | 43 | 44 | unpatched `perturb` |
+| 2.5 km, SICE, Nd 20 / 50 / 200 | 8 | 6 h | 20-22 | 44 | |
+| 1.25 km | 16 | 6 h | 70 | 133 | dyn_ratio 24, stable |
+| 625 m, CICE | 16 | 1 h | 520 | 137 | unpatched `perturb` |
+| 625 m, SICE | 16 | 1 h | 88 | 135 | patched `perturb` |
+| 625 m, SICE, 3D turbulence on | 16 | 1 h | 86 | 147 | horizontal Kh up to ~30 m2/s, LWP within 0.5 g/m2 of off |
+| 625 m, SICE, 3D turbulence on | 16 | 5 h 45 min | - | - | killed by an unrelated session end at step 691/720; no NaNs, LWP 131-140 g/m2, Kh 26-30 m2/s |
+| 312 m, SICE, 3D turbulence on | 16 | - | - | - | out of GPU memory in RRTMGP init: needs >= 32 GPUs |
+
+**Initialization bottleneck.** DP perturbs the initial `T_mid` below 900 hPa.
+`scream::impl::perturb` (`components/eamxx/src/share/field/utils/perturb.cpp`)
+does that one (column, level) at a time, with two subfield allocations and two
+device kernels each. That costs ~9 min of init at 1024 elements per GPU. A fast
+path that applies the same random draws on the host in one pass gives
+bit-identical `T_mid` (checked at 40 km) and cuts init from 520 s to 88 s at
+625 m. The patch is on the local E3SM branch `mahf708/eamxx/fast-col-perturb`
+and is not upstream yet. Without it, budget ~9 extra minutes of init per run at
+1024 elements per GPU.
+
 ## Open questions
 
 - Is 6 h long enough? LWP adjustments to Nd develop over many hours. A 12 h
@@ -187,5 +264,5 @@ on this branch are not on E3SM master, so they are not included here.
 - Is one realization per cell enough? The DP runs perturb T_mid with a fixed
   seed. The sub-km Nd-LWP signal may need 2-3 seeds
   (`generate_perturbation_random_seed=true`) to separate it from noise.
-- At 40 km there are only 16 physics columns, so the domain-mean spread is
-  small by construction. Use L = 360 km if that matters.
+- At 40 and 20 km there are only 100 physics columns, so the column statistics
+  are thin. A larger domain is cheap at that resolution if it matters.

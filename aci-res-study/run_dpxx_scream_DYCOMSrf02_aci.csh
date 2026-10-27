@@ -76,22 +76,23 @@
   # dx = domain_size_x / (num_ne_x * 3)
   # (there are 3x3 unique dynamics columns per element, hence the "3" factor)
   # The physics (pg2) grid is coarser: dx_phys = domain_size_x / (num_ne_x * 2)
-
-  # The domain is fixed at 240 km for every resolution.  num_ne_x must be an
-  #  integer, so 240 km (not 200 km) is the smallest domain that hits
-  #  dx = 40 km exactly (num_ne_x = 2: 6 dynamics / 4 physics columns per
-  #  direction) and lets every finer level be an exact halving.
-  set domain_size_x = 240000
-  set domain_size_y = 240000
+  #
+  # DP needs num_ne_x >= 5 (semi-Lagrangian tracer transport on the plane
+  #  aborts otherwise), so the domain is 240 km for dx <= 10 km and grows at
+  #  the coarse end to keep num_ne_x = 5: 300 km at 20 km, 600 km at 40 km.
 
   # Resolution-dependent settings.  Columns:
   #   num_ne_x  : elements per direction
+  #   domain    : domain length [m] in x and y
   #   model_dtime : model/physics time step [s] (integer, divides 86400)
   #   dyn_ratio : model_dtime / se_tstep (must be a multiple of 6 =
   #               lcm(dt_remap_factor=2, dt_tracer_factor=6))
   #   nu_top_dyn: second order viscosity near model top [m2/s]
-  #   num_procs : MPI ranks (1 per GPU on pm-gpu, <= num_ne_x**2)
-  #   walltime  : rough estimate, scaled from the inverted-v-res-study ~100 m runs
+  #   num_procs : MPI ranks (1 per GPU on pm-gpu, <= num_ne_x**2).  A 40 GB
+  #               A100 holds ~4096 elements (16k physics columns run out of
+  #               memory in RRTMGP init).
+  #   walltime  : measured 6 h cost on pm-gpu (2026-10-26) plus margin; dx < 625 m
+  #               is extrapolated at the same elements per GPU
   #
   # dx >= 5 km : model_dtime stays at the 3.33 km default (100 s) so the physics
   #              time step does not co-vary with dx; dynamics is far from its CFL.
@@ -102,45 +103,47 @@
   #              proportion to dx (1111 m2/s at ~800 m).
   switch ($res)
     case 40km:
-      set num_ne_x = 2;   set model_dtime = 100; set dyn_ratio = 12; set nu_top_dyn = 1.2e5
+      set num_ne_x = 5;   set domain = 600000; set model_dtime = 100; set dyn_ratio = 12; set nu_top_dyn = 1.2e5
       set num_procs = 4;   set walltime = '00:30:00'; setenv debug_queue true
       breaksw
     case 20km:
-      set num_ne_x = 4;   set model_dtime = 100; set dyn_ratio = 12; set nu_top_dyn = 6.0e4
+      set num_ne_x = 5;   set domain = 300000; set model_dtime = 100; set dyn_ratio = 12; set nu_top_dyn = 6.0e4
       set num_procs = 4;   set walltime = '00:30:00'; setenv debug_queue true
       breaksw
     case 10km:
-      set num_ne_x = 8;   set model_dtime = 100; set dyn_ratio = 12; set nu_top_dyn = 3.0e4
+      set num_ne_x = 8;   set domain = 240000; set model_dtime = 100; set dyn_ratio = 12; set nu_top_dyn = 3.0e4
       set num_procs = 4;   set walltime = '00:30:00'; setenv debug_queue true
       breaksw
     case 5km:
-      set num_ne_x = 16;  set model_dtime = 100; set dyn_ratio = 12; set nu_top_dyn = 1.5e4
+      set num_ne_x = 16;  set domain = 240000; set model_dtime = 100; set dyn_ratio = 12; set nu_top_dyn = 1.5e4
       set num_procs = 4;   set walltime = '00:30:00'; setenv debug_queue true
       breaksw
     case 2p5km:
-      set num_ne_x = 32;  set model_dtime = 75;  set dyn_ratio = 12; set nu_top_dyn = 7500
+      set num_ne_x = 32;  set domain = 240000; set model_dtime = 75;  set dyn_ratio = 12; set nu_top_dyn = 7500
       set num_procs = 8;   set walltime = '00:30:00'; setenv debug_queue true
       breaksw
     case 1p25km:
-      set num_ne_x = 64;  set model_dtime = 60;  set dyn_ratio = 24; set nu_top_dyn = 1666.667
+      set num_ne_x = 64;  set domain = 240000; set model_dtime = 60;  set dyn_ratio = 24; set nu_top_dyn = 1666.667
       set num_procs = 16;  set walltime = '00:30:00'; setenv debug_queue true
       breaksw
     case 625m:
-      set num_ne_x = 128; set model_dtime = 30;  set dyn_ratio = 24; set nu_top_dyn = 833.333
-      set num_procs = 32;  set walltime = '01:00:00'; setenv debug_queue false
+      set num_ne_x = 128; set domain = 240000; set model_dtime = 30;  set dyn_ratio = 24; set nu_top_dyn = 833.333
+      set num_procs = 16;  set walltime = '01:00:00'; setenv debug_queue false
       breaksw
     case 312m:
-      set num_ne_x = 256; set model_dtime = 15;  set dyn_ratio = 24; set nu_top_dyn = 416.667
-      set num_procs = 64;  set walltime = '03:00:00'; setenv debug_queue false
+      set num_ne_x = 256; set domain = 240000; set model_dtime = 15;  set dyn_ratio = 24; set nu_top_dyn = 416.667
+      set num_procs = 64;  set walltime = '01:30:00'; setenv debug_queue false
       breaksw
     case 156m:
-      set num_ne_x = 512; set model_dtime = 6;   set dyn_ratio = 24; set nu_top_dyn = 208.333
-      set num_procs = 256; set walltime = '06:00:00'; setenv debug_queue false
+      set num_ne_x = 512; set domain = 240000; set model_dtime = 6;   set dyn_ratio = 24; set nu_top_dyn = 208.333
+      set num_procs = 256; set walltime = '03:00:00'; setenv debug_queue false
       breaksw
     default:
       echo "Unknown res '$res'"; exit 1
   endsw
   set num_ne_y = $num_ne_x
+  set domain_size_x = $domain
+  set domain_size_y = $domain
   set dyn_dtime = `echo $model_dtime $dyn_ratio | awk '{printf "%.13f", $1/$2}'`
 
   ## SPA SETTINGS (target droplet number)
@@ -197,7 +200,11 @@
 
   cd $E3SMROOT/cime/scripts
 
-  set compset=FIOP-SCREAMv1-DP
+  # FIOP-SCREAMv1-DP with the stub sea ice (SICE) instead of prescribed CICE.
+  #  CICE compiles the column count into the executable (-DNXGLOB=ICE_NX), so
+  #  each resolution would need its own build; with SICE one executable runs
+  #  every resolution.  There is no sea ice at the DYCOMS site (31.5N, July).
+  set compset=2010_SCREAM_ELM%SPBC_SICE_DOCN%DOM_SROF_SGLC_SWAV_SIAC_SESP%DP-EAMxx%IOP
 
   # Note that in DP-SCREAM the grid is set ONLY to initialize
   #  the model from these files
@@ -225,6 +232,8 @@
 # Define executable and run directories
   ./xmlchange --id EXEROOT --val "${case_build_dir}"
   ./xmlchange --id RUNDIR --val "${case_run_dir}"
+  # the pm-gpu default is 6
+  ./xmlchange GMAKE_J=64
 
 # Set to debug, only on certain machines
   if ($debug_queue == 'true') then
@@ -413,8 +422,14 @@ EOF
 # Write restart files at the end of model simulation
   ./xmlchange PIO_TYPENAME="pnetcdf"
 
-# Build the case
-  ./case.build
+# Build the case, or reuse a finished build of any other case in this study
+#  (setenv ACI_EXEROOT /path/to/that/case/build; submit_matrix.sh does this)
+  if ($?ACI_EXEROOT) then
+    ./xmlchange EXEROOT=$ACI_EXEROOT
+    ./xmlchange BUILD_COMPLETE=TRUE
+  else
+    ./case.build
+  endif
 
 # Submit the case
   ./case.submit
