@@ -146,11 +146,14 @@ down. Hour 4-6 means, with Nd as diagnosed in-cloud medians:
 | | 200 -> 235 | 152 | 0.99 | 0.01 | 6.6 |
 | 625 m | 20 -> 20 | 62 | 0.71 | 0.84 | 4.7 |
 | | 100 -> 112 | 138 | 0.97 | 0.05 | 7.2 |
-| 625 m, 3D turbulence on | 100 -> 113 | 138 | 0.97 | 0.05 | 7.1 |
+| | 200 -> 222 | 139 | 0.98 | 0.01 | 7.6 |
+| 625 m, 3D turbulence on | 20 -> 20 | 62 | 0.72 | 0.85 | 4.6 |
+| | 100 -> 113 | 138 | 0.97 | 0.05 | 7.1 |
+| | 200 -> 223 | 139 | 0.98 | 0.01 | 7.6 |
 
-Still running when this was written: 625 m Nd 200 (3D turbulence off), and
-Nd 20 and 200 with 3D turbulence on. Their output goes to the same place. Re-run
-`analysis/analyze_runs.py` to add them.
+Figures (`fig_nd_response.png`, `fig_lwp_maps.png`, `fig_lwp_timeseries.png`,
+`fig_w2_partition.png`) and `susceptibility.csv` are in the analysis directory.
+Regenerate them with the commands at the end of this note.
 
 Costs (stepping only, 6 h):
 
@@ -182,6 +185,7 @@ Costs (stepping only, 6 h):
    | >= 5 km | 0.20 | 0.15 |
    | 2.5 km | 0.57 | 0.05 |
    | 1.25 km | 0.57 | ~0 |
+   | 625 m | ~0.47 (Nd 20 -> 100 only) | ~0 |
 
    S = d ln LWP / d ln Nd, split at ~80 cm-3.
    - At >= 5 km the response is GCM-like: monotonic, with rain suppression
@@ -189,16 +193,22 @@ Costs (stepping only, 6 h):
    - At <= 2.5 km it starts to look like an inverted V. At low Nd the deck
      breaks up under drizzle. At high Nd, entrainment rising with Nd offsets
      rain suppression.
-   - At 625 m the low-Nd branch steepens further (LWP 62 g/m2, cloud cover
-     0.71 at Nd 20). Whether the high-Nd branch turns negative depends on the
-     pending 625 m Nd 200 run.
+   - At 625 m the deck is thinnest at low Nd (LWP 62 g/m2, cloud cover 0.71
+     at Nd 20). The high-Nd branch is flat (LWP 138 -> 139 from Nd 100 to
+     200) even though entrainment keeps rising (7.2 -> 7.6 mm/s).
+   - So the high-Nd response saturates from 1.25 km down but does not turn
+     negative within 6 h. Whether the falling branch of the inverted V
+     appears at 312 m and 156 m, or only in longer runs, is the main open
+     science question.
 4. **Km-scale cells are grid-controlled.** The dominant LWP wavelength is
    24 km (6.4 physics cells) at 2.5 km, 15 km (8) at 1.25 km and 12 km (13) at
    625 m. It does not depend on Nd. So the 2.5-1.25 km results are grey-zone,
    not converged, and the sub-km levels carry the weight.
-5. **3D turbulence makes no difference at 625 m and Nd 100** (LWP, w_e, z_i
-   and cell size all agree within 1 %). The horizontal diffusivity there is
-   ~30 m2/s. Its effect at low and high Nd is pending.
+5. **3D turbulence makes no measurable difference at 625 m** at Nd 20, 100 or
+   200. LWP, cloud cover, rain, w_e and z_i all agree within ~1 %, even in the
+   broken Nd 20 deck. The horizontal diffusivity there is ~30 m2/s. Expect
+   any effect to appear at 312 m and 156 m, where it competes with the grid's
+   own effective diffusion.
 
 Not yet established: the mechanism behind entrainment rising with Nd.
 Sedimentation-evaporation at cloud top is the obvious candidate. A first
