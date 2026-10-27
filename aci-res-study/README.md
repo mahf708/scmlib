@@ -249,6 +249,25 @@ the current `run_dpxx_scream_DYCOMSrf02_aci.csh`:
 | 1.25 km on a 600 km domain (ne 160), SICE | 16 | 1 h | 132 | 112 | 1600 elements per GPU fits |
 | 312 m, SICE, 3D turbulence on | 16 | - | - | - | out of GPU memory in RRTMGP init: needs >= 32 GPUs |
 
+**GPU memory (16 x A100 40 GB, 625 m config, 3D turbulence on, 128 levels).**
+Peak `nvidia-smi` memory on one node, with equal elements on every rank:
+
+| elements/GPU | domain at 625 m | peak GB | result | stepping s per model hour |
+|---|---|---|---|---|
+| 1,600 | 300 km (ne 160) | 25.6 | ok | 220 |
+| 1,936 | 330 km (ne 176) | 28.5 | ok | |
+| 2,304 | 360 km (ne 192) | 32.1 | ok, 78 % | |
+| 2,500 | 375 km (ne 200) | 33.7 | ok, 82 % | 337 |
+| 2,916 | 405 km (ne 216) | 37.6 | ok but 92 %, too tight | |
+| 3,364 | 435 km (ne 232) | - | out of memory | |
+| 3,844 | 465 km (ne 248) | - | out of memory | |
+
+Memory is ~11 GB fixed plus ~9 MB per element. Stay at or below **~2,300
+elements per GPU** for comfortable headroom (2,500 works). The cost per element
+is the same between 1,600 and 2,500 per GPU, so packing denser cuts node count
+without changing node-hours. At ne <= 192 per 16 GPUs, the largest domain is
+576 x dx: 360 km at 625 m, 180 km at 312 m, 90 km at 156 m.
+
 **Initialization bottleneck.** DP perturbs the initial `T_mid` below 900 hPa.
 `scream::impl::perturb` (`components/eamxx/src/share/field/utils/perturb.cpp`)
 does that one (column, level) at a time, with two subfield allocations and two
