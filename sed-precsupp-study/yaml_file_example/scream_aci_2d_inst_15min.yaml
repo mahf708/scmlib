@@ -1,0 +1,24 @@
+%YAML 1.1
+---
+# Column-level 2D fields for Nd-LWP (inverted-V) joint statistics.
+# Cheap enough to keep at every resolution.
+averaging_type: instant
+max_snapshots_per_file: 100000
+filename_prefix: ${CASE}.aci2d
+fields:
+  physics_pg2:
+    field_names:
+    - LiqWaterPath
+    - LiqNumberPath
+    - RainWaterPath
+    - RainNumberPath
+    - VapWaterPath
+    - pbl_height
+    - precip_liq_surf_mass_flux
+    - LW_flux_up_at_model_top
+    - LongwaveCloudForcing
+    - surf_sens_flux
+    - surf_evap
+output_control:
+  frequency: 15
+  frequency_units: nmins

@@ -1,0 +1,474 @@
+#!/bin/csh -fe
+
+#######################################################################
+#######################################################################
+#######  Script to run SCREAMv1 in doubly periodic (DP) mode (DP-EAMxx)
+#######  DYCOMSrf02
+#######  Drizzling marine stratocumulus
+#######
+#######  Cloud-sedimentation x precip-suppression x Nd x resolution study
+#######  (see README.md in this dir).  Copy of
+#######  aci-res-study/run_dpxx_scream_DYCOMSrf02_aci.csh with 3D turbulence
+#######  fixed off and two new factors.
+#######  Based on DPxx_SCREAM_SCRIPTS/run_dpxx_scream_DYCOMSrf02.csh
+#######  (script author: P. Bogenschutz) and the sub-800m settings in
+#######  inverted-v-res-study/.
+#######
+#######  Usage:
+#######    ./run_dpxx_scream_DYCOMSrf02_sedps.csh <res> <nd> <sed> <ps>
+#######      res : 40km 20km 10km 5km 2p5km 1p25km 625m 312m 156m
+#######      nd  : 20 50 100 200   (target in-cloud droplet number, #/cm3)
+#######      sed : 0p5 1 2         (p3 cloud_sedimentation_factor)
+#######      ps  : on off          (precip suppression: off sets the KK2000
+#######                             Nd exponent to 0, prefactor matched at 63/cm3)
+#######  e.g.  ./run_dpxx_scream_DYCOMSrf02_sedps.csh 2p5km 100 2 off
+#######
+#######  IMPORTANT:
+#######    - needs E3SM with p3 cloud_sedimentation_factor and the aerocom(..)
+#######      expression (branch mahf708/eamxx/p3-cloud-sed-factor, on top of
+#######      E3SM PR #9017).
+#######
+
+  if ($#argv != 4) then
+    echo "Usage: $0 <res> <nd> <sed> <ps>"
+    echo "  res : 40km 20km 10km 5km 2p5km 1p25km 625m 312m 156m"
+    echo "  nd  : 20 50 100 200"
+    echo "  sed : 0p5 1 2"
+    echo "  ps  : on off"
+    exit 1
+  endif
+  set res = $argv[1]
+  set nd = $argv[2]
+  set sed = $argv[3]
+  set ps = $argv[4]
+  set turb3d = off
+
+#######################################################
+#######  BEGIN USER DEFINED SETTINGS
+####### NOTE: beyond this section you will need to configure your
+#######  ouput yaml file(s).  Please do a search for "yamlpath" and you will
+#######  be brought to the correct locations.
+####### See the example yaml file in the DPxx_SCREAM_SCRIPTS/yaml_file_example
+#######  of the scmlib repo to get you started.
+
+  # Set the name of your case here
+  setenv casename sedps_${res}_nd${nd}_sed${sed}_ps${ps}
+
+  # Set the case directory here
+  setenv casedirectory $PSCRATCH/dp_screamxx_sedps
+
+  # Directory where code lives
+  setenv code_dir $PSCRATCH/e3sm-repo
+
+  # Code tag name (branch mahf708/eamxx/p3-cloud-sed-factor, see above)
+  setenv code_tag sedps
+
+  # Name of machine you are running on (i.e. pm-cpu, anvil, etc)
+  setenv machine pm-gpu
+
+  # Compiler (pm-cpu should use "gnu"; pm-gpu should use "gnugpu"; LC should use "intel";
+  #   frontier should use "craygnu-mphipcc") more machine compiler defaults will be added
+  #   as they are tested/validated.
+  setenv compiler gnugpu
+
+  # Name of project to run on, if submitting to queue
+  setenv projectname e3sm_g
+
+  # Path where output YAML files are located (i.e. where you specify your output streams)
+  #  See example files in DPxx_SCREAM_SCRIPTS/yaml_file_example to get you started.
+  # NOTE, you will likely need to edit the section of the script where the yaml files
+  #  are appended to your case.  Do a search for "yamlpath" to find this location.
+  setenv yamlpath $PSCRATCH/scmlib/sed-precsupp-study/yaml_file_example
+
+  ## SET DOMAIN SIZE AND DYNAMICS RESOLUTION:
+  # To estimate dx (analogous for dy):
+  # dx = domain_size_x / (num_ne_x * 3)
+  # (there are 3x3 unique dynamics columns per element, hence the "3" factor)
+  # The physics (pg2) grid is coarser: dx_phys = domain_size_x / (num_ne_x * 2)
+  #
+  # DP needs num_ne_x >= 5 (semi-Lagrangian tracer transport on the plane
+  #  aborts otherwise), so the domain is 240 km for dx <= 10 km and grows at
+  #  the coarse end to keep num_ne_x = 5: 300 km at 20 km, 600 km at 40 km.
+
+  # Resolution-dependent settings.  Columns:
+  #   num_ne_x  : elements per direction
+  #   domain    : domain length [m] in x and y
+  #   model_dtime : model/physics time step [s] (integer, divides 86400)
+  #   dyn_ratio : model_dtime / se_tstep (must be a multiple of 6 =
+  #               lcm(dt_remap_factor=2, dt_tracer_factor=6))
+  #   nu_top_dyn: second order viscosity near model top [m2/s]
+  #   num_procs : MPI ranks (1 per GPU on pm-gpu, <= num_ne_x**2).  A 40 GB
+  #               A100 holds ~4096 elements (16k physics columns run out of
+  #               memory in RRTMGP init).
+  #   walltime  : measured 6 h cost on pm-gpu (2026-10-26) plus margin; dx < 625 m
+  #               is extrapolated at the same elements per GPU
+  #
+  # dx >= 5 km : model_dtime stays at the 3.33 km default (100 s) so the physics
+  #              time step does not co-vary with dx; dynamics is far from its CFL.
+  # 2.5-1.25 km: default rule of thumb (dt halves with dx) and dyn_ratio 12/24.
+  # dx < 1 km  : the inverted-v-res-study fix for the sub-800 m CFL blow-ups:
+  #              dyn_ratio = 24 instead of 12 (se_tstep = model_dtime/24, i.e.
+  #              ~2 s of dynamics step per km of dx) and nu_top reduced in
+  #              proportion to dx (1111 m2/s at ~800 m).
+  switch ($res)
+    case 40km:
+      set num_ne_x = 5;   set domain = 600000; set model_dtime = 100; set dyn_ratio = 12; set nu_top_dyn = 1.2e5
+      set num_procs = 4;   set walltime = '00:30:00'; setenv debug_queue true
+      breaksw
+    case 20km:
+      set num_ne_x = 5;   set domain = 300000; set model_dtime = 100; set dyn_ratio = 12; set nu_top_dyn = 6.0e4
+      set num_procs = 4;   set walltime = '00:30:00'; setenv debug_queue true
+      breaksw
+    case 10km:
+      set num_ne_x = 8;   set domain = 240000; set model_dtime = 100; set dyn_ratio = 12; set nu_top_dyn = 3.0e4
+      set num_procs = 4;   set walltime = '00:30:00'; setenv debug_queue true
+      breaksw
+    case 5km:
+      set num_ne_x = 16;  set domain = 240000; set model_dtime = 100; set dyn_ratio = 12; set nu_top_dyn = 1.5e4
+      set num_procs = 4;   set walltime = '00:30:00'; setenv debug_queue true
+      breaksw
+    case 2p5km:
+      set num_ne_x = 32;  set domain = 240000; set model_dtime = 75;  set dyn_ratio = 12; set nu_top_dyn = 7500
+      set num_procs = 8;   set walltime = '00:30:00'; setenv debug_queue true
+      breaksw
+    case 1p25km:
+      set num_ne_x = 64;  set domain = 240000; set model_dtime = 60;  set dyn_ratio = 24; set nu_top_dyn = 1666.667
+      set num_procs = 16;  set walltime = '00:30:00'; setenv debug_queue true
+      breaksw
+    case 625m:
+      set num_ne_x = 128; set domain = 240000; set model_dtime = 30;  set dyn_ratio = 24; set nu_top_dyn = 833.333
+      set num_procs = 16;  set walltime = '01:00:00'; setenv debug_queue false
+      breaksw
+    case 312m:
+      set num_ne_x = 256; set domain = 240000; set model_dtime = 15;  set dyn_ratio = 24; set nu_top_dyn = 416.667
+      set num_procs = 64;  set walltime = '01:30:00'; setenv debug_queue false
+      breaksw
+    case 156m:
+      set num_ne_x = 512; set domain = 240000; set model_dtime = 6;   set dyn_ratio = 24; set nu_top_dyn = 208.333
+      set num_procs = 256; set walltime = '03:00:00'; setenv debug_queue false
+      breaksw
+    default:
+      echo "Unknown res '$res'"; exit 1
+  endsw
+  set num_ne_y = $num_ne_x
+  set domain_size_x = $domain
+  set domain_size_y = $domain
+  set dyn_dtime = `echo $model_dtime $dyn_ratio | awk '{printf "%.13f", $1/$2}'`
+
+  ## SPA SETTINGS (target droplet number)
+  # P3 activates SPA CCN as  nc = max(nc, factor * (CCN3 * cld_frac_l)^exponent).
+  # With exponent = 1 the in-cloud Nd is factor * CCN3 * rho, independent of
+  # the (resolution-dependent) liquid cloud fraction.  The factors below come
+  # from compute_spa_factors.py: SPA CCN3 over the IOP cloud layer
+  # (926-967 hPa) at the DYCOMS site is 9.2e7 #/kg, i.e. ~106 #/cm3 at
+  # factor 1.  (The default 2000, 0.55 gives ~55 #/cm3 here.)
+  set spa_exponent = 1.0
+  switch ($nd)
+    case 20:
+      set spa_factor = 0.1882; breaksw
+    case 50:
+      set spa_factor = 0.4706; breaksw
+    case 100:
+      set spa_factor = 0.9412; breaksw
+    case 200:
+      set spa_factor = 1.8824; breaksw
+    default:
+      echo "Unknown nd '$nd'"; exit 1
+  endsw
+
+  ## CLOUD SEDIMENTATION (p3 cloud_sedimentation_factor scales the droplet
+  ##  mass- and number-weighted fall speeds, like MG2's cld_sed)
+  switch ($sed)
+    case 0p5:
+      set sed_factor = 0.5; breaksw
+    case 1:
+      set sed_factor = 1.0; breaksw
+    case 2:
+      set sed_factor = 2.0; breaksw
+    default:
+      echo "Unknown sed '$sed'"; exit 1
+  endsw
+
+  ## PRECIP SUPPRESSION (KK2000 autoconversion, P3:
+  ##   rate = prefactor * qc^2.47 * (Nd [cm-3])^-1.79 )
+  ##  off: Nd exponent 0, prefactor 1350 * 63^-1.79 = 0.8119, which gives the
+  ##  default rate at Nd = 63 cm-3, the geometric mean of the 20-200 sweep.
+  switch ($ps)
+    case on:
+      set aut_pref = 1350.0; set aut_nexp = 1.79; breaksw
+    case off:
+      set aut_pref = 0.8119; set aut_nexp = 0.0;  breaksw
+    default:
+      echo "Unknown ps '$ps'"; exit 1
+  endsw
+
+####### END (mandatory) USER DEFINED SETTINGS, but see above about output
+###########################################################################
+###########################################################################
+###########################################################################
+
+# Case specific information kept here
+  set lat = 31.5 # latitude
+  set lon = 238.500 # longitude
+  set do_iop_srf_prop = true # Use surface fluxes in IOP file?
+  set do_iop_nudge_tq = true # Relax T&Q to observations?
+  set do_iop_nudge_uv = false # Relax U&V to observations?
+  set do_iop_nudge_coriolis = false # Nudge to geostrophic winds?
+  set do_iop_subsidence = true # compute LS vertical transport?
+  set startdate = 1999-07-11 # Start date in IOP file
+  set start_in_sec = 0 # start time in seconds in IOP file
+  set stop_option = nhours
+  set stop_n = 6
+  set iop_file = DYCOMSrf02_iopfile_4scam.nc #IOP file name
+  set do_turnoff_swrad = true # Turn off SW calculation (if false, keep false)
+# End Case specific stuff here
+
+  # Location of IOP file
+  set iop_path = atm/cam/scam/iop
+
+  set PROJECT=$projectname
+  set E3SMROOT=${code_dir}/${code_tag}
+
+  cd $E3SMROOT/cime/scripts
+
+  # FIOP-SCREAMv1-DP with the stub sea ice (SICE) instead of prescribed CICE.
+  #  CICE compiles the column count into the executable (-DNXGLOB=ICE_NX), so
+  #  each resolution would need its own build; with SICE one executable runs
+  #  every resolution.  There is no sea ice at the DYCOMS site (31.5N, July).
+  set compset=2010_SCREAM_ELM%SPBC_SICE_DOCN%DOM_SROF_SGLC_SWAV_SIAC_SESP%DP-EAMxx%IOP
+
+  # Note that in DP-SCREAM the grid is set ONLY to initialize
+  #  the model from these files
+  set grid=ne30pg2_ne30pg2
+
+  set CASEID=$casename
+
+  set CASEDIR=${casedirectory}/$CASEID
+
+  set run_root_dir = $CASEDIR
+  set temp_case_scripts_dir = $run_root_dir/case_scripts
+
+  set case_scripts_dir = $run_root_dir/case_scripts
+  set case_build_dir   = $run_root_dir/build
+  set case_run_dir     = $run_root_dir/run
+
+# Create new case
+  ./create_newcase -case $casename --script-root $temp_case_scripts_dir -mach $machine -project $PROJECT -compset $compset -res $grid --compiler $compiler --driver mct
+  cd $temp_case_scripts_dir
+
+  ./xmlchange JOB_WALLCLOCK_TIME=$walltime
+
+ ./xmlchange SCREAM_CMAKE_OPTIONS="`./xmlquery -value SCREAM_CMAKE_OPTIONS | sed 's/SCREAM_NUM_VERTICAL_LEV [0-9][0-9]*/SCREAM_NUM_VERTICAL_LEV 128/'`"
+
+# Define executable and run directories
+  ./xmlchange --id EXEROOT --val "${case_build_dir}"
+  ./xmlchange --id RUNDIR --val "${case_run_dir}"
+  # the pm-gpu default is 6
+  ./xmlchange GMAKE_J=64
+
+# Set to debug, only on certain machines
+  if ($debug_queue == 'true') then
+    if ($machine =~ 'pm*') then
+      ./xmlchange --id JOB_QUEUE --val 'debug'
+    endif
+
+    if ($machine == 'quartz' || $machine == 'syrah' || $machine == 'ruby') then
+      ./xmlchange --id JOB_QUEUE --val 'pdebug'
+    endif
+  endif
+
+# need to use single thread
+  set npes = $num_procs
+  foreach component ( ATM LND ICE OCN CPL GLC ROF WAV )
+    ./xmlchange  NTASKS_$component=$npes,NTHRDS_$component=1,ROOTPE_$component=0
+  end
+
+# Compute maximum allowable number for processes (number of elements)
+  set dyn_pes_nxny = `expr $num_ne_x \* $num_ne_y`
+
+  set ELM_CONFIG_OPTS="-phys elm"
+  ./xmlchange ELM_CONFIG_OPTS="$ELM_CONFIG_OPTS"
+
+# Modify the run start and duration parameters for the desired case
+  ./xmlchange RUN_STARTDATE="$startdate",START_TOD="$start_in_sec",STOP_OPTION="$stop_option",STOP_N="$stop_n"
+
+# Compute number of columns needed for component model initialization
+  set comp_mods_nx = `expr $num_ne_x \* $num_ne_y \* 4`
+
+# Modify the latitude and longitude for the particular case
+  ./xmlchange PTS_MULTCOLS_MODE="TRUE",PTS_MODE="TRUE",PTS_LAT="$lat",PTS_LON="$lon"
+  ./xmlchange MASK_GRID="USGS",PTS_NX="${comp_mods_nx}",PTS_NY=1
+  ./xmlchange ICE_NX="${comp_mods_nx}",ICE_NY=1
+  ./xmlchange CALENDAR="GREGORIAN"
+
+
+# Set model timesteps
+
+  @ ncpl = 86400 / $model_dtime
+  ./xmlchange ATM_NCPL=$ncpl
+  ./xmlchange ELM_NAMELIST_OPTS="dtime=$model_dtime"
+
+  ./case.setup
+
+# Get local input data directory path
+  set input_data_dir = `./xmlquery DIN_LOC_ROOT -value`
+
+
+# Set relevant namelist modifications
+  ./atmchange se_ne_x=$num_ne_x
+  ./atmchange se_ne_y=$num_ne_y
+  ./atmchange se_lx=$domain_size_x
+  ./atmchange se_ly=$domain_size_y
+  ./atmchange dt_remap_factor=2
+  ./atmchange cubed_sphere_map=2
+  ./atmchange target_latitude=$lat
+  ./atmchange target_longitude=$lon
+  ./atmchange iop_file=$input_data_dir/$iop_path/$iop_file
+  ./atmchange nu=0.216784
+  ./atmchange nu_top=$nu_top_dyn
+  ./atmchange se_ftype=2
+  ./atmchange se_tstep=$dyn_dtime
+  ./atmchange rad_frequency=3
+  ./atmchange iop_srf_prop=$do_iop_srf_prop
+  ./atmchange iop_dosubsidence=$do_iop_subsidence
+  ./atmchange iop_coriolis=$do_iop_nudge_coriolis
+  ./atmchange iop_nudge_uv=$do_iop_nudge_uv
+  ./atmchange iop_nudge_tq=$do_iop_nudge_tq
+  ./atmchange iop_nudge_tq_low=650
+  ./atmchange iop_nudge_tq_high=0
+  ./atmchange iop_nudge_tscale=3600
+
+# Set default physics process ordering (NOTE: if you add/remove a process or change ordering,
+# all DPxx runs NEED to have "iop_forcing" process in the list somewhere).
+  ./atmchange physics::atm_procs_list=iop_forcing,mac_aero_mic,rrtmgp
+  # SHOC and P3 run once per model_dtime (no subcycling), so the physics
+  #  time step is exactly the model_dtime in the table above
+  ./atmchange physics::mac_aero_mic::number_of_subcycles=1
+
+#######################################################
+####### SPA settings  (namelist group: p3, process: spa)
+#######  spa supplies CCN3 ("nccn", #/kg) from the climatology file
+#######  `./atmquery spa_data_file`; p3 turns it into droplet number.
+#######  ./atmquery --listall p3   to see all P3 options
+  ./atmchange do_prescribed_ccn=true
+  ./atmchange spa_ccn_to_nc_factor=$spa_factor
+  ./atmchange spa_ccn_to_nc_exponent=$spa_exponent
+
+#######################################################
+####### P3 settings  (namelist group: p3)
+#######  Left at master defaults; listed here so they are easy to vary.
+#######  The ones that matter most for ACI are the warm-rain terms.
+  ./atmchange autoconversion_prefactor=$aut_pref
+#  ./atmchange autoconversion_qc_exponent=2.47
+  ./atmchange autoconversion_nc_exponent=$aut_nexp
+  ./atmchange cloud_sedimentation_factor=$sed_factor
+#  ./atmchange autoconversion_radius=25.0e-6
+#  ./atmchange accretion_prefactor=67.0
+#  ./atmchange accretion_qc_exponent=1.15
+#  ./atmchange accretion_qr_exponent=1.15
+#  ./atmchange set_cld_frac_l_to_one=false
+  ./atmchange set_cld_frac_r_to_one=true
+  # process rates (qc2qr_autoconv, qc2qr_accret, qr2qv_evap, ...)
+  ./atmchange extra_p3_diags=true
+
+#######################################################
+####### SHOC settings  (namelist group: shoc)
+#######  Left at master defaults; listed here so they are easy to vary.
+#######  ./atmquery --listall shoc   to see all SHOC options
+#  ./atmchange length_fac=0.5
+#  ./atmchange c_diag_3rd_mom=7.0
+#  ./atmchange lambda_low=0.001
+#  ./atmchange lambda_high=0.08
+#  ./atmchange coeff_kh=0.1
+#  ./atmchange coeff_km=0.1
+#  ./atmchange shoc_1p5tke=false
+  ./atmchange extra_shoc_diags=true
+
+#######################################################
+####### 3D turbulence (SHOC <-> HOMME)
+#######  Switch: ctl_nl::do_3d_turbulence (HOMME control namelist).  Do NOT
+#######  set homme::do_3d_turbulence_homme, it is locked and mirrored from
+#######  the ctl_nl value.  When on, SHOC hands horizontal eddy
+#######  diffusivities (coeff_k*_horiz * sqrt(dx*dy) * sqrt(TKE)) to HOMME and
+#######  HOMME hands horizontal velocity gradients back for 3D shear
+#######  production.  HOMME clips the horizontal diffusivities to an explicit
+#######  CFL limit; if the clip is active a lot, subcycle with
+#######  ctl_nl::horiz_turb_subcycle / horiz_turb_subcycle_q.
+#######  See components/eamxx/docs/user/shoc_homme_3d_turbulence.md
+  if ($turb3d == on) then
+    ./atmchange ctl_nl::do_3d_turbulence=true
+#    ./atmchange coeff_kh_horiz=0.1
+#    ./atmchange coeff_km_horiz=0.1
+#    ./atmchange ctl_nl::horiz_turb_subcycle=1
+#    ./atmchange ctl_nl::horiz_turb_subcycle_q=1
+  else
+    ./atmchange ctl_nl::do_3d_turbulence=false
+  endif
+
+# Allow for the computation of tendencies for output purposes
+  ./atmchange physics::mac_aero_mic::shoc::compute_tendencies=T_mid,qv
+  ./atmchange physics::mac_aero_mic::p3::compute_tendencies=T_mid,qv
+  ./atmchange physics::rrtmgp::compute_tendencies=T_mid
+  ./atmchange homme::compute_tendencies=T_mid,qv
+  ./atmchange physics::iop_forcing::compute_tendencies=T_mid,qv
+
+ # configure yaml output
+ # See the example yaml files in the DPxx_SCREAM_SCRIPTS/yaml_file_example
+ # Note that you can have as many output streams (yaml files) as you want!
+cp ${yamlpath}/scream_horiz_avg_output_15min.yaml .
+cp ${yamlpath}/scream_aci_2d_inst_15min.yaml .
+cp ${yamlpath}/scream_aci_3d_inst_2hour.yaml .
+./atmchange output_yaml_files="./scream_horiz_avg_output_15min.yaml"
+./atmchange output_yaml_files+="./scream_aci_2d_inst_15min.yaml"
+./atmchange output_yaml_files+="./scream_aci_3d_inst_2hour.yaml"
+cp ${yamlpath}/scream_aerocom_15min.yaml .
+./atmchange output_yaml_files+="./scream_aerocom_15min.yaml"
+# the 3D-turbulence fields only exist when do_3d_turbulence=true
+if ($turb3d == on) then
+  cp ${yamlpath}/scream_turb3d_horiz_avg_output_15min.yaml .
+  ./atmchange output_yaml_files+="./scream_turb3d_horiz_avg_output_15min.yaml"
+endif
+
+# avoid the monthly cice file from writing as this
+#   appears to be currently broken for SCM
+cat <<EOF >> user_nl_cice
+  histfreq='y','x','x','x','x'
+EOF
+
+# Turn on UofA surface flux scheme
+cat <<EOF>> user_nl_cpl
+  ocn_surface_flux_scheme = 2
+EOF
+
+if ($do_turnoff_swrad == 'true') then
+  set solar_angle = 180 # turns off incoming solar radiation
+else
+  set solar_angle = -1 # Interactive SW radiation
+endif
+
+# Note that this call will be disabled for RCE
+cat <<EOF>> user_nl_cpl
+  constant_zenith_deg = $solar_angle
+EOF
+
+  ./case.setup
+
+# Write restart files at the end of model simulation
+  ./xmlchange PIO_TYPENAME="pnetcdf"
+
+# Build the case, or reuse a finished build of any other case in this study
+#  (setenv SEDPS_EXEROOT /path/to/that/case/build)
+  if ($?SEDPS_EXEROOT) then
+    ./xmlchange EXEROOT=$SEDPS_EXEROOT
+    ./xmlchange BUILD_COMPLETE=TRUE
+  else
+    ./case.build
+  endif
+
+# Submit only if asked (setenv SEDPS_SUBMIT 1); otherwise run_packed.sh
+#  runs the case with case.submit --no-batch inside a shared allocation.
+  if ($?SEDPS_SUBMIT) then
+    ./case.submit
+  endif
+
+  exit

@@ -1,0 +1,22 @@
+%YAML 1.1
+---
+# AeroCom cloud-top sampling (E3SM PR #9017 expression operator) and the
+# LWP spatial variance.  aerocom(..) is a weighted sum: divide the X fields by
+# the matching cloud-top fraction (cf_top_liq) offline to get the mean at cloud top.
+averaging_type: instant
+max_snapshots_per_file: 100000
+filename_prefix: ${CASE}.aerocom
+fields:
+  physics_pg2:
+    field_names:
+    - cf_top     := mask.aerocom('top')
+    - cf_top_liq := mask.aerocom('top', phase='liq')
+    - T_top      := T_mid.aerocom('top')
+    - p_top      := p_mid.aerocom('top')
+    - reff_top_liq := eff_radius_qc.aerocom('top', phase='liq')
+    - cdnc_top_liq := (nc*pseudo_density/dz/gravit/cldfrac_tot.where(cldfrac_tot>0)).aerocom('top', phase='liq')
+    - lwp_mean   := LiqWaterPath.mean('col')
+    - lwp_var    := ((LiqWaterPath - LiqWaterPath.mean('col').broadcast_like(LiqWaterPath))*(LiqWaterPath - LiqWaterPath.mean('col').broadcast_like(LiqWaterPath))).mean('col')
+output_control:
+  frequency: 15
+  frequency_units: nmins
