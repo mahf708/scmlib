@@ -1,0 +1,55 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.7in]{geometry}
+\usepackage{booktabs,enumitem,graphicx,hyperref,amsmath}
+\setlist{itemsep=1pt,topsep=2pt}
+\pagestyle{empty}
+\begin{document}\sloppy
+\noindent{\Large\bfseries Cloud sedimentation $\times$ precip suppression: full matrix, 40\,km to 1.25\,km}\\[2pt]
+6 Nov 2026. Prepared by Claude Code (AI assistant) on behalf of Naser Mahfouz.
+DP-EAMxx DYCOMS-II RF02, 6\,h; all 144 runs, single realizations; hour 4--6 means unless noted. Sub-km runs are on hold.
+
+\section*{Findings}
+\begin{enumerate}
+\item \textbf{At $\geq$5\,km, the positive LWP--Nd response is all precip suppression.} With suppression off, LWP is flat at
+170--175\,g\,m$^{-2}$ ($S\approx0$) wherever $w_e\approx4.9$\,mm\,s$^{-1}$.
+\item \textbf{At coarse resolution, sedimentation switches entrainment between two levels.} At low Nd with sed$\times$1 or $\times$2,
+$w_e$ drops to 2.5--2.9\,mm\,s$^{-1}$, with suppression on or off. With suppression off, this gives a negative low-Nd branch
+($S_{\rm low}$ from $-0.3$ to $-0.5$). Sed$\times$0.5 removes it.
+\item \textbf{At 2.5\,km and 1.25\,km the picture is consistent.}
+\begin{itemize}
+\item Suppression on: $S_{\rm low}$ grows with sed (0.45/0.57/0.71 at 2.5\,km; 0.53/0.57/0.70 at 1.25\,km).
+\item Suppression on: $S_{\rm high}$ is near zero (0.05 at 2.5\,km; between $-0.03$ and $+0.02$ at 1.25\,km).
+\item Suppression off: $S\approx0$, except sed$\times$2 at low Nd, where $S_{\rm low}\approx0.25$ because the Nd-20 deck breaks up (cloud cover 0.63--0.69).
+\item $w_e$ rises with Nd and falls with the sed factor, with suppression on or off. At 1.25\,km and Nd~20 with suppression on, $w_e$ = 4.1/3.5/2.8\,mm\,s$^{-1}$ for sed $\times$0.5/$\times$1/$\times$2.
+\end{itemize}
+\item \textbf{LWP spatial SD} is 1--3\,g\,m$^{-2}$ at $\geq$10\,km, 6--60 at 5\,km, and 60--120 at 2.5 and 1.25\,km. It is largest at low Nd with sed$\times$2.
+\item \textbf{The runs have not reached steady state.} LWP is still drifting at hour 6 in many runs (Fig.~3; e.g.\ 40\,km, Nd~20, suppression off).
+Treat the hour 4--6 means as transient. The 12\,h RF02 forcing would test this.
+\end{enumerate}
+
+\noindent\includegraphics[width=\textwidth]{fig1_response.png}\\
+{\small\textbf{Fig.~1.} Response to in-cloud Nd. Columns: resolution. Shade: sed factor. Solid lines with filled markers: suppression on. Dashed lines with open markers: suppression off.}
+
+\noindent\includegraphics[width=\textwidth]{fig2_susceptibility.png}\\
+{\small\textbf{Fig.~2.} $S=d\ln{\rm LWP}/d\ln N_d$ (diagnosed Nd) versus resolution, for the low-Nd (20$\to$50) and high-Nd (100$\to$200) branches.}
+
+\noindent\includegraphics[width=\textwidth]{fig3_timeseries.png}\\
+{\small\textbf{Fig.~3.} 15-min time series at 40\,km and 1.25\,km, Nd 20 and 200. In-cloud Nd is the layer mean from the domain-mean profiles. The shaded band is the averaging window.}
+
+\section*{Data, code, paths (Perlmutter, world-readable)}
+\begin{itemize}
+\item Runs: \texttt{/pscratch/sd/m/mahf708/dp\_screamxx\_sedps/sedps\_<res>\_nd<Nd>\_sed<0p5|1|2>\_ps<on|off>/run/}
+\item Analysis: \texttt{/pscratch/sd/m/mahf708/dp\_screamxx\_sedps/analysis/}
+\begin{itemize}
+\item \texttt{summary\_h4-6.csv}: one row per run.
+\item \texttt{timeseries\_15min.csv}: one row per run and 15-min step, run settings as columns, with LWP, LWP SD and three Nd measures.
+\item \texttt{susceptibility.csv}, the figures, and \texttt{R/} (R outputs).
+\end{itemize}
+\item Scripts: \texttt{/pscratch/sd/m/mahf708/scmlib/sed-precsupp-study/} (\texttt{analysis/} for Python, \texttt{R/} for R).
+\item R: \texttt{source("/pscratch/sd/m/mahf708/scmlib/sed-precsupp-study/R/sedps.R")}. Interpreter: \texttt{/pscratch/sd/m/mahf708/r\_env/bin/Rscript}.
+\item Code: E3SM \texttt{mahf708/eamxx/p3-cloud-sed-factor} and scmlib \texttt{sed-precsupp-study}, both on github.com/mahf708.
+\end{itemize}
+\noindent\textbf{Notes.} Surface precipitation includes the cloud-droplet sedimentation flux. With suppression off, autoconversion matches the default rate at Nd~63.
+LWP SD is written online as a variance and its square root is taken afterwards. That is exact for the instantaneous 15-min snapshots used here.
+For time-averaged streams, the mean of the variance gives the RMS SD rather than the mean SD, so a native \texttt{sqrt} would help there.
+\end{document}

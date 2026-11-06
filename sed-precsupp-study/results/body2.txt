@@ -1,0 +1,43 @@
+Hi Naser and Johannes,
+
+I'm Claude Code, an AI assistant working on Naser's behalf. All 144 runs are done (40 km down to 1.25 km), and sub-km runs are on hold. Attached are a 3-page PDF with the figures and three CSVs.
+
+Findings (hour 4-6 means, single realizations):
+1. At 5 km and coarser, the positive LWP-Nd response is all precip suppression. With suppression off, LWP is flat at 170-175 g/m2.
+2. At coarse resolution, sedimentation switches entrainment between two levels. At low Nd with sed x1 or x2, w_e drops to 2.5-2.9 mm/s, with suppression on or off. With suppression off this gives a negative low-Nd branch (S -0.3 to -0.5). Sed x0.5 removes it.
+3. At 2.5 and 1.25 km the picture is consistent:
+   - Suppression on: S_low grows with sed. It is 0.45/0.57/0.71 at 2.5 km and 0.53/0.57/0.70 at 1.25 km, for sed x0.5/x1/x2.
+   - Suppression on: S_high is about zero (0.05 at 2.5 km; -0.03 to +0.02 at 1.25 km).
+   - Suppression off: S is about zero, except sed x2 at low Nd (~0.25), where the Nd-20 deck breaks up (cloud cover 0.63-0.69).
+   - w_e rises with Nd and falls with the sed factor, with suppression on or off. At 1.25 km and Nd 20 with suppression on, it is 4.1/3.5/2.8 mm/s for sed x0.5/x1/x2.
+4. LWP spatial SD is 1-3 g/m2 at 10 km and coarser, 6-60 at 5 km, and 60-120 at 2.5 and 1.25 km.
+5. The runs have not reached steady state. LWP is still drifting at hour 6 in many runs (PDF Fig. 3), so treat the hour 4-6 means as transient. The 12 h RF02 forcing would test this.
+
+Attached CSVs:
+- timeseries_15min.csv: LWP and Nd time series, one row per run and 15-min step. The run settings are columns: case, res, dx_km, Nd_target, sed_factor, precip_suppression. The rest are LWP (instant and 15-min mean), LWP spatial SD, cloud cover, cloud-top liquid fraction, rain, inversion height, and three Nd measures:
+  - Nd_layer_cm3: in-cloud layer mean from the domain-mean profiles, every 15 min.
+  - Nd_top_cm3: AeroCom liquid cloud-top CDNC, every 15 min.
+  - Nd_med_3d_cm3: median over all cloudy grid cells, from the 2-hourly 3D snapshots.
+- summary_h4-6.csv: one row per run (hour 4-6 means).
+- susceptibility.csv: low- and high-Nd branch S for every resolution, sed and suppression setting.
+
+Where things are on Perlmutter (world-readable):
+- Runs: /pscratch/sd/m/mahf708/dp_screamxx_sedps/sedps_<res>_nd<Nd>_sed<0p5|1|2>_ps<on|off>/run/
+  - <case>.horiz_avg.AVERAGE.nmins_x15.*.nc: domain-mean profiles and scalars.
+  - <case>.aci2d.INSTANT.nmins_x15.*.nc: per-column 2D fields.
+  - <case>.aerocom.INSTANT.nmins_x15.*.nc: AeroCom cloud-top fields (weighted sums) and lwp_var.
+  - <case>.aci3d.INSTANT.nhours_x2.*.nc: trimmed 3D state.
+- Analysis outputs: /pscratch/sd/m/mahf708/dp_screamxx_sedps/analysis/ (CSVs, figures, R/)
+- Python scripts: /pscratch/sd/m/mahf708/scmlib/sed-precsupp-study/analysis/
+- R tools (Johannes): /pscratch/sd/m/mahf708/scmlib/sed-precsupp-study/R/
+  - sedps.R: loaders in the plyr/dplyr/magrittr style of mltools: sedps_runs(), load_sedps_2d(), load_sedps_lwp_sd(), load_sedps_profiles(), sedps_ddply(), read_sedps_summary(), read_sedps_timeseries().
+  - sedps_analysis.R: knitr-chunked example. It plots the Nd response, the time series and column-level Nd-LWP joint histograms with ggplot2. Its outputs are in /pscratch/sd/m/mahf708/dp_screamxx_sedps/analysis/R/.
+  - An R 4.4 with ncdf4/dplyr/ggplot2 is at /pscratch/sd/m/mahf708/r_env/bin/Rscript. Use it if the NERSC R module doesn't suit.
+  - Quick start in R: source("/pscratch/sd/m/mahf708/scmlib/sed-precsupp-study/R/sedps.R"); runs <- sedps_runs(); df <- sedps_ddply(runs, load_sedps_2d)
+- Code: E3SM branch https://github.com/mahf708/E3SM/tree/mahf708/eamxx/p3-cloud-sed-factor and scmlib branch https://github.com/mahf708/scmlib/tree/sed-precsupp-study
+
+A note on LWP spatial SD without an online sqrt. The stream writes the spatial variance at instantaneous 15-min snapshots, and the square root is taken afterwards. For instantaneous output that is exact, so nothing is lost. It would matter only for time-averaged streams: the mean of the variance gives the RMS SD over the window, not the mean SD. A native sqrt would be a small addition for that case.
+
+Let us know about the sub-km runs (which cells, and whether to switch to the 12 h forcing) when you're ready.
+
+-- Claude, on behalf of Naser Mahfouz
