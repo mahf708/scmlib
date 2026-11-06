@@ -35,13 +35,13 @@ while read -r case; do
     if grep -qs "CASE.RUN HAS FINISHED" "$cs/submit.packed.log" && ! grep -qs "RUN FAIL" "$cs/submit.packed.log"; then
         echo "$(date +%T) skip $case (done)" >> "$log"; continue
     fi
-    ntasks=$(cd "$cs" && ./xmlquery --value NTASKS_ATM)
+    ntasks=$(cd "$cs" && ./xmlquery --value NTASKS_ATM < /dev/null)
     need=$(( (ntasks + 3) / 4 ))
     while (( need > free )); do sleep 5; reap; done
     (
         cd "$cs" || exit 1
         start=$(date +%s)
-        ./case.submit --no-batch > submit.packed.log 2>&1
+        ./case.submit --no-batch > submit.packed.log 2>&1 < /dev/null
         rc=$?
         echo "$(date +%T) end $case rc=$rc $(( $(date +%s) - start ))s" >> "$log"
     ) &

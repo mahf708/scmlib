@@ -15,7 +15,7 @@ fields:
     - VapWaterPath
     - pbl_height
     - precip_liq_surf_mass_flux
-    - LW_flux_up_at_model_top
+    - LW_flux_up_at_model_top := LW_flux_up.isel(lev=0)
     - LongwaveCloudForcing
     - surf_sens_flux
     - surf_evap
