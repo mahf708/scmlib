@@ -1,0 +1,22 @@
+Hi Naser and Johannes,
+
+I'm Claude Code, an AI assistant working on Naser's behalf. The first results are in: 120 of the 144 runs, covering 40 km down to 2.5 km. The 1.25 km runs are queued, and sub-km is on hold until you've looked at these. The 2-page PDF with the figure is attached, along with the summary CSVs. All runs are single realizations, hour 4-6 means.
+
+Headlines:
+1. The sed x1, precip-suppression-on runs reproduce the earlier ACI-study numbers to within about 1-2%.
+2. At 5 km and coarser, the positive LWP-Nd response is all precip suppression. With suppression off, LWP is flat at 170-175 g/m2 (S ~ 0) wherever w_e stays near 4.9 mm/s. With it on, S_high ~ 0.15.
+3. Sedimentation sets an entrainment regime at coarse resolution. At Nd 20 (sed x1 and x2), and at Nd 50 with sed x2 at 40 km, w_e drops to 2.5-2.9 mm/s, with suppression on or off. With suppression off, LWP then rises to 210-230 g/m2, a negative low-Nd branch (S_low -0.3 to -0.5). Sed x0.5 removes that regime entirely. It looks like the sedimentation-entrainment feedback acting as a threshold in the single-column limit.
+4. At 2.5 km with suppression off, LWP is flat (~141 g/m2) at sed x0.5 and x1, even though w_e still rises with Nd. With suppression on, S_low grows with sed: 0.45, 0.57, 0.71 for x0.5, x1, x2. S_high is ~0.05 for every sed value. Sed x2 lowers w_e by 0.3-1.1 mm/s at every Nd, and it breaks up the Nd-20 deck even with suppression off (cloud cover 0.64-0.69).
+5. LWP spatial SD is 1-3 g/m2 at 10 km and coarser, 6-60 at 5 km and 65-120 at 2.5 km. It grows with the sed factor and is largest at low Nd. The value computed online matches the one computed afterwards from the 2D LWP output.
+6. AeroCom cloud top (PR #9017): liquid cloud-top CDNC is about 0.7x the in-cloud median Nd, as expected since SPA CCN decreases upward. Cloud-top reff is 8-21 um and decreases with Nd and with the sed factor.
+
+Caveats: surface precip includes the cloud-droplet sedimentation flux. With suppression off, autoconversion matches the default at Nd 63, so rain is higher than default above that Nd and lower below it.
+
+Code:
+- E3SM branch: https://github.com/mahf708/E3SM/tree/mahf708/eamxx/p3-cloud-sed-factor
+- scmlib branch: https://github.com/mahf708/scmlib/tree/sed-precsupp-study
+- Run outputs: /pscratch/sd/m/mahf708/dp_screamxx_sedps (analysis/ holds the CSVs and timeseries.nc)
+
+I'll send the 1.25 km results when they finish. Let me know when you want the sub-km runs, and at which settings.
+
+-- Claude, on behalf of Naser Mahfouz

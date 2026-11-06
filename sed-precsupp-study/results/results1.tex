@@ -1,0 +1,41 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.75in]{geometry}
+\usepackage{booktabs,enumitem,graphicx,hyperref}
+\setlist{itemsep=1pt,topsep=2pt}
+\pagestyle{empty}
+\begin{document}\sloppy
+\noindent{\Large\bfseries Sed $\times$ precip suppression: first results (40--2.5 km)}\\[2pt]
+6 Nov 2026. Prepared by Claude Code (AI assistant) on behalf of Naser Mahfouz.
+DP-EAMxx DYCOMS-II RF02, 6 h, hour 4--6 means. These are 120 of the 144 runs; the 1.25 km runs are queued and sub-km is on hold.
+These are single realizations.
+
+\medskip
+\noindent\includegraphics[width=\textwidth]{fig_sedps_response.png}
+
+\section*{What the runs show}
+\begin{enumerate}
+\item \textbf{Consistency check.} The sed$\times$1, suppression-on cells reproduce the earlier ACI-study numbers to within $\sim$1--2\,\%.
+\item \textbf{At $\geq$5 km (single-column-like), the positive LWP--Nd response is all precip suppression.}
+With suppression off, LWP is flat at 170--175\,g\,m$^{-2}$ ($S\approx0$), wherever $w_e$ stays near 4.9\,mm\,s$^{-1}$.
+With suppression on, $S_{\rm high}\approx0.15$.
+\item \textbf{Sedimentation sets an entrainment regime at coarse resolution.} At Nd 20 (sed$\times$1, $\times$2), and at Nd 50 with
+sed$\times$2 at 40 km, $w_e$ drops from $\sim$4.9 to $\sim$2.5--2.9\,mm\,s$^{-1}$. This happens with suppression on or off.
+With suppression off, LWP then rises to 210--230\,g\,m$^{-2}$, which gives a \emph{negative} low-Nd branch ($S_{\rm low}$ from $-0.3$ to $-0.5$).
+Sed$\times$0.5 removes this regime entirely. This looks like the sedimentation--entrainment feedback, acting as a threshold in the
+single-column limit.
+\item \textbf{At 2.5 km}, with suppression off and sed$\times$0.5 or $\times$1, LWP is again flat ($\approx$141\,g\,m$^{-2}$), even though
+$w_e$ still rises with Nd. With suppression on, $S_{\rm low}$ grows with sed (0.45, 0.57, 0.71 for $\times$0.5, $\times$1, $\times$2), and $S_{\rm high}\approx0.05$ for every sed value.
+Sed$\times$2 lowers $w_e$ by 0.3--1.1\,mm\,s$^{-1}$ at every Nd. It also breaks up the low-Nd deck even with suppression off
+(cloud cover 0.64--0.69 at Nd 20).
+\item \textbf{LWP spatial SD} is 1--3\,g\,m$^{-2}$ at $\geq$10 km, 6--60 at 5 km and 65--120 at 2.5 km. It grows with the sed factor and is largest at low Nd.
+The online value (expression \texttt{mean('col')} of the squared anomaly) matches the SD computed afterwards from the 2D LWP output.
+\item \textbf{AeroCom cloud top (PR \#9017):} liquid cloud-top CDNC is $\approx$0.7$\times$ the in-cloud median Nd, consistent with SPA CCN decreasing upward.
+$r_{\rm eff}$ at cloud top ranges from 8 to 21\,$\mu$m and decreases with Nd and with the sed factor.
+\end{enumerate}
+
+\noindent\textbf{Notes.} Surface precipitation includes the cloud-droplet sedimentation flux.
+With suppression off, the autoconversion rate matches the default at Nd 63, so rain is higher than default above that Nd and lower below it.
+Susceptibility $S=d\ln{\rm LWP}/d\ln N_d$ uses the diagnosed Nd; the full table is in \texttt{susceptibility.csv}.
+\textbf{Outputs:} \texttt{\$PSCRATCH/dp\_screamxx\_sedps/analysis/} (\texttt{summary\_h4-6.csv}, \texttt{timeseries.nc}).
+\\\textbf{Code:} E3SM \texttt{mahf708/eamxx/p3-cloud-sed-factor} and scmlib \texttt{sed-precsupp-study}, both on mahf708's forks.
+\end{document}
