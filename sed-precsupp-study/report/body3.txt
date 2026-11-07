@@ -1,0 +1,28 @@
+Hi Naser and Johannes,
+
+I'm Claude Code, an AI assistant working on Naser's behalf. Johannes asked for Nd 500 and 1000, and those runs are done. The matrix is now 216 runs: 6 resolutions (40 km to 1.25 km) x Nd 20/50/100/200/500/1000 x sed x0.5/1/2 x precip suppression on/off. Attached is a 7-page technical note with mechanism figures, plus the CSVs.
+
+Headlines:
+1. 5 km and coarser (single-column-like): the LWP response is all precip suppression. With suppression off, LWP is flat at 170-175 g/m2 from Nd 50 to 1000. With it on, LWP keeps rising through Nd 1000 (S = 0.03-0.07 for Nd 200 -> 1000).
+2. At coarse resolution, sedimentation acts as a switch. Above a cloud-top fall-speed proxy of sed x (reff_top/10 um)^2 ~ 3.5, w_e drops from ~4.9 to ~2.7 mm/s, with suppression on or off. With suppression off this gives a negative low-Nd branch (S -0.3 to -0.5).
+3. At 2.5 and 1.25 km, w_e falls smoothly with the same proxy across all runs, from ~7 to ~3 mm/s. Entrainment rises with Nd and falls with sedimentation.
+4. Very high Nd: at km scale LWP saturates above Nd ~200, and at 1.25 km it turns slightly down from Nd 200 to 1000 (S -0.003 to -0.04, negative for every sed value), while w_e keeps rising (6.55 -> 6.94 mm/s at sed x1). That may be the onset of the entrainment-driven falling branch, but it is weak at 6 h.
+5. The runs are transient. LWP is still trending over hours 4-6: +10 to +24 g/m2/h for most coarse runs, and ~+7 g/m2/h at 1.25 km, high Nd, suppression on. A 12 h forcing is needed before calling any of these equilibrium susceptibilities.
+
+The note proposes next steps: 12 h forcing plus 2-3 seeds for the km-scale high-Nd cells, and a targeted 625 m set (Nd 20/200/1000 x sed 0.5/2 x suppression on/off, 12 runs, ~15 node-hours) before any 312/156 m runs. Sub-km is still on hold until you say go.
+
+Attachments:
+- sedps_technical_note.pdf: 7 pages.
+- timeseries_15min.csv: one row per run per 15-min step, with run settings as columns.
+- summary_h4-6.csv: one row per run.
+- susceptibility.csv: three Nd branches.
+- lwp_trend_h4-6.csv: hour 4-6 LWP trend per run.
+
+Perlmutter paths (world-readable):
+- Runs: /pscratch/sd/m/mahf708/dp_screamxx_sedps/sedps_<res>_nd<Nd>_sed<0p5|1|2>_ps<on|off>/run/
+- Analysis (CSVs, figures, the note, R outputs): /pscratch/sd/m/mahf708/dp_screamxx_sedps/analysis/
+- Scripts: /pscratch/sd/m/mahf708/scmlib/sed-precsupp-study/ (analysis/ Python, R/ R tools, report/ LaTeX source)
+- R: source("/pscratch/sd/m/mahf708/scmlib/sed-precsupp-study/R/sedps.R"); interpreter /pscratch/sd/m/mahf708/r_env/bin/Rscript
+- Code: https://github.com/mahf708/E3SM/tree/mahf708/eamxx/p3-cloud-sed-factor and https://github.com/mahf708/scmlib/tree/sed-precsupp-study
+
+-- Claude, on behalf of Naser Mahfouz

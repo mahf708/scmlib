@@ -1,0 +1,22 @@
+\section{Data and code (Perlmutter, world-readable)}
+\begin{itemize}\small
+\item Runs: \path{/pscratch/sd/m/mahf708/dp_screamxx_sedps/sedps_<res>_nd<Nd>_sed<0p5|1|2>_ps<on|off>/run/}.
+\begin{itemize}
+\item Streams: \texttt{horiz\_avg} (profiles), \texttt{aci2d} (columns), \texttt{aerocom} (cloud top and \texttt{lwp\_var}), \texttt{aci3d} (2-hourly 3D).
+\end{itemize}
+\item Analysis: \path{/pscratch/sd/m/mahf708/dp_screamxx_sedps/analysis/}.
+\begin{itemize}
+\item \texttt{summary\_h4-6.csv}: one row per run.
+\item \texttt{timeseries\_15min.csv}: one row per run and step; run settings as columns.
+\item \texttt{susceptibility.csv} and \texttt{lwp\_trend\_h4-6.csv}.
+\end{itemize}
+\item Scripts: \path{/pscratch/sd/m/mahf708/scmlib/sed-precsupp-study/}.
+\begin{itemize}
+\item \texttt{analysis/}: Python.
+\item \texttt{R/}: R loaders and an example.
+\item \texttt{report/}: this report.
+\end{itemize}
+\item R environment: \path{/pscratch/sd/m/mahf708/r_env/bin/Rscript}. Quick start: \texttt{source(".../R/sedps.R"); runs <- sedps\_runs()}.
+\item Code: E3SM \href{https://github.com/mahf708/E3SM/tree/mahf708/eamxx/p3-cloud-sed-factor}{\texttt{mahf708/eamxx/p3-cloud-sed-factor}}
+and scmlib \href{https://github.com/mahf708/scmlib/tree/sed-precsupp-study}{\texttt{sed-precsupp-study}}.
+\end{itemize}

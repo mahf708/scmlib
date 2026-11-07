@@ -1,0 +1,119 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{booktabs,enumitem,graphicx,hyperref,amsmath,url,float,caption}
+\captionsetup{font=small,labelfont=bf}
+\setlist{itemsep=1.5pt,topsep=3pt}
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue!50!black}
+\title{\bfseries Cloud-droplet sedimentation and precipitation suppression\\ in the Nd--LWP response of DP-EAMxx (DYCOMS-II RF02)}
+\author{Prepared by Claude Code (AI assistant) on behalf of Naser Mahfouz\\ for Naser Mahfouz and Johannes M\"ulmenst\"adt}
+\date{Technical note, 6 November 2026}
+\begin{document}\sloppy
+\maketitle
+
+\begin{abstract}\noindent
+We ran DP-EAMxx on the nocturnal DYCOMS-II RF02 drizzling stratocumulus over a 216-run matrix:
+grid spacing (40\,km to 1.25\,km) $\times$ droplet number (20--1000\,cm$^{-3}$) $\times$ a cloud-droplet sedimentation multiplier
+($\times$0.5, 1, 2) $\times$ precipitation suppression (KK2000 Nd dependence on or off).
+The aim is to separate the two microphysical pathways through which Nd controls LWP.
+At $\geq$5\,km the model behaves like a single column. There, the positive LWP response to Nd comes entirely from precipitation suppression, and sedimentation acts as a switch
+that halves entrainment at low Nd. At 2.5 and 1.25\,km, where boundary-layer cells are resolved, entrainment rises with Nd and falls with sedimentation, smoothly and largely
+regardless of the suppression setting. This offsets precipitation suppression, so LWP saturates above Nd$\approx$100--200\,cm$^{-3}$.
+At 1.25\,km the response from Nd 200 to 1000 turns slightly negative ($S$ from $-0.003$ to $-0.04$).
+None of the runs is in steady state at hour 6, so these are transient (6\,h) results.
+\end{abstract}
+
+\section*{Key results}
+\begin{enumerate}
+\item \textbf{Single-column limit ($\geq$5\,km): suppression explains all of the LWP response.} With suppression off, LWP is flat at 170--175\,g\,m$^{-2}$ ($S\approx0$)
+from Nd 50 to 1000 (Figs.~\ref{fig:resp}, \ref{fig:S}). With suppression on, LWP rises monotonically
+($S$ = 0.15 for Nd 100$\to$200 and 0.03--0.07 for Nd 200$\to$1000) and has not saturated by Nd 1000 (Fig.~\ref{fig:path}a).
+\item \textbf{Sedimentation acts as a threshold at coarse resolution.} Below a cloud-top fall-speed proxy of
+sed$\times(r_{\rm eff,top}/10\,\mu{\rm m})^2\approx3.5$ (the switch falls between 3 and 4), $w_e$ is pinned at 4.8--5.2\,mm\,s$^{-1}$. Above it, $w_e$ jumps to 2.5--2.9\,mm\,s$^{-1}$
+(Fig.~\ref{fig:we}a), whether suppression is on or off. Low Nd with sed$\times$1 or $\times$2 crosses the threshold, and sed$\times$0.5 never does.
+With suppression off this produces a \emph{negative} low-Nd branch ($S_{20\to50}$ from $-0.3$ to $-0.5$), which is the classical
+sedimentation--entrainment effect acting as a regime switch.
+\item \textbf{Resolved cells ($\leq$2.5\,km): entrainment varies smoothly with sedimentation.} $w_e$ falls almost monotonically with the fall-speed proxy across
+all Nd and sed values (Fig.~\ref{fig:we}b), from $\approx$7\,mm\,s$^{-1}$ to $\approx$3\,mm\,s$^{-1}$. At the same proxy, suppression-off runs
+entrain 0.3--0.6\,mm\,s$^{-1}$ less.
+\item \textbf{At km scale, LWP saturates at high Nd.} The suppression gain levels off at +16 to +23\,g\,m$^{-2}$ beyond Nd 200,
+against +45\,g\,m$^{-2}$ and still rising at $\geq$5\,km (Fig.~\ref{fig:path}a). $S_{200\to1000}$ ranges from $-0.04$ to $+0.01$, and at 1.25\,km it is
+negative for every sed value. $w_e$ still rises from Nd 200 to 1000 (at 1.25\,km, sed$\times$1: 6.55$\to$6.94\,mm\,s$^{-1}$), so this
+looks like the onset of the entrainment-driven falling branch. It is weak at 6\,h.
+\item \textbf{The low-Nd branch steepens with sedimentation at km scale.} With suppression on, $S_{20\to50}$ = 0.45/0.57/0.71 (2.5\,km) and 0.53/0.57/0.70 (1.25\,km) for sed $\times$0.5/$\times$1/$\times$2.
+Faster sedimentation thins and breaks the Nd-20 deck even with suppression off (cloud cover 0.63--0.69, LWP SD up to 117\,g\,m$^{-2}$; Fig.~\ref{fig:pdf}).
+\item \textbf{The runs are transient.} dLWP/dt over hours 4--6 is +10 to +24\,g\,m$^{-2}$\,h$^{-1}$ for most runs at $\geq$5\,km. At 1.25\,km it is about +7\,g\,m$^{-2}$\,h$^{-1}$ at high Nd with suppression on (Fig.~\ref{fig:trend}).
+A 12\,h forcing is needed before treating any $S$ value as an equilibrium susceptibility.
+\end{enumerate}
+
+\input{setup}
+
+\section{Results}
+\begin{figure}[H]\centering
+\includegraphics[width=\textwidth]{fig1_response.png}
+\caption{Hour 4--6 means against diagnosed in-cloud Nd. Columns: resolution. Shade: sedimentation factor. Solid lines with filled circles:
+precip suppression on. Dashed lines with open squares: off.}\label{fig:resp}
+\end{figure}
+
+\begin{figure}[H]\centering
+\includegraphics[width=\textwidth]{fig2_susceptibility.png}
+\caption{Susceptibility $S=d\ln{\rm LWP}/d\ln N_d$ (finite differences on diagnosed Nd) on three Nd branches, against resolution.}\label{fig:S}
+\end{figure}
+
+\paragraph{Pathway decomposition.} Fig.~\ref{fig:path} isolates each pathway by differencing runs that differ in one switch only.
+(a) The suppression pathway, LWP(on) $-$ LWP(off), crosses zero near Nd 63 by construction, since autoconversion rates match there.
+It is resolution-independent below Nd 100 and diverges above it: it keeps growing at $\geq$5\,km and saturates at km scale.
+(b) The sedimentation pathway, LWP(sed$\times$2) $-$ LWP(sed$\times$0.5), has the opposite sign in the two regimes.
+At $\geq$5\,km more sedimentation raises LWP at low Nd (by $\approx$40--55\,g\,m$^{-2}$, through the $w_e$ switch) and lowers it at Nd 100--500 with suppression on.
+At km scale it lowers LWP at low Nd (deck break-up) and raises it at Nd 100--500 with suppression on (less entrainment).
+
+\begin{figure}[H]\centering
+\includegraphics[width=\textwidth]{figR1_pathways.png}
+\caption{(a) Precipitation-suppression pathway at sed$\times$1. (b) Sedimentation pathway with suppression on (solid) and off (dashed). Colour: resolution.}\label{fig:path}
+\end{figure}
+
+\paragraph{Sedimentation--entrainment.} P3's cloud-droplet fall speed scales as Stokes, $\propto r^2$, so
+sed$\times(r_{\rm eff,top}/10\,\mu$m$)^2$ is a dimensionless proxy for the sedimentation velocity at cloud top. It combines the knob and Nd, through $r_{\rm eff}$.
+In Fig.~\ref{fig:we}, every run from both factors lands on one relation per regime. That supports sedimentation removing liquid from the entrainment zone
+as the common mechanism behind the sed and Nd effects on $w_e$. The single-column regime responds as a bistable switch, and resolved cells respond smoothly.
+
+\begin{figure}[H]\centering
+\includegraphics[width=\textwidth]{figR2_we_vs_vsed.png}
+\caption{Entrainment rate against the cloud-top fall-speed proxy, for all 216 runs. (a) $\Delta x\geq$5\,km. (b) $\Delta x\leq$2.5\,km.}\label{fig:we}
+\end{figure}
+
+\paragraph{Cloud morphology.} At km scale, low Nd broadens the column-LWP distribution toward thin and clear columns (Fig.~\ref{fig:pdf}).
+Faster sedimentation fattens the thin-cloud tail at Nd 20, even with suppression off. At high Nd the distribution narrows and peaks near 200--250\,g\,m$^{-2}$.
+LWP spatial SD (Fig.~\ref{fig:resp}) is 1--3\,g\,m$^{-2}$ at $\geq$10\,km, where the columns are nearly identical. It is 6--60\,g\,m$^{-2}$ at 5\,km and 57--117\,g\,m$^{-2}$ at km scale,
+largest at low Nd with sed$\times$2.
+
+\begin{figure}[H]\centering
+\includegraphics[width=\textwidth]{figR4_lwp_pdf.png}
+\caption{Distribution of column LWP over hours 4--6 at 2.5 and 1.25\,km, for Nd 20, 100 and 1000. The area under each curve is the fraction of columns with LWP $>$ 1\,g\,m$^{-2}$.}\label{fig:pdf}
+\end{figure}
+
+\paragraph{Transience.} Fig.~\ref{fig:trend} shows the linear LWP trend over the averaging window, and Fig.~\ref{fig:ts} the trajectories.
+The coarse runs are still deepening and moistening at hour 6. Only the km-scale runs with suppression off are close to steady.
+
+\begin{figure}[H]\centering
+\includegraphics[width=\textwidth]{figR3_lwp_trend.png}
+\caption{Linear LWP trend over hours 4--6. The grey band marks $\pm$5\,g\,m$^{-2}$\,h$^{-1}$.}\label{fig:trend}
+\end{figure}
+
+\begin{figure}[H]\centering
+\includegraphics[width=0.92\textwidth]{fig3_timeseries.png}
+\caption{15-min time series at 40\,km and 1.25\,km for Nd 20 and 1000. The shaded band is the hour 4--6 averaging window.}\label{fig:ts}
+\end{figure}
+
+\section{Caveats and next steps}
+\begin{itemize}
+\item \textbf{Transient, single realization.} Run the 12\,h RF02 forcing (\texttt{DYCOMSrf02\_12hr\_PMCnBLH\_4scam.nc}) and 2--3 perturbation seeds
+for the km-scale cells, especially Nd 200--1000, where the falling branch is just appearing.
+\item \textbf{Sub-km.} 625, 312 and 156\,m are on hold. A targeted set would be Nd \{20, 200, 1000\} $\times$ sed \{0.5, 2\} $\times$ suppression \{on, off\}
+at 625\,m (12 runs, $\sim$15 node-h at 6\,h) before committing to 312 and 156\,m.
+\item \textbf{Nd targeting.} The SPA factors give diagnosed Nd 10--25\,\% above target. All analysis uses the diagnosed Nd.
+\item \textbf{Diagnostics.} Surface precipitation includes cloud-droplet sedimentation. $w_e$ comes from a linear $z_i$ fit from hour 2 on, which is crude for the coarse runs.
+A cloud-top sedimentation flux diagnostic (P3 \texttt{qc\_sed} at $z_i$) would replace the proxy in Fig.~\ref{fig:we}.
+\end{itemize}
+
+\input{data}
+\end{document}

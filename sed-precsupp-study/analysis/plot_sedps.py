@@ -54,10 +54,11 @@ def legend(fig, y=1.0):
 
 def ndaxis(ax):
     ax.set_xscale("log")
-    ax.set_xticks([20, 50, 100, 200])
+    hi = df.Nd_target.max() > 200
+    ax.set_xticks([20, 50, 100, 200, 500, 1000] if hi else [20, 50, 100, 200])
     ax.xaxis.set_major_formatter(mt.ScalarFormatter())
     ax.xaxis.set_minor_locator(mt.NullLocator())
-    ax.set_xlim(16, 290)
+    ax.set_xlim(16, 1500 if hi else 290)
 
 
 # ---------- Fig 1: response to Nd, small multiples (rows = quantity, cols = dx) ----------
@@ -95,13 +96,18 @@ rows_s = []
 for (r, sed, ps), g in df.groupby(["res", "sed", "precsupp"]):
     g = g.set_index("Nd_target")
     s = lambda a, b: np.log(g.LWP[b] / g.LWP[a]) / np.log(g.Nd_incloud[b] / g.Nd_incloud[a])
-    rows_s.append({"res": r, "dx_km": g.dx_km.iloc[0], "sed": sed, "precsupp": ps,
-                   "S_low_20_50": s(20, 50), "S_high_100_200": s(100, 200)})
+    row = {"res": r, "dx_km": g.dx_km.iloc[0], "sed": sed, "precsupp": ps,
+           "S_low_20_50": s(20, 50), "S_high_100_200": s(100, 200)}
+    if 1000 in g.index and 200 in g.index:
+        row["S_vhigh_200_1000"] = s(200, 1000)
+    rows_s.append(row)
 S = pd.DataFrame(rows_s).sort_values(["dx_km", "precsupp", "sed"], ascending=[False, False, True])
 S.round(3).to_csv(f"{out}/susceptibility.csv", index=False)
-fig, axs = plt.subplots(1, 2, figsize=(9.5, 3.6), sharey=True)
-for ax, col, ttl in zip(axs, ["S_low_20_50", "S_high_100_200"],
-                        ["low-Nd branch (Nd 20 → 50)", "high-Nd branch (Nd 100 → 200)"]):
+branches = [("S_low_20_50", "low-Nd branch (Nd 20 → 50)"), ("S_high_100_200", "high-Nd branch (Nd 100 → 200)")]
+if "S_vhigh_200_1000" in S:
+    branches.append(("S_vhigh_200_1000", "very-high-Nd branch (Nd 200 → 1000)"))
+fig, axs = plt.subplots(1, len(branches), figsize=(4.75 * len(branches), 3.6), sharey=True)
+for ax, (col, ttl) in zip(axs, branches):
     for sed in (0.5, 1.0, 2.0):
         for ps in ("on", "off"):
             d = S[(S.sed == sed) & (S.precsupp == ps)].sort_values("dx_km", ascending=False)
@@ -120,9 +126,9 @@ fig.tight_layout(rect=(0, 0, 1, 0.93))
 fig.savefig(f"{out}/fig2_susceptibility.png", dpi=150, bbox_inches="tight")
 
 # ---------- Fig 3: time series, coarse vs km-scale, low vs high Nd ----------
-cases = [(RES[0], 20), (RES[0], 200), ("2p5km", 20), ("2p5km", 200)]
-if "1p25km" in RES:
-    cases = [(RES[0], 20), (RES[0], 200), ("1p25km", 20), ("1p25km", 200)]
+ndhi = int(df.Nd_target.max())
+fine = "1p25km" if "1p25km" in RES else "2p5km"
+cases = [(RES[0], 20), (RES[0], ndhi), (fine, 20), (fine, ndhi)]
 trows = [("LWP_gm2", "LWP (g m$^{-2}$)"), ("LWP_sd_gm2", "LWP spatial SD\n(g m$^{-2}$)"),
          ("Nd_layer_cm3", "in-cloud Nd\n(cm$^{-3}$)"), ("precip_mmday", "surface precip\n(mm day$^{-1}$)")]
 fig, axs = plt.subplots(len(trows), len(cases), figsize=(11, 7.6), sharex=True, sharey="row")
@@ -145,7 +151,7 @@ for j, (r, nd) in enumerate(cases):
         if i == len(trows) - 1:
             ax.set_xlabel("hour")
 axs[2, 0].set_yscale("log")
-axs[2, 0].set_yticks([20, 50, 100, 200])
+axs[2, 0].set_yticks([20, 50, 100, 200, 500, 1000] if ndhi > 200 else [20, 50, 100, 200])
 axs[2, 0].yaxis.set_major_formatter(mt.ScalarFormatter())
 axs[2, 0].yaxis.set_minor_locator(mt.NullLocator())
 legend(fig, 1.02)

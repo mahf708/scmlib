@@ -32,7 +32,7 @@ df.sum %>%
                           "precip~(mm~d^-1)", "r[eff*','*top]~(mu*m)"))) %>%
     ggplot(aes(Nd_incloud, val, col = sed, lty = precsupp, shape = precsupp)) +
     geom_line() + geom_point(size = 1.5) +
-    scale_x_log10(breaks = c(20, 50, 100, 200)) + scales_sedps +
+    scale_x_log10(breaks = c(20, 50, 100, 200, 500, 1000)) + scales_sedps +
     facet_grid(var ~ res, scales = "free_y", labeller = labeller(var = label_parsed)) +
     labs(x = expression(paste("in-cloud ", N[d], " (cm"^-3, ")")), y = NULL,
          title = "DP-EAMxx RF02, hours 4-6 mean")
@@ -43,7 +43,7 @@ df.ts <- read_sedps_timeseries() %>%
     mutate(res = factor(res, res.levels, res.labels), sed = factor(sed_factor),
            precsupp = factor(precip_suppression, c("on", "off")))
 df.ts %>%
-    filter(Nd_target %in% c(20, 200)) %>%
+    filter(Nd_target %in% c(20, 200, 1000)) %>%
     select(res, Nd_target, sed, precsupp, time_h, LWP_inst_gm2, LWP_sd_gm2, Nd_layer_cm3) %>%
     gather(var, val, LWP_inst_gm2, LWP_sd_gm2, Nd_layer_cm3) %>%
     ggplot(aes(time_h, val, col = sed, lty = precsupp)) +
@@ -56,7 +56,7 @@ ggsave(file.path(outdir, "sedps_timeseries.pdf"), width = 14, height = 6)
 ## Column-level Nd-LWP joint distribution at hours 4-6 (km-scale runs only;
 ## at >= 10 km all columns are nearly identical).  cdnc.top is the in-cloud
 ## liquid cloud-top CDNC; require a mostly-liquid-capped, cloudy (LWP > 10 g/m2) column.
-runs <- sedps_runs() %>% filter(dx.km <= 2.5, nd %in% c(20, 200), sed == 1)
+runs <- sedps_runs() %>% filter(dx.km <= 2.5, nd %in% c(20, 200, 1000), sed == 1)
 df.col <- sedps_ddply(runs, load_sedps_2d) %>%
     filter(time > 4, cf.top.liq > 0.5, lwp > 10) %>%
     mutate(res = factor(res, res.levels, res.labels), precsupp = factor(precsupp, c("on", "off")))
@@ -64,7 +64,7 @@ saveRDS(df.col, file.path(outdir, "sedps_columns_h4-6_sed1.rds"))
 df.col %>%
     ggplot(aes(cdnc.top, lwp)) +
     geom_bin2d(bins = 40) +
-    scale_x_log10(breaks = c(10, 20, 50, 100, 200, 400)) +
+    scale_x_log10(breaks = c(10, 20, 50, 100, 200, 500, 1000)) +
     scale_y_log10(breaks = c(10, 20, 50, 100, 200, 500)) +
     scale_fill_viridis_c(trans = "log10") +
     facet_grid(precsupp ~ res + nd, labeller = label_both) +

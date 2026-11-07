@@ -17,7 +17,7 @@
 #######  Usage:
 #######    ./run_dpxx_scream_DYCOMSrf02_sedps.csh <res> <nd> <sed> <ps>
 #######      res : 40km 20km 10km 5km 2p5km 1p25km 625m 312m 156m
-#######      nd  : 20 50 100 200   (target in-cloud droplet number, #/cm3)
+#######      nd  : 20 50 100 200 500 1000 (target in-cloud droplet number, #/cm3)
 #######      sed : 0p5 1 2         (p3 cloud_sedimentation_factor)
 #######      ps  : on off          (precip suppression: off sets the KK2000
 #######                             Nd exponent to 0, prefactor matched at 63/cm3)
@@ -32,7 +32,7 @@
   if ($#argv != 4) then
     echo "Usage: $0 <res> <nd> <sed> <ps>"
     echo "  res : 40km 20km 10km 5km 2p5km 1p25km 625m 312m 156m"
-    echo "  nd  : 20 50 100 200"
+    echo "  nd  : 20 50 100 200 500 1000"
     echo "  sed : 0p5 1 2"
     echo "  ps  : on off"
     exit 1
@@ -172,6 +172,10 @@
       set spa_factor = 0.9412; breaksw
     case 200:
       set spa_factor = 1.8824; breaksw
+    case 500:
+      set spa_factor = 4.7059; breaksw
+    case 1000:
+      set spa_factor = 9.4118; breaksw
     default:
       echo "Unknown nd '$nd'"; exit 1
   endsw
