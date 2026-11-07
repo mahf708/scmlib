@@ -53,6 +53,16 @@ def find_runs(root):
     return runs
 
 
+def open_stream(case, stream):
+    """All files of one output stream of a case (restart segments write one
+    file each), concatenated in time with duplicate times dropped."""
+    name = os.path.basename(case)
+    files = sorted(glob.glob(f"{case}/run/{name}.{stream}.*.nc"))
+    ds = xr.concat([xr.open_dataset(f) for f in files], "time", data_vars="minimal",
+                   coords="minimal", compat="override") if len(files) > 1 else xr.open_dataset(files[0])
+    return ds.sel(time=~ds.indexes["time"].duplicated())
+
+
 def inversion_height(z, thl):
     """Height where theta_l crosses the midpoint of the inversion jump."""
     bl = thl[z < 400].mean()
@@ -71,11 +81,11 @@ def column_integral(rate, p):
     return (rate * dp).sum(axis=-1) / G * 86400.0
 
 
-def analyze(case):
+def analyze(case, t_end=6.0):
     name = os.path.basename(case)
-    h = xr.open_dataset(glob.glob(f"{case}/run/{name}.horiz_avg.AVERAGE*.nc")[0])
-    a = xr.open_dataset(glob.glob(f"{case}/run/{name}.aci2d.INSTANT*.nc")[0])
-    d3 = xr.open_dataset(glob.glob(f"{case}/run/{name}.aci3d.INSTANT*.nc")[0])
+    h = open_stream(case, "horiz_avg.AVERAGE")
+    a = open_stream(case, "aci2d.INSTANT")
+    d3 = open_stream(case, "aci3d.INSTANT")
 
     t = (h.time_bnds.values.astype("datetime64[s]").astype(float).mean(axis=1)
          - h.time_bnds.values[0, 0].astype("datetime64[s]").astype(float)) / 3600.0
@@ -137,13 +147,13 @@ def analyze(case):
         zi_hr = float(np.interp(hr, t, zi))
         w2_res[hr] = w.var(axis=0)[zz < zi_hr].mean()
 
-    late = (t > 4.0) & (t <= 6.0)
+    late = (t > t_end - 2.0) & (t <= t_end)
     fit = np.polyfit(t[(t >= 2.0)], zi[(t >= 2.0)], 1)
     summary = {
         "LWP": ts.LWP.values[late].mean(),
         "RWP": ts.RWP.values[late].mean(),
         "precip": ts.precip.values[late].mean(),
-        "cloud_cover": ts_cc[(t2d > 4.0) & (t2d <= 6.0)].mean(),
+        "cloud_cover": ts_cc[(t2d > t_end - 2.0) & (t2d <= t_end)].mean(),
         "zi": zi[late].mean(),
         "zb": np.nanmean(zb[late]),
         "dzi_dt_mm_s": fit[0] / 3.6,
@@ -151,8 +161,8 @@ def analyze(case):
         "autoconv": ts.autoconv.values[late].mean(),
         "accret": ts.accret.values[late].mean(),
         "w2_sgs_bl": w2_sgs[late].mean(),
-        "w2_res_bl": np.mean([w2_res[k] for k in (4, 6) if k in w2_res]),
-        "Nd_incloud": np.mean([nd_med[k] for k in (4, 6) if k in nd_med]),
+        "w2_res_bl": np.mean([w2_res[k] for k in (t_end - 2, t_end) if k in w2_res]),
+        "Nd_incloud": np.mean([nd_med[k] for k in (t_end - 2, t_end) if k in nd_med]),
     }
     summary["we_mm_s"] = summary["dzi_dt_mm_s"] - summary["w_subs_mm_s"]
     return ts, summary

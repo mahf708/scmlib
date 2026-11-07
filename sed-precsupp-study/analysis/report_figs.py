@@ -6,6 +6,7 @@ column-level joint histograms) defaults to /pscratch/sd/m/mahf708/dp_screamxx_se
 """
 import glob
 import os
+import os
 import sys
 import numpy as np
 import pandas as pd
@@ -17,7 +18,9 @@ from matplotlib.lines import Line2D
 
 out = sys.argv[1]
 root = sys.argv[2] if len(sys.argv) > 2 else "/pscratch/sd/m/mahf708/dp_screamxx_sedps"
-df = pd.read_csv(f"{out}/summary_h4-6.csv")
+T_END = float(os.environ.get("SEDPS_TEND", 6))
+WIN = f"{T_END - 2:g}–{T_END:g}"
+df = pd.read_csv(f"{out}/summary_h{T_END - 2:g}-{T_END:g}.csv")
 ts = pd.read_csv(f"{out}/timeseries_15min.csv")
 
 INK, INK2, GRID = "#0b0b0b", "#52514e", "#e4e3df"
@@ -106,12 +109,12 @@ fig.savefig(f"{out}/figR2_we_vs_vsed.png", dpi=150, bbox_inches="tight")
 # ---------- R3: steadiness: LWP trend over hours 4-6 ----------
 rows = []
 for (case, r, nd, sed, ps), g in ts.groupby(["case", "res", "Nd_target", "sed_factor", "precip_suppression"]):
-    g = g[(g.time_h > 4) & (g.time_h <= 6)].dropna(subset=["LWP_gm2"])
+    g = g[(g.time_h > T_END - 2) & (g.time_h <= T_END)].dropna(subset=["LWP_gm2"])
     slope = np.polyfit(g.time_h, g.LWP_gm2, 1)[0]
     rows.append({"res": r, "Nd_target": nd, "sed": sed, "precsupp": ps, "dLWPdt": slope,
                  "rel": slope * 2 / g.LWP_gm2.mean()})
 T = pd.DataFrame(rows)
-T.round(3).to_csv(f"{out}/lwp_trend_h4-6.csv", index=False)
+T.round(3).to_csv(f"{out}/lwp_trend_h{T_END - 2:g}-{T_END:g}.csv", index=False)
 fig, axs = plt.subplots(1, len(RES), figsize=(2.3 * len(RES), 3.0), sharey=True, sharex=True)
 for ax, r in zip(axs, RES):
     for sed in (0.5, 1.0, 2.0):
@@ -124,7 +127,7 @@ for ax, r in zip(axs, RES):
     ndaxis(ax)
     ax.set_title(LAB[r])
     ax.set_xlabel("Nd target")
-axs[0].set_ylabel("dLWP/dt, hours 4–6\n(g m$^{-2}$ h$^{-1}$)")
+axs[0].set_ylabel(f"dLWP/dt, hours {WIN}\n(g m$^{{-2}}$ h$^{{-1}}$)")
 h = [Line2D([], [], color=SEDC[s], lw=2.5, label=f"sed ×{s:g}") for s in (0.5, 1.0, 2.0)]
 h += [Line2D([], [], color=INK2, marker="o", label="suppression on"),
       Line2D([], [], color=INK2, ls=(0, (4, 2)), marker="s", mfc="white", label="suppression off")]
@@ -147,12 +150,17 @@ for i, r in enumerate(fine):
         for nd in [n for n in (20, 100, 1000) if n in NDT]:
             for ps, ls in (("on", "-"), ("off", (0, (4, 2)))):
                 case = f"sedps_{r}_nd{nd}_sed{sed}_ps{ps}"
-                fl = glob.glob(f"{root}/{case}/run/{case}.aci2d.INSTANT*00000.nc")
+                fl = sorted(glob.glob(f"{root}/{case}/run/{case}.aci2d.INSTANT.*.nc"))
                 if not fl:
                     continue
-                l = netCDF4.Dataset(fl[0]); l.set_auto_mask(False)
-                tt = l["time"][:]
-                lwp = l["LiqWaterPath"][(tt - tt[0]) * 24 > 4].ravel() * 1e3
+                lw, tt = [], []
+                for fn in fl:   # restart segments write one file each
+                    l = netCDF4.Dataset(fn); l.set_auto_mask(False)
+                    tt.append(l["time"][:]); lw.append(l["LiqWaterPath"][:])
+                tt, lw = np.concatenate(tt), np.concatenate(lw)
+                tt, iu = np.unique(tt, return_index=True)
+                lw = lw[iu]
+                lwp = lw[(tt - tt[0]) * 24 > T_END - 2].ravel() * 1e3
                 h, _ = np.histogram(lwp, bins=bins)   # columns below 1 g/m2 (clear) drop out,
                 ax.plot(mid, h / lwp.size / np.diff(np.log10(bins)),   # so the area is the cloudy fraction
                         color=NDC.get(nd, INK), ls=ls, lw=1.5)
@@ -160,7 +168,7 @@ for i, r in enumerate(fine):
         ax.axvline(10, color=INK2, lw=0.7, ls=":")
         ax.set_title(f"{LAB[r]}, sed ×{sed.replace('0p5', '0.5')}")
         if i == len(fine) - 1:
-            ax.set_xlabel("column LWP (g m$^{-2}$), hours 4–6")
+            ax.set_xlabel(f"column LWP (g m$^{{-2}}$), hours {WIN}")
         if j == 0:
             ax.set_ylabel("fraction of columns\nper decade of LWP")
 h = [Line2D([], [], color=NDC[n], lw=2.5, label=f"Nd {n}") for n in NDC if n in NDT]

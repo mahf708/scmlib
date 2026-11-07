@@ -24,12 +24,12 @@ import xarray as xr
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from analyze_sedps import find_runs, SED  # noqa: E402
-from analyze_runs import RES_KM, RD, G, inversion_height  # noqa: E402
+from analyze_runs import RES_KM, RD, G, inversion_height, open_stream  # noqa: E402
 
 
 def one(case):
     name = os.path.basename(case)
-    op = lambda s: xr.open_dataset(glob.glob(f"{case}/run/{name}.{s}*00000.nc")[0])
+    op = lambda s: open_stream(case, s)
     h, a2, ac, d3 = op("horiz_avg.AVERAGE"), op("aci2d.INSTANT"), op("aerocom.INSTANT"), op("aci3d.INSTANT")
     t0 = a2.time.values[0]
     hr = lambda t: np.round((t - t0) / np.timedelta64(1, "h"), 4)
@@ -84,7 +84,7 @@ def one(case):
 def main():
     root, outcsv = sys.argv[1], sys.argv[2]
     frames = []
-    for (res, nd, sed, ps), case in find_runs(root).items():
+    for (res, nd, sed, ps, t3d), case in find_runs(root).items():
         df = one(case)
         df.insert(0, "case", os.path.basename(case))
         df.insert(1, "res", res)
@@ -92,6 +92,7 @@ def main():
         df.insert(3, "Nd_target", nd)
         df.insert(4, "sed_factor", SED[sed])
         df.insert(5, "precip_suppression", ps)
+        df.insert(6, "turb3d", t3d)
         frames.append(df)
         print(os.path.basename(case), len(df))
     out = pd.concat(frames)

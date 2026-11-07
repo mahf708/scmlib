@@ -6,6 +6,7 @@ Figures for the sed x precip-suppression study.
 Encoding (all figures): sed factor = one blue ramp, light (x0.5) -> dark (x2);
 precip suppression on = solid line + filled circle, off = dashed + open square.
 """
+import os
 import sys
 import numpy as np
 import pandas as pd
@@ -16,7 +17,9 @@ import matplotlib.ticker as mt
 from matplotlib.lines import Line2D
 
 out = sys.argv[1]
-df = pd.read_csv(f"{out}/summary_h4-6.csv")
+T_END = float(os.environ.get("SEDPS_TEND", 6))
+WIN = f"{T_END - 2:g}–{T_END:g}"
+df = pd.read_csv(f"{out}/summary_h{T_END - 2:g}-{T_END:g}.csv")
 ts = pd.read_csv(f"{out}/timeseries_15min.csv")
 
 INK, INK2, GRID = "#0b0b0b", "#52514e", "#e4e3df"
@@ -86,7 +89,7 @@ for j, r in enumerate(RES):
             ax.set_xlabel("in-cloud Nd (cm$^{-3}$)")
 axs[2, 0].set_ylim(0.6, 1.02)
 legend(fig, 1.0)
-fig.suptitle("DP-EAMxx DYCOMS-II RF02: response to droplet number, hours 4–6 mean",
+fig.suptitle(f"DP-EAMxx DYCOMS-II RF02: response to droplet number, hours {WIN} mean",
              y=1.035, fontsize=12, fontweight="bold", color=INK)
 fig.tight_layout(rect=(0, 0, 1, 0.975), h_pad=0.6, w_pad=0.4)
 fig.savefig(f"{out}/fig1_response.png", dpi=150, bbox_inches="tight")
@@ -141,9 +144,9 @@ for j, (r, nd) in enumerate(cases):
                        (ts.precip_suppression == ps)].dropna(subset=[v]).sort_values("time_h")
                 st = PS[ps]
                 ax.plot(d.time_h, d[v], color=SEDC[sed], lw=1.5, ls=st["ls"])
-        ax.axvspan(4, 6, color=GRID, alpha=0.5, lw=0, zorder=0)
-        ax.set_xticks([0, 2, 4, 6])
-        ax.set_xlim(0, 6)
+        ax.axvspan(T_END - 2, T_END, color=GRID, alpha=0.5, lw=0, zorder=0)
+        ax.set_xticks(np.arange(0, T_END + 1, 2))
+        ax.set_xlim(0, T_END)
         if i == 0:
             ax.set_title(f"Δx = {LAB[r]}, Nd target {nd}")
         if j == 0:
@@ -155,7 +158,7 @@ axs[2, 0].set_yticks([20, 50, 100, 200, 500, 1000] if ndhi > 200 else [20, 50, 1
 axs[2, 0].yaxis.set_major_formatter(mt.ScalarFormatter())
 axs[2, 0].yaxis.set_minor_locator(mt.NullLocator())
 legend(fig, 1.02)
-fig.text(0.99, 0.005, "shaded: hours 4–6 averaging window", ha="right", fontsize=8, color=INK2)
+fig.text(0.99, 0.005, f"shaded: hours {WIN} averaging window", ha="right", fontsize=8, color=INK2)
 fig.tight_layout(rect=(0, 0.01, 1, 0.96))
 fig.savefig(f"{out}/fig3_timeseries.png", dpi=150, bbox_inches="tight")
 print("ok")

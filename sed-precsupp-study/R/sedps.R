@@ -31,25 +31,28 @@ sedps.res.km <- c("40km" = 40, "20km" = 20, "10km" = 10, "5km" = 5, "2p5km" = 2.
 sedps.sed <- c("0p5" = 0.5, "1" = 1, "2" = 2)
 
 #' Finished runs: res, dx.km, nd (target, cm-3), sed (factor), precsupp (on/off), case, dir
-sedps_runs <- function(root = sedps.root) {
+sedps_runs <- function(root = sedps.root, hours = 6) {
     dirs <- Sys.glob(file.path(root, "sedps_*"))
     m <- regmatches(basename(dirs),
-                    regexec("^sedps_(.+?)_nd([0-9]+)_sed(0p5|1|2)_ps(on|off)$", basename(dirs)))
-    ok <- lengths(m) == 5
+                    regexec("^sedps_(.+?)_nd([0-9]+)_sed(0p5|1|2)_ps(on|off)(_t3don)?$", basename(dirs)))
+    ok <- lengths(m) == 6
     runs <- data.frame(res = sapply(m[ok], `[`, 2),
                        nd = as.integer(sapply(m[ok], `[`, 3)),
                        sed = sedps.sed[sapply(m[ok], `[`, 4)],
                        precsupp = sapply(m[ok], `[`, 5),
+                       turb3d = ifelse(sapply(m[ok], `[`, 6) == "_t3don", "on", "off"),
                        case = basename(dirs[ok]),
                        dir = dirs[ok],
                        stringsAsFactors = FALSE, row.names = NULL) %>%
         mutate(dx.km = unname(sedps.res.km[res]))
     ## keep only runs with a complete 6 h aerocom stream
     runs[sapply(runs$dir, function(d) {
-        f <- sedps_file(d, "aerocom.INSTANT")
-        if (is.na(f)) return(FALSE)
-        nc <- ncdf4::nc_open(f); on.exit(ncdf4::nc_close(nc))
-        nc$dim$time$len >= 25
+        fs <- sedps_files(d, "aerocom.INSTANT")
+        if (!length(fs)) return(FALSE)
+        tv <- unlist(lapply(fs, function(f) {
+            nc <- ncdf4::nc_open(f); on.exit(ncdf4::nc_close(nc)); nc$dim$time$vals
+        }))
+        length(unique(tv)) >= 4 * hours + 1
     }), ] %>% arrange(desc(dx.km), nd, sed, desc(precsupp))
 }
 
@@ -57,6 +60,25 @@ sedps_runs <- function(root = sedps.root) {
 sedps_file <- function(dir, stream) {
     f <- Sys.glob(file.path(dir, "run", sprintf("%s.%s.*-00000.nc", basename(dir), stream)))
     if (length(f)) f[1] else NA_character_
+}
+
+#' All files of one stream (restart segments write one file each)
+sedps_files <- function(dir, stream) {
+    sort(Sys.glob(file.path(dir, "run", sprintf("%s.%s.*.nc", basename(dir), stream))))
+}
+
+#' nc_df over all files of a stream, duplicate times dropped
+stream_df <- function(dir, stream, vars) {
+    t0 <- NULL
+    df <- do.call(rbind, lapply(sedps_files(dir, stream), function(f) {
+        nc <- ncdf4::nc_open(f); on.exit(ncdf4::nc_close(nc))
+        tv <- nc$dim$time$vals
+        if (is.null(t0)) t0 <<- tv[1]
+        d <- nc_df(nc, vars)
+        d$time <- d$time + (tv[1] - t0) * 24   # nc_df counts from each file's start
+        d
+    }))
+    df[!duplicated(df[, setdiff(names(df), vars)]), ]
 }
 
 #' Variables of an open nc into a long-by-dimension, wide-by-variable data.frame
@@ -79,12 +101,9 @@ nc_df <- function(nc, vars) {
 #' the AeroCom cloud-top fields turned into cloud-top values:
 #'   cf.top.liq, cdnc.top (cm-3, in cloud), reff.top (um), T.top (K)
 load_sedps_2d <- function(dir) {
-    nc <- ncdf4::nc_open(sedps_file(dir, "aci2d.INSTANT")); on.exit(ncdf4::nc_close(nc))
-    df <- nc_df(nc, c("LiqWaterPath", "LiqNumberPath", "RainWaterPath", "pbl_height",
-                      "precip_liq_surf_mass_flux", "LongwaveCloudForcing"))
-    na <- ncdf4::nc_open(sedps_file(dir, "aerocom.INSTANT"))
-    da <- nc_df(na, c("cf_top", "cf_top_liq", "T_top", "reff_top_liq", "cdnc_top_liq"))
-    ncdf4::nc_close(na)
+    df <- stream_df(dir, "aci2d.INSTANT", c("LiqWaterPath", "LiqNumberPath", "RainWaterPath", "pbl_height",
+                                             "precip_liq_surf_mass_flux", "LongwaveCloudForcing"))
+    da <- stream_df(dir, "aerocom.INSTANT", c("cf_top", "cf_top_liq", "T_top", "reff_top_liq", "cdnc_top_liq"))
     df %>%
         left_join(da, by = c("ncol", "time")) %>%
         transmute(time, ncol,
@@ -103,8 +122,7 @@ load_sedps_2d <- function(dir) {
 
 #' Domain-mean scalars every 15 min: online LWP mean and spatial SD (g/m2)
 load_sedps_lwp_sd <- function(dir) {
-    nc <- ncdf4::nc_open(sedps_file(dir, "aerocom.INSTANT")); on.exit(ncdf4::nc_close(nc))
-    nc_df(nc, c("lwp_mean", "lwp_var")) %>%
+    stream_df(dir, "aerocom.INSTANT", c("lwp_mean", "lwp_var")) %>%
         transmute(time, lwp.mean = lwp_mean * 1e3, lwp.sd = sqrt(pmax(lwp_var, 0)) * 1e3)
 }
 
@@ -112,8 +130,7 @@ load_sedps_lwp_sd <- function(dir) {
 #' vars: names without the _horiz_avg suffix, e.g. c("T_mid", "qc", "nc", "cldfrac_liq")
 load_sedps_profiles <- function(dir, vars = c("z_mid", "p_mid", "T_mid", "qv", "qc", "nc",
                                               "cldfrac_liq", "LiqPotentialTemperature")) {
-    nc <- ncdf4::nc_open(sedps_file(dir, "horiz_avg.AVERAGE")); on.exit(ncdf4::nc_close(nc))
-    df <- nc_df(nc, paste0(vars, "_horiz_avg"))
+    df <- stream_df(dir, "horiz_avg.AVERAGE", paste0(vars, "_horiz_avg"))
     names(df) <- sub("_horiz_avg$", "", names(df))
     df %>% mutate(time = time + 0.25)
 }
@@ -122,12 +139,12 @@ load_sedps_profiles <- function(dir, vars = c("z_mid", "p_mid", "T_mid", "qv", "
 #' Use .parallel = TRUE after doParallel::registerDoParallel(n).
 sedps_ddply <- function(runs, fun, ..., .parallel = FALSE) {
     plyr::ddply(runs, ~ case, function(r) {
-        cbind(r[rep(1, 1), c("res", "dx.km", "nd", "sed", "precsupp", "case")], fun(r$dir, ...),
+        cbind(r[rep(1, 1), c("res", "dx.km", "nd", "sed", "precsupp", "turb3d", "case")], fun(r$dir, ...),
               row.names = NULL)
     }, .parallel = .parallel)
 }
 
 #' Hours 4-6 summary and 15-min time series already computed in Python
 #' (one row per run / per run and time, run factors as columns)
-read_sedps_summary <- function() read.csv(file.path(sedps.analysis, "summary_h4-6.csv"))
+read_sedps_summary <- function(window = "4-6") read.csv(file.path(sedps.analysis, sprintf("summary_h%s.csv", window)))
 read_sedps_timeseries <- function() read.csv(file.path(sedps.analysis, "timeseries_15min.csv"))

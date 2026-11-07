@@ -41,7 +41,15 @@
   set nd = $argv[2]
   set sed = $argv[3]
   set ps = $argv[4]
+  # 3D turbulence: off unless setenv SEDPS_TURB3D on (cases get a _t3don suffix)
   set turb3d = off
+  set t3dsfx = ""
+  if ($?SEDPS_TURB3D) then
+    if ($SEDPS_TURB3D == on) then
+      set turb3d = on
+      set t3dsfx = "_t3don"
+    endif
+  endif
 
 #######################################################
 #######  BEGIN USER DEFINED SETTINGS
@@ -52,10 +60,24 @@
 #######  of the scmlib repo to get you started.
 
   # Set the name of your case here
-  setenv casename sedps_${res}_nd${nd}_sed${sed}_ps${ps}
+  setenv casename sedps_${res}_nd${nd}_sed${sed}_ps${ps}${t3dsfx}
 
   # Set the case directory here
-  setenv casedirectory $PSCRATCH/dp_screamxx_sedps
+  # Run length in hours (setenv SEDPS_HOURS 12 for the 12 h set); runs other
+  #  than 6 h go to their own directory, e.g. $PSCRATCH/dp_screamxx_sedps_12h
+  if ($?SEDPS_HOURS) then
+    set run_hours = $SEDPS_HOURS
+  else
+    set run_hours = 6
+  endif
+  if ($run_hours == 6) then
+    setenv casedirectory $PSCRATCH/dp_screamxx_sedps
+  else
+    setenv casedirectory $PSCRATCH/dp_screamxx_sedps_${run_hours}h
+  endif
+  if ($?SEDPS_CASEDIR) then
+    setenv casedirectory $SEDPS_CASEDIR
+  endif
 
   # Directory where code lives
   setenv code_dir $PSCRATCH/e3sm-repo
@@ -150,6 +172,9 @@
     default:
       echo "Unknown res '$res'"; exit 1
   endsw
+  if ($?SEDPS_NPROCS) then
+    set num_procs = $SEDPS_NPROCS
+  endif
   set num_ne_y = $num_ne_x
   set domain_size_x = $domain
   set domain_size_y = $domain
@@ -222,7 +247,7 @@
   set startdate = 1999-07-11 # Start date in IOP file
   set start_in_sec = 0 # start time in seconds in IOP file
   set stop_option = nhours
-  set stop_n = 6
+  set stop_n = $run_hours # the IOP file is constant in time over 0-12 h
   set iop_file = DYCOMSrf02_iopfile_4scam.nc #IOP file name
   set do_turnoff_swrad = true # Turn off SW calculation (if false, keep false)
 # End Case specific stuff here
