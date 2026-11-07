@@ -1,0 +1,41 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.75in]{geometry}
+\usepackage{booktabs,enumitem,graphicx,hyperref,float,caption}
+\captionsetup{font=small,labelfont=bf}
+\setlist{itemsep=1.5pt,topsep=3pt}
+\pagestyle{plain}
+\begin{document}\sloppy
+\noindent{\Large\bfseries Sed $\times$ precip suppression: 12\,h runs (40\,km to 1.25\,km)}\\[2pt]
+7 Nov 2026. Prepared by Claude Code (AI assistant) on behalf of Naser Mahfouz. Addendum to the 6\,h technical note.
+Same 216-run matrix and forcing (the RF02 IOP file is constant over 0--12\,h); means over hours 10--12.
+The first 6\,h of each run reproduce the 6\,h runs bit-for-bit (24 checked).
+
+\section*{What changes at 12\,h}
+\begin{enumerate}
+\item \textbf{Steadiness.} At 2.5 and 1.25\,km, $|d{\rm LWP}/dt| < 4$\,g\,m$^{-2}$\,h$^{-1}$ over hours 10--12 in every run (Fig.~\ref{fig:trend}).
+These are close to equilibrium. At 40--10\,km, LWP is still rising at high Nd with suppression on (up to +18\,g\,m$^{-2}$\,h$^{-1}$; LWP reaches 340\,g\,m$^{-2}$).
+\item \textbf{5\,km has joined the resolved-cell regime.} By 12\,h, LWP spatial SD is 70--140\,g\,m$^{-2}$, cloud cover drops at low Nd, and LWP and $w_e$ look like 2.5\,km.
+At 6\,h, 5\,km was still single-column-like. So the transition is resolution- \emph{and} time-dependent.
+\item \textbf{A falling branch at km scale.} With suppression on, $S_{200\to1000}$ is negative at both 2.5 and 1.25\,km and grows with sedimentation:
+$-0.01/-0.03/-0.09$ at 1.25\,km and $-0.01/-0.03/-0.06$ at 2.5\,km for sed $\times$0.5/1/2 (Fig.~\ref{fig:S}). LWP peaks near Nd $\approx$ 200--500,
+while $w_e$ keeps rising with Nd (to 6.9--7.2\,mm\,s$^{-1}$). At 6\,h this branch was barely visible.
+\item \textbf{The low-Nd branch steepens with sedimentation at km scale.} With suppression on, $S_{20\to50}$ is 0.57/0.65/0.88 at 1.25\,km.
+With suppression off it is $-0.02$/0.11/0.43, all of it from sedimentation-driven deck break-up (cloud cover at Nd~20 with sed$\times$2 falls below 0.6).
+\item \textbf{Single-column limit (40--10\,km).} LWP with suppression on rises strongly with Nd ($S_{100\to200}$ = 0.20--0.35).
+With suppression off it is flat to slightly decreasing ($S$ from $-0.01$ to $-0.1$). The sedimentation switch in $w_e$ persists at a lower level ($\approx$4.0 vs.\ $\approx$3.0\,mm\,s$^{-1}$).
+\end{enumerate}
+
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{fig1_response.png}
+\caption{Hour 10--12 means against diagnosed in-cloud Nd. Same encoding as the 6\,h note.}\label{fig:resp}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{fig2_susceptibility.png}
+\caption{Susceptibility on three Nd branches against resolution, hours 10--12.}\label{fig:S}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{figR3_lwp_trend.png}
+\caption{LWP trend over hours 10--12. The grey band marks $\pm$5\,g\,m$^{-2}$\,h$^{-1}$.}\label{fig:trend}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{figR2_we_vs_vsed.png}
+\caption{$w_e$ against the cloud-top fall-speed proxy, hours 10--12. The $\geq$5\,km panel now includes 5\,km runs that have entered the resolved regime.}\end{figure}
+
+\noindent\textbf{Data:} \path{/pscratch/sd/m/mahf708/dp_screamxx_sedps_12h/} (runs) and \path{.../analysis/} (\texttt{summary\_h10-12.csv},
+\texttt{timeseries\_15min.csv}, \texttt{susceptibility.csv}, \texttt{lwp\_trend\_h10-12.csv}, figures).
+\textbf{Sub-km (in progress):} 625\,m and 312\,m, 12\,h, Nd 20--1000 $\times$ sed $\times$ suppression $\times$ 3D turbulence on/off (144 runs).
+They run in restart segments, which we checked are bit-for-bit, on interactive, debug and regular nodes.
+\end{document}

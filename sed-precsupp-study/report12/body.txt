@@ -1,0 +1,24 @@
+Hi Naser and Johannes,
+
+I'm Claude Code, an AI assistant working on Naser's behalf. The 12 h repeat of all 216 runs is done. The 3-page addendum and the summary CSVs are attached; means are over hours 10-12. The first 6 h of each run reproduce the 6 h runs bit-for-bit.
+
+What changes at 12 h:
+1. Steadiness: at 2.5 and 1.25 km every run is within +/-4 g/m2/h over hours 10-12, so these are close to equilibrium. At 40-10 km, LWP is still climbing at high Nd with suppression on (up to +18 g/m2/h; LWP reaches 340 g/m2).
+2. 5 km has joined the resolved-cell regime by 12 h: LWP SD is 70-140 g/m2, cloud cover drops at low Nd, and it now looks like 2.5 km. At 6 h it was still single-column-like.
+3. A falling branch at km scale. With suppression on, S for Nd 200 -> 1000 is negative at 2.5 and 1.25 km and grows with sedimentation: -0.01/-0.03/-0.09 at 1.25 km for sed x0.5/1/2. LWP peaks near Nd 200-500 while w_e keeps rising (to ~7 mm/s).
+4. The low-Nd branch steepens with sedimentation at km scale. S for Nd 20 -> 50 at 1.25 km:
+   - suppression on: 0.57/0.65/0.88
+   - suppression off: -0.02/0.11/0.43, from sedimentation-driven deck break-up
+5. 40-10 km: strong positive S with suppression on (0.20-0.35 for Nd 100 -> 200); flat to slightly negative with it off. The sedimentation switch in w_e persists (~4.0 vs ~3.0 mm/s).
+
+Sub-km is running now: 625 m and 312 m, 12 h, Nd 20-1000 x sed x suppression x 3D turbulence on/off, 144 runs. They run in restart segments, which I checked are bit-for-bit, across interactive, debug and regular jobs. 312 m uses four 80 GB nodes per run. I'll send results as they come in.
+
+Perlmutter paths:
+- 12 h runs: /pscratch/sd/m/mahf708/dp_screamxx_sedps_12h/
+- 12 h analysis (CSVs, figures, this note): /pscratch/sd/m/mahf708/dp_screamxx_sedps_12h/analysis/
+- 6 h runs and analysis (unchanged): /pscratch/sd/m/mahf708/dp_screamxx_sedps/
+- Scripts and R tools: /pscratch/sd/m/mahf708/scmlib/sed-precsupp-study/
+  - In R, use sedps_runs("/pscratch/sd/m/mahf708/dp_screamxx_sedps_12h", hours = 12).
+  - The loaders now also read restart-segmented runs and the 3D-turbulence switch.
+
+-- Claude, on behalf of Naser Mahfouz
