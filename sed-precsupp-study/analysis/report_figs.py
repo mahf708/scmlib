@@ -22,15 +22,22 @@ T_END = float(os.environ.get("SEDPS_TEND", 6))
 WIN = f"{T_END - 2:g}–{T_END:g}"
 df = pd.read_csv(f"{out}/summary_h{T_END - 2:g}-{T_END:g}.csv")
 ts = pd.read_csv(f"{out}/timeseries_15min.csv")
+# main figures use the 3D-turbulence-off runs; fig_turb3d.png compares on/off
+DF_ALL = df.copy()
+if "turb3d" in df:
+    df = df[df.turb3d == "off"].copy()
+if "turb3d" in ts:
+    ts = ts[ts.turb3d == "off"].copy()
 
 INK, INK2, GRID = "#0b0b0b", "#52514e", "#e4e3df"
 SEDC = {0.5: "#86b6ef", 1.0: "#2a78d6", 2.0: "#104281"}
 # resolution as an ordered magnitude: one aqua->blue sequential-ish ramp is hard to read
 # with 6 levels, so use the categorical palette in fixed order (identity, not rank)
-RES = [r for r in ["40km", "20km", "10km", "5km", "2p5km", "1p25km"] if r in set(df.res)]
-RESC = dict(zip(["40km", "20km", "10km", "5km", "2p5km", "1p25km"],
-                ["#eda100", "#e87ba4", "#6250d6", "#1baf7a", "#2a78d6", "#e34948"]))
-LAB = {"40km": "40 km", "20km": "20 km", "10km": "10 km", "5km": "5 km", "2p5km": "2.5 km", "1p25km": "1.25 km"}
+ALLRES = ["40km", "20km", "10km", "5km", "2p5km", "1p25km", "625m", "312m"]
+RES = [r for r in ALLRES if r in set(df.res)]
+RESC = dict(zip(ALLRES, ["#eda100", "#e87ba4", "#6250d6", "#1baf7a", "#2a78d6", "#e34948", "#008300", "#52514e"]))
+LAB = {"40km": "40 km", "20km": "20 km", "10km": "10 km", "5km": "5 km", "2p5km": "2.5 km", "1p25km": "1.25 km",
+       "625m": "625 m", "312m": "312 m"}
 NDT = sorted(df.Nd_target.unique())
 plt.rcParams.update({
     "font.size": 9, "axes.edgecolor": INK2, "axes.labelcolor": INK, "xtick.color": INK2,
@@ -85,8 +92,9 @@ fig.savefig(f"{out}/figR1_pathways.png", dpi=150, bbox_inches="tight")
 # Stokes: v_sed ~ sed_factor * r^2; use cloud-top r_eff (um) -> proxy in units of (sed x 10 um)^2
 df["vsed_proxy"] = df.sed * (df.reff_top_um / 10.0) ** 2
 fig, axs = plt.subplots(1, 2, figsize=(10, 3.9), sharey=True)
-for ax, sel, ttl in ((axs[0], df.dx_km >= 5, "Δx ≥ 5 km (single-column-like)"),
-                     (axs[1], df.dx_km <= 2.5, "Δx ≤ 2.5 km (resolved cells)")):
+split = 5 if T_END > 6 else 2.5     # by 12 h, 5 km has resolved cells too
+for ax, sel, ttl in ((axs[0], df.dx_km > split, f"Δx > {split:g} km (single-column-like)"),
+                     (axs[1], df.dx_km <= split, f"Δx ≤ {split:g} km (resolved cells)")):
     for r in [r for r in RES if r in set(df[sel].res)]:
         for ps, mk in (("on", "o"), ("off", "s")):
             d = df[(df.res == r) & (df.precsupp == ps)]
@@ -140,7 +148,7 @@ fig.savefig(f"{out}/figR3_lwp_trend.png", dpi=150, bbox_inches="tight")
 # information is in the LWP distribution (deck break-up, thinning), not Nd-LWP.
 import netCDF4  # noqa: E402
 NDC = {20: "#86b6ef", 100: "#2a78d6", 1000: "#0d366b"}
-fine = [r for r in ("2p5km", "1p25km") if r in RES]
+fine = [r for r in ("2p5km", "1p25km", "625m", "312m") if r in RES][-2:]
 bins = np.logspace(0, np.log10(800), 50)
 mid = np.sqrt(bins[1:] * bins[:-1])
 fig, axs = plt.subplots(len(fine), 3, figsize=(11, 3.1 * len(fine)), sharex=True, sharey=True, squeeze=False)
@@ -177,4 +185,37 @@ h += [Line2D([], [], color=INK2, label="suppression on"),
 fig.legend(handles=h, loc="upper center", ncol=len(h), bbox_to_anchor=(0.5, 1.04))
 fig.tight_layout()
 fig.savefig(f"{out}/figR4_lwp_pdf.png", dpi=150, bbox_inches="tight")
+
+# ---------- R5: 3D turbulence on - off (sub-km) ----------
+if "turb3d" in DF_ALL and (DF_ALL.turb3d == "on").any():
+    on = DF_ALL[DF_ALL.turb3d == "on"].set_index(["res", "Nd_target", "sed", "precsupp"])
+    off = DF_ALL[DF_ALL.turb3d == "off"].set_index(["res", "Nd_target", "sed", "precsupp"])
+    idx = on.index.intersection(off.index)
+    D = (on.loc[idx, ["LWP", "we_mm_s", "cloud_cover", "LWP_sd_online", "precip"]]
+         - off.loc[idx, ["LWP", "we_mm_s", "cloud_cover", "LWP_sd_online", "precip"]]).reset_index()
+    D.round(3).to_csv(f"{out}/turb3d_on_minus_off.csv", index=False)
+    vv = [("LWP", "ΔLWP (g m$^{-2}$)"), ("we_mm_s", "Δ$w_e$ (mm s$^{-1}$)"),
+          ("cloud_cover", "Δcloud cover"), ("LWP_sd_online", "ΔLWP SD (g m$^{-2}$)")]
+    rr = sorted(set(D.res), key=ALLRES.index)
+    fig, axs = plt.subplots(len(rr), len(vv), figsize=(11, 2.8 * len(rr)), squeeze=False, sharex=True)
+    for i, r in enumerate(rr):
+        for j, (v, vl) in enumerate(vv):
+            ax = axs[i, j]
+            for sed in (0.5, 1.0, 2.0):
+                for ps, ls, mk in (("on", "-", "o"), ("off", (0, (4, 2)), "s")):
+                    d = D[(D.res == r) & (D.sed == sed) & (D.precsupp == ps)].sort_values("Nd_target")
+                    ax.plot(d.Nd_target, d[v], ls=ls, marker=mk, ms=4, color=SEDC[sed], lw=1.4,
+                            mfc=SEDC[sed] if ps == "on" else "white")
+            ax.axhline(0, color=INK2, lw=0.8)
+            ndaxis(ax)
+            ax.set_title(f"{LAB[r]}: {vl}", fontsize=9)
+            if i == len(rr) - 1:
+                ax.set_xlabel("Nd target")
+    h = [Line2D([], [], color=SEDC[s], lw=2.5, label=f"sed ×{s:g}") for s in (0.5, 1.0, 2.0)]
+    h += [Line2D([], [], color=INK2, marker="o", label="suppression on"),
+          Line2D([], [], color=INK2, ls=(0, (4, 2)), marker="s", mfc="white", label="suppression off")]
+    fig.legend(handles=h, loc="upper center", ncol=5, bbox_to_anchor=(0.5, 1.06))
+    fig.suptitle(f"3D turbulence on − off, hours {WIN}", y=1.1, fontweight="bold")
+    fig.tight_layout()
+    fig.savefig(f"{out}/figR5_turb3d.png", dpi=150, bbox_inches="tight")
 print("ok")

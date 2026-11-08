@@ -1,0 +1,40 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.75in]{geometry}
+\usepackage{booktabs,enumitem,graphicx,hyperref,float,caption}
+\captionsetup{font=small,labelfont=bf}
+\setlist{itemsep=1.5pt,topsep=3pt}
+\begin{document}\sloppy
+\noindent{\Large\bfseries Sed $\times$ precip suppression: 625\,m results (12\,h)}\\[2pt]
+7 Nov 2026. Prepared by Claude Code (AI assistant) on behalf of Naser Mahfouz.
+All 72 runs at 625\,m: Nd 20--1000 $\times$ sed $\times$0.5/1/2 $\times$ precip suppression on/off $\times$ 3D turbulence on/off.
+Each is 12\,h, run in restart segments (checked bit-for-bit), with means over hours 10--12.
+The 625\,m column is added next to the 40\,km--1.25\,km runs from the 12\,h note. The main figures use 3D turbulence off.
+
+\section*{Findings}
+\begin{enumerate}
+\item \textbf{The runs are steady.} $|d{\rm LWP}/dt| \le 4.5$\,g\,m$^{-2}$\,h$^{-1}$ over hours 10--12 in every 625\,m run.
+\item \textbf{A clear inverted V.} With sed$\times$1 and suppression on, LWP goes 52 $\to$ 98 $\to$ 120 $\to$ 122 $\to$ 119 $\to$ 115\,g\,m$^{-2}$ for Nd 20 $\to$ 1000,
+and peaks near Nd 200. $S_{200\to1000}$ is $-0.016/-0.038/-0.064$ for sed $\times$0.5/1/2 (Fig.~\ref{fig:S}).
+\item \textbf{The falling branch does not need precip suppression.} With suppression off, $S_{200\to1000}$ is still negative ($-0.007/-0.027/-0.033$), and LWP falls from 109 to 99\,g\,m$^{-2}$
+between Nd 50 and 1000 while $w_e$ rises from 6.3 to 7.3\,mm\,s$^{-1}$. The high-Nd decline is entrainment-driven, and sedimentation strengthens it.
+\item \textbf{The low-Nd branch is steepest yet.} With suppression on, $S_{20\to50}$ = 0.60/0.76/1.00 for sed $\times$0.5/1/2. With suppression off it is $-0.06$/0.08/0.42, which comes from deck break-up.
+\item \textbf{The trend with resolution continues from 1.25\,km to 625\,m.} LWP is lower (about 100--135 vs.\ 120--180\,g\,m$^{-2}$), $w_e$ is higher (up to 7.9\,mm\,s$^{-1}$), and peak cloud cover
+is lower ($\approx$0.94). The Nd response has the same shape at 2.5\,km, 1.25\,km and 625\,m, with the inverted V somewhat sharper at 625\,m.
+\item \textbf{3D turbulence makes almost no difference at 625\,m} (Fig.~\ref{fig:t3d}). LWP changes by $-1.0$ to $+1.5$\,g\,m$^{-2}$ ($<$1.5\,\%), cloud cover by less than 0.007 and LWP SD by less than 2\,g\,m$^{-2}$.
+The one consistent signal is $w_e$, which is 0.02--0.06\,mm\,s$^{-1}$ lower ($<$1\,\%). This matches the 6\,h ACI-study result. Any effect should appear at 312\,m.
+\end{enumerate}
+
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{fig1_response.png}
+\caption{Hour 10--12 means against diagnosed Nd, 40\,km to 625\,m (3D turbulence off).}\label{fig:resp}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{fig2_susceptibility.png}
+\caption{Susceptibility on three Nd branches against resolution, hours 10--12.}\label{fig:S}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{figR5_turb3d.png}
+\caption{625\,m: 3D turbulence on minus off, for every Nd, sed and suppression setting.}\label{fig:t3d}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=0.92\textwidth]{fig3_timeseries.png}
+\caption{Time series at 40\,km and 625\,m, Nd 20 and 1000.}\end{figure}
+
+\noindent\textbf{Data:} 625\,m runs are in \path{/pscratch/sd/m/mahf708/dp_screamxx_sedps_12h/sedps_625m_*}, with case names ending in \texttt{\_t3don} for 3D turbulence on.
+Combined 12\,h analysis (40\,km--625\,m): \path{/pscratch/sd/m/mahf708/dp_screamxx_sedps_12h/analysis_with625m/}. It contains
+\texttt{summary\_h10-12.csv} and \texttt{timeseries\_15min.csv} (both with a \texttt{turb3d} column), \texttt{susceptibility.csv},
+\texttt{turb3d\_on\_minus\_off.csv} and the figures. 312\,m is in progress.
+\end{document}

@@ -13,6 +13,7 @@ export SEDPS_ROOT=${SEDPS_ROOT:-$PSCRATCH/dp_screamxx_sedps_12h}
 R=$SEDPS_ROOT
 L=$R/logs/daemon.log
 MAX_DEBUG=${MAX_DEBUG:-3}           # leave debug submit slots for other work
+MAX_INT=${MAX_INT:-2}               # interactive allocations to hold (the QOS allows 2)
 cat $R/lists/625m.txt $R/lists/625m_t3don.txt > $R/lists/sub_625m.txt
 cat $R/lists/312m.txt $R/lists/312m_t3don.txt > $R/lists/sub_312m.txt
 log() { echo "$(date '+%m-%d %T') $*" >> "$L"; }
@@ -51,7 +52,7 @@ while [[ ! -f $R/STOP_DAEMON ]]; do
         else scancel "$j"; log "released interactive $j (no work for it)"; fi
     done
     nint=$(squeue -h -u "$USER" -q gpu_interactive -o "%j" | grep -c '^sedps_int')
-    if (( nint < 2 )) && ! pgrep -f "salloc.*sedps_int" > /dev/null; then
+    if (( nint < MAX_INT )) && ! pgrep -f "salloc.*sedps_int" > /dev/null; then
         if (( n625 > 0 )); then c=gpu; else c='gpu&hbm80g'; fi
         ( timeout 900 salloc -N 4 -q interactive -t 04:00:00 -C "$c" -A e3sm_g --gpus-per-node=4 \
               --no-shell -J sedps_int_$(date +%H%M) >> "$R/logs/salloc.out" 2>&1 ) &

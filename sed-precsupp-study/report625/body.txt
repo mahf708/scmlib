@@ -1,0 +1,24 @@
+Hi Naser and Johannes,
+
+I'm Claude Code, an AI assistant working on Naser's behalf. All 72 runs at 625 m are done: 12 h, Nd 20-1000 x sed x0.5/1/2 x precip suppression on/off x 3D turbulence on/off. The 3-page note and CSVs are attached; means are over hours 10-12.
+
+Headlines:
+1. Steady: |dLWP/dt| <= 4.5 g/m2/h over hours 10-12 in every run.
+2. A clear inverted V. With sed x1 and suppression on, LWP goes 52 -> 98 -> 120 -> 122 -> 119 -> 115 g/m2 for Nd 20 -> 1000, peaking near Nd 200. S for Nd 200 -> 1000 is -0.016/-0.038/-0.064 for sed x0.5/1/2.
+3. The falling branch does not need precip suppression. With suppression off, S for Nd 200 -> 1000 is still negative (-0.007/-0.027/-0.033): LWP falls from 109 to 99 g/m2 between Nd 50 and 1000 while w_e rises from 6.3 to 7.3 mm/s. So the high-Nd decline is entrainment-driven, and sedimentation makes it stronger.
+4. The low-Nd branch is the steepest yet. S for Nd 20 -> 50:
+   - suppression on: 0.60/0.76/1.00 for sed x0.5/1/2
+   - suppression off: -0.06/0.08/0.42, from deck break-up
+5. The trend with resolution continues from 1.25 km to 625 m: lower LWP, higher w_e (up to 7.9 mm/s), slightly lower peak cloud cover (~0.94). The Nd response has the same shape at 2.5 km, 1.25 km and 625 m.
+6. 3D turbulence makes almost no difference at 625 m. LWP changes by -1.0 to +1.5 g/m2 (<1.5%), cloud cover by <0.007 and LWP SD by <2 g/m2. The one consistent signal is w_e, which is 0.02-0.06 mm/s lower (<1%). That matches the earlier 6 h ACI-study result; any effect should appear at 312 m.
+
+312 m status: 17 of 864 model-hours done across 6 runs. It runs on 80 GB interactive and debug nodes at ~16 min per model hour, about 3.2 h per 12 h run. Six regular-queue jobs are also waiting: two aging 16-node jobs plus four 8-node backfill jobs.
+
+Perlmutter paths:
+- 625 m runs: /pscratch/sd/m/mahf708/dp_screamxx_sedps_12h/sedps_625m_*   (names ending in _t3don have 3D turbulence on)
+- Combined 12 h analysis, 40 km - 625 m: /pscratch/sd/m/mahf708/dp_screamxx_sedps_12h/analysis_with625m/
+  - summary_h10-12.csv and timeseries_15min.csv, both with a turb3d column
+  - susceptibility.csv, turb3d_on_minus_off.csv, figures, and this note (sedps_625m_note.pdf)
+- R: sedps_runs("/pscratch/sd/m/mahf708/dp_screamxx_sedps_12h", hours = 12). The runs data frame has a turb3d column, and the loaders read restart-segmented output.
+
+-- Claude, on behalf of Naser Mahfouz

@@ -484,6 +484,11 @@ EOF
 
 # Write restart files at the end of model simulation
   ./xmlchange PIO_TYPENAME="pnetcdf"
+  # At >= ~4000 elements per rank the restart write of Qdp_dyn from 4 ranks
+  #  per I/O task exceeds PIO's 2 GB request limit: make every rank an I/O task
+  if ($res == 312m || $res == 156m) then
+    ./xmlchange PIO_STRIDE=1
+  endif
 
 # Build the case, or reuse a finished build of any other case in this study
 #  (setenv SEDPS_EXEROOT /path/to/that/case/build)

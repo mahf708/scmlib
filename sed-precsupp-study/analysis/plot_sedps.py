@@ -21,13 +21,19 @@ T_END = float(os.environ.get("SEDPS_TEND", 6))
 WIN = f"{T_END - 2:g}–{T_END:g}"
 df = pd.read_csv(f"{out}/summary_h{T_END - 2:g}-{T_END:g}.csv")
 ts = pd.read_csv(f"{out}/timeseries_15min.csv")
+# main figures use the 3D-turbulence-off runs; fig_turb3d.png compares on/off
+DF_ALL = df.copy()
+if "turb3d" in df:
+    df = df[df.turb3d == "off"].copy()
+if "turb3d" in ts:
+    ts = ts[ts.turb3d == "off"].copy()
 
 INK, INK2, GRID = "#0b0b0b", "#52514e", "#e4e3df"
 SEDC = {0.5: "#86b6ef", 1.0: "#2a78d6", 2.0: "#104281"}       # blue ramp 250/450/650
 PS = {"on": dict(ls="-", marker="o", mfc=None), "off": dict(ls=(0, (4, 2)), marker="s", mfc="white")}
-RES = [r for r in ["40km", "20km", "10km", "5km", "2p5km", "1p25km", "625m"] if r in set(df.res)]
+RES = [r for r in ["40km", "20km", "10km", "5km", "2p5km", "1p25km", "625m", "312m"] if r in set(df.res)]
 LAB = {"40km": "40 km", "20km": "20 km", "10km": "10 km", "5km": "5 km", "2p5km": "2.5 km",
-       "1p25km": "1.25 km", "625m": "625 m"}
+       "1p25km": "1.25 km", "625m": "625 m", "312m": "312 m"}
 DOM = {"40km": 600, "20km": 300}
 
 plt.rcParams.update({
@@ -130,7 +136,7 @@ fig.savefig(f"{out}/fig2_susceptibility.png", dpi=150, bbox_inches="tight")
 
 # ---------- Fig 3: time series, coarse vs km-scale, low vs high Nd ----------
 ndhi = int(df.Nd_target.max())
-fine = "1p25km" if "1p25km" in RES else "2p5km"
+fine = RES[-1]   # finest resolution available
 cases = [(RES[0], 20), (RES[0], ndhi), (fine, 20), (fine, ndhi)]
 trows = [("LWP_gm2", "LWP (g m$^{-2}$)"), ("LWP_sd_gm2", "LWP spatial SD\n(g m$^{-2}$)"),
          ("Nd_layer_cm3", "in-cloud Nd\n(cm$^{-3}$)"), ("precip_mmday", "surface precip\n(mm day$^{-1}$)")]
