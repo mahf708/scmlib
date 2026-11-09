@@ -1,0 +1,21 @@
+Hi Naser and Johannes,
+
+I'm Claude Code, an AI assistant working on Naser's behalf. Here is an interim look at the 312 m runs, 27% of the 312 m set. The 3-page note with figures is attached.
+
+Done so far: 17 of 72 runs, covering every sed and suppression setting at Nd 20, 50 and 100 with 3D turbulence off (Nd 100, sed x2, suppression off is still running). All are 12 h, averaged over hours 10-12, and compared with the same settings at 2.5 km, 1.25 km and 625 m. Nd 200-1000 and 3D turbulence on are still running, so this doesn't cover the high-Nd branch yet.
+
+Findings so far:
+1. No convergence at 312 m; the step from 625 m to 312 m is the largest yet. At Nd 100, sed x1, suppression on: LWP 119 -> 76 g/m2 (163 at 2.5 km), cloud cover 0.92 -> 0.83, w_e 7.0 -> 8.1 mm/s, and the cells shrink with dx (see the LWP maps). At Nd 20 the deck breaks up into scattered small clouds (cover ~0.5, LWP ~40 g/m2).
+2. The low-Nd susceptibility barely changes with resolution. S for Nd 20 -> 50 with suppression on is 0.56/0.73/0.97 for sed x0.5/1/2 at 312 m, within +/-0.1 of the 2.5 km to 625 m values.
+3. The LWP peak moves to lower Nd as dx shrinks. S for Nd 50 -> 100 (sed x1, suppression on) goes 0.43 (2.5 km) -> 0.42 -> 0.29 -> 0.08 (312 m), so LWP is nearly saturated by Nd 100 at 312 m. Whether it falls beyond that waits on the Nd 200-1000 runs.
+4. Precip suppression matters less at 312 m. At Nd 100, LWP with suppression on/off is 76 vs 72 g/m2 (163 vs 138 at 2.5 km). With suppression off, S on the low-Nd branches is negative at 312 m (-0.11, -0.13).
+5. Steadiness: LWP is still thinning slowly over hours 10-12 at both 625 m and 312 m (-1 to -4 g/m2/h).
+
+Progress: 233 of 864 model-hours at 312 m. It runs on one interactive allocation plus debug, all on 80 GB nodes. The first 16-node regular job is expected to start around 01:40 tonight.
+
+Perlmutter paths:
+- Interim 312 m analysis: /pscratch/sd/m/mahf708/dp_screamxx_sedps_12h/analysis_312m_interim/ (summary_h10-12.csv, susceptibility_lowNd.csv, figures including LWP maps with suppression off, and this note)
+- 312 m runs: /pscratch/sd/m/mahf708/dp_screamxx_sedps_12h/sedps_312m_*
+- Earlier 12 h analysis, 40 km - 625 m: /pscratch/sd/m/mahf708/dp_screamxx_sedps_12h/analysis_with625m/
+
+-- Claude, on behalf of Naser Mahfouz

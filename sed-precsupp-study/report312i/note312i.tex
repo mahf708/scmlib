@@ -1,0 +1,44 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.75in]{geometry}
+\usepackage{booktabs,enumitem,graphicx,hyperref,float,caption}
+\captionsetup{font=small,labelfont=bf}
+\setlist{itemsep=1.5pt,topsep=3pt}
+\begin{document}\sloppy
+\noindent{\Large\bfseries 312\,m interim results (27\,\% of the 312\,m set)}\\[2pt]
+8 Nov 2026. Prepared by Claude Code (AI assistant) on behalf of Naser Mahfouz.
+We have 17 of the 72 runs at 312\,m: every sed and suppression setting at Nd 20, 50 and 100, with 3D turbulence off. The exception is Nd~100, sed$\times$2, suppression off, which is still running.
+All runs are 12\,h; means are over hours 10--12. Below they are compared with the same settings at 2.5\,km, 1.25\,km and 625\,m.
+Nd 200--1000 and 3D turbulence on are still running, so the high-Nd branch is not covered yet.
+
+\section*{Findings so far}
+\begin{enumerate}
+\item \textbf{No convergence at 312\,m. The step from 625\,m to 312\,m is the largest yet} (Fig.~\ref{fig:conv}). With sed$\times$1 and suppression on at Nd~100:
+\begin{itemize}
+\item LWP drops from 119 to 76\,g\,m$^{-2}$ (163 at 2.5\,km).
+\item Cloud cover drops from 0.92 to 0.83.
+\item $w_e$ rises from 7.0 to 8.1\,mm\,s$^{-1}$.
+\item LWP spatial SD drops, and the cells shrink with $\Delta x$ (Fig.~\ref{fig:maps}).
+\end{itemize}
+At Nd~20 the deck breaks up into scattered small clouds: cover 0.49, LWP 39\,g\,m$^{-2}$.
+\item \textbf{The low-Nd susceptibility barely changes with resolution.} $S_{20\to50}$ with suppression on is 0.56/0.73/0.97 for sed $\times$0.5/1/2 at 312\,m.
+That is within $\pm$0.1 of the 2.5\,km--625\,m values (Fig.~\ref{fig:S}).
+\item \textbf{The LWP peak moves to lower Nd as $\Delta x$ shrinks.} With sed$\times$1 and suppression on, $S_{50\to100}$ falls from 0.43 at 2.5\,km to 0.42, 0.29 and \textbf{0.08} at 312\,m.
+So at 312\,m LWP is nearly saturated by Nd~100. Whether it falls beyond that waits on the Nd 200--1000 runs.
+\item \textbf{Precip suppression matters less at 312\,m.} At Nd~100, LWP with suppression on and off is 76 vs.\ 72\,g\,m$^{-2}$, against 163 vs.\ 138 at 2.5\,km.
+With suppression off, $S$ is negative on both low-Nd branches at 312\,m ($-0.11$ and $-0.13$).
+\item \textbf{Steadiness.} LWP is still thinning slowly over hours 10--12 at 625\,m and 312\,m alike ($-1$ to $-4$\,g\,m$^{-2}$\,h$^{-1}$; Fig.~\ref{fig:ts}).
+\end{enumerate}
+
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{figI1_convergence.png}
+\caption{Hour 10--12 means against $\Delta x$ for sed$\times$1, with Nd 20/50/100 and suppression on (solid) and off (dashed).}\label{fig:conv}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=0.8\textwidth]{figI2_susceptibility_lowNd.png}
+\caption{Low-Nd susceptibility against $\Delta x$ for all sed values.}\label{fig:S}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=0.95\textwidth]{figI3_lwp_maps_pson.png}
+\caption{LWP at hour 12 over the full 240\,km domain, sed$\times$1, suppression on. Rows: Nd 20/50/100. Columns: $\Delta x$.}\label{fig:maps}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{figI4_timeseries.png}
+\caption{Domain-mean LWP and cloud cover against time at 2.5\,km--312\,m, sed$\times$1.}\label{fig:ts}\end{figure}
+
+\noindent\textbf{Data:} \path{/pscratch/sd/m/mahf708/dp_screamxx_sedps_12h/analysis_312m_interim/} holds \texttt{summary\_h10-12.csv} for the 17 finished 312\,m runs,
+\texttt{susceptibility\_lowNd.csv}, the figures (including \texttt{figI3\_lwp\_maps\_psoff.png}) and this note.
+312\,m progress: 233 of 864 model-hours. The first 16-node regular job is expected to start about 01:40 tonight.
+\end{document}

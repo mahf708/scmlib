@@ -9,8 +9,8 @@
 #
 # Per case (in case_scripts/):  .sedps_target  total model hours (from STOP_N at
 # first use);  .sedps_done  model hours completed;  segments.log  timings.
-# A segment starts only if the allocation has time left for it (estimated from
-# the case's previous segment, or SEDPS_SEG_MIN minutes, times 1.2 plus 3 min).
+# Segments are sized to the time left in the allocation (at most SEDPS_SEG h),
+# from the case's last segment speed (or SEDPS_SEG_MIN minutes per SEG hours).
 
 ROOT=${SEDPS_ROOT:-$PSCRATCH/dp_screamxx_sedps}
 SEG=${SEDPS_SEG:?set SEDPS_SEG (model hours per segment)}
@@ -51,12 +51,22 @@ chain() {   # run segments of one case until done or out of time
     while :; do
         done=$(cat .sedps_done)
         (( done >= target )) && { echo "$(date +%T) $case complete" >> "$log"; return 0; }
-        est=$(tail -1 segments.log 2>/dev/null | awk '{print $4}')
-        est=${est:-$(( ${SEDPS_SEG_MIN:-25} * 60 ))}
-        if (( $(date +%s) + est * 12 / 10 + 180 > end )); then
+        # time model: T(h) = 150 s + b*h, b (s per model hour) from the last
+        # segment of this case, else from SEDPS_SEG_MIN minutes per SEG hours
+        local last b avail seg
+        last=$(tail -1 segments.log 2>/dev/null)
+        if [[ -n $last ]]; then
+            b=$(echo "$last" | awk '{split($2,a,"-"); h=a[2]-a[1]; t=$4; b=(t-150)/h; if (b<60) b=60; printf "%d", b}')
+        else
+            b=$(( (${SEDPS_SEG_MIN:-25} * 60 - 150) / SEG ))
+        fi
+        avail=$(( end - $(date +%s) - 180 ))
+        seg=$(( (avail * 10 / 12 - 150) / b ))            # 20 % margin
+        (( seg > SEG )) && seg=$SEG
+        (( seg > target - done )) && seg=$(( target - done ))
+        if (( seg < 1 )); then
             echo "$(date +%T) $case stop at ${done}/${target} h (not enough time left)" >> "$log"; return 0
         fi
-        local seg=$(( target - done < SEG ? target - done : SEG ))
         if (( done == 0 )); then
             ./xmlchange CONTINUE_RUN=FALSE,STOP_OPTION=nhours,STOP_N=$seg,REST_OPTION=nhours,REST_N=$seg < /dev/null
         else
