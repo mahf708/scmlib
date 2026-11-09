@@ -135,8 +135,8 @@ fig.tight_layout(rect=(0, 0, 1, 0.93))
 fig.savefig(f"{out}/fig2_susceptibility.png", dpi=150, bbox_inches="tight")
 
 # ---------- Fig 3: time series, coarse vs km-scale, low vs high Nd ----------
-ndhi = int(df.Nd_target.max())
 fine = RES[-1]   # finest resolution available
+ndhi = int(df[df.res == fine].Nd_target.max())
 cases = [(RES[0], 20), (RES[0], ndhi), (fine, 20), (fine, ndhi)]
 trows = [("LWP_gm2", "LWP (g m$^{-2}$)"), ("LWP_sd_gm2", "LWP spatial SD\n(g m$^{-2}$)"),
          ("Nd_layer_cm3", "in-cloud Nd\n(cm$^{-3}$)"), ("precip_mmday", "surface precip\n(mm day$^{-1}$)")]

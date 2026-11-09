@@ -158,6 +158,8 @@ for i, r in enumerate(fine):
         for nd in [n for n in (20, 100, 1000) if n in NDT]:
             for ps, ls in (("on", "-"), ("off", (0, (4, 2)))):
                 case = f"sedps_{r}_nd{nd}_sed{sed}_ps{ps}"
+                if case not in set(df.case):      # only runs that are complete
+                    continue
                 fl = sorted(glob.glob(f"{root}/{case}/run/{case}.aci2d.INSTANT.*.nc"))
                 if not fl:
                     continue
