@@ -1,0 +1,250 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{booktabs,enumitem,graphicx,hyperref,amsmath,url,float,caption}
+\captionsetup{font=small,labelfont=bf}
+\setlist{itemsep=1.5pt,topsep=3pt}
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue!50!black}
+\title{\bfseries Droplet sedimentation, precipitation suppression and resolution in the Nd--LWP response of DP-EAMxx (DYCOMS-II RF02)\\[4pt]\large Technical report, version 4}
+\author{Prepared by Claude Code (AI assistant) on behalf of Naser Mahfouz\\ for Naser Mahfouz and Johannes M\"ulmenst\"adt}
+\date{10 November 2026 (afternoon)}
+\begin{document}\sloppy
+\maketitle
+
+\begin{abstract}\noindent
+We ran DP-EAMxx on the DYCOMS-II RF02 nocturnal drizzling stratocumulus for 12\,h. The matrix covers grid spacing $\Delta x$ from 40\,km to 312\,m,
+droplet number Nd from 20 to 1000\,cm$^{-3}$, a cloud-droplet sedimentation multiplier ($\times$0.5, 1, 2), precipitation suppression
+(KK2000 Nd dependence on or off) and, below 1\,km, 3D turbulence on or off. In all, 340 runs are complete and analysed. That includes all 36 runs at 312\,m with 3D turbulence off, and 16 of the 36 with it on (76\,\% of 312\,m model-hours). Section~\ref{sec:proc} adds process-level diagnostics.
+The Nd--LWP response depends strongly on resolution, and the two microphysical pathways trade places as $\Delta x$ shrinks.
+At $\geq$10\,km, LWP rises monotonically with Nd, and precipitation suppression explains all of that rise.
+As $\Delta x$ shrinks, entrainment increases and depends more strongly on Nd, the precipitation-suppression gain collapses
+(from +134\,g\,m$^{-2}$ at 40\,km to +6\,g\,m$^{-2}$ at 312\,m, both at Nd~1000), and the LWP maximum moves to lower Nd
+(Nd $>$ 1000 at $\geq$10\,km, 500 at 5\,km, 200 at 2.5\,km--625\,m, 100 at 312\,m). The result is an inverted V whose falling branch is
+entrainment-driven: it persists with precipitation suppression off, and faster sedimentation strengthens it. The low-Nd branch ($S_{20\to50}$) barely changes with
+resolution below 2.5\,km, while LWP itself has not converged at 312\,m. 3D turbulence changes LWP by less than 1.5\,g\,m$^{-2}$ at both 625\,m and 312\,m.
+\end{abstract}
+
+\section*{Key results}
+\begin{enumerate}
+\item \textbf{The inverted V forms and its peak moves to lower Nd as $\Delta x$ shrinks} (Figs.~\ref{fig:h1}, \ref{fig:resp}; Table~\ref{tab:lwp}).
+With sed$\times$1 and suppression on, LWP peaks at Nd $\geq$1000 at $\geq$10\,km, at 500 at 5\,km, at 200 from 2.5\,km to 625\,m, and at 100 at 312\,m.
+The high-Nd susceptibility $S_{100\to200}$ falls monotonically: 0.27 (40\,km), 0.20 (5\,km), 0.11 (2.5\,km), 0.07 (1.25\,km), 0.03 (625\,m), $-0.05$ (312\,m) (Fig.~\ref{fig:S}).
+\item \textbf{Precipitation suppression fades with resolution} (Fig.~\ref{fig:path}a). At high Nd, LWP(on) $-$ LWP(off) is +134 (40\,km), +58 (5\,km),
++34 (2.5\,km), +27 (1.25\,km), +16 (625\,m) and +6\,g\,m$^{-2}$ (312\,m), all at Nd~1000. With suppression off, $S$ is near zero or negative at every resolution.
+\item \textbf{The falling branch comes from entrainment and is strengthened by sedimentation.} It survives with suppression off
+(at 312\,m, $S_{100\to200}$ is $-0.07$ off and $-0.05$ on), while $w_e$ keeps rising with Nd (Fig.~\ref{fig:h1}). With suppression on it steepens with the sed factor
+(625\,m: $S_{200\to1000}$ = $-0.02/-0.04/-0.06$ for sed $\times$0.5/1/2; 312\,m: $-0.02/-0.04/-0.07$ on and $-0.02/-0.05/-0.06$ off).
+\item \textbf{Sedimentation--entrainment} (Fig.~\ref{fig:we}). At $\geq$10\,km, $w_e$ switches between two levels (about 4.0 and 3.0\,mm\,s$^{-1}$) at a cloud-top
+fall-speed proxy near 3.5. At $\leq$5\,km, $w_e$ falls smoothly with the proxy, and at a given proxy it is higher the finer the grid.
+\item \textbf{The low-Nd branch is robust; LWP is not converged.} Below 5\,km, $S_{20\to50}$ (suppression on) is 0.56--0.60, 0.65--0.76 and 0.88--1.00 for sed
+$\times$0.5/1/2, with little dependence on $\Delta x$. LWP, cloud cover and $w_e$ still change strongly between 625\,m and 312\,m (Fig.~\ref{fig:conv}):
+at Nd~100, LWP goes from 120 to 76\,g\,m$^{-2}$, cloud cover from 0.92 to 0.83 and $w_e$ from 7.0 to 8.1\,mm\,s$^{-1}$, and the cells shrink (Fig.~\ref{fig:maps}).
+\item \textbf{3D turbulence makes almost no difference at 625\,m or 312\,m} (Fig.~\ref{fig:t3d}). At 625\,m (36 pairs), $|\Delta{\rm LWP}| <$ 1.5\,g\,m$^{-2}$ and $|\Delta{\rm cloud\ cover}| <$ 0.007.
+At 312\,m (16 pairs so far, Nd 20--200), $|\Delta{\rm LWP}| \leq$ 1.0\,g\,m$^{-2}$ and $|\Delta{\rm cloud\ cover}| \leq$ 0.006.
+The one consistent signal is $w_e$, which is 0.02--0.07\,mm\,s$^{-1}$ lower ($<$1\,\%).
+\item \textbf{Steadiness} (Fig.~\ref{fig:trend}). At $\leq$2.5\,km, $|d{\rm LWP}/dt| \leq$ 4.5\,g\,m$^{-2}$\,h$^{-1}$ over hours 10--12.
+At 40--10\,km, LWP is still rising at high Nd with suppression on, by up to +18\,g\,m$^{-2}$\,h$^{-1}$.
+\item \textbf{Process-level diagnostics} (Section~\ref{sec:proc}).
+\begin{itemize}
+\item The LWP cell scale converges near 17--20\,km (aspect ratio $\approx$17) by 625--312\,m, even though LWP does not.
+\item The resolved share of boundary-layer $w$-variance climbs from 0 at $\geq$10\,km to 9\,\% (2.5\,km), 37\,\% (625\,m) and 66\,\% (312\,m).
+\item Drizzle decouples the boundary layer at low Nd (cumulus-like positive $w$ skewness), and high Nd brings back Sc-like negative skewness, except at 312\,m.
+\item Precipitation suppression fades at fine resolution because thinner clouds make little rain and up to 90\,\% of it evaporates.
+\item At fixed radiative driving, entrainment roughly doubles from 40\,km to 625\,m.
+\item P3's \texttt{qc\_sed}/\texttt{qr\_sed}/\texttt{qi\_sed} outputs are broken (a C++ port bug, diagnostics only).
+\end{itemize}
+\end{enumerate}
+
+\begin{table}[H]\centering\small
+\caption{LWP (g\,m$^{-2}$, hours 10--12) with sed$\times$1 and 3D turbulence off. Bold marks the maximum with suppression on.}\label{tab:lwp}
+\begin{tabular}{@{}llrrrrrr@{}}
+\toprule
+$\Delta x$ & suppression & Nd 20 & 50 & 100 & 200 & 500 & 1000 \\ \midrule
+40\,km & on & 135 & 188 & 246 & 295 & 333 & \textbf{342} \\
+ & off & 234 & 221 & 216 & 211 & 209 & 208 \\
+10\,km & on & 134 & 186 & 240 & 281 & 308 & \textbf{312} \\
+ & off & 232 & 217 & 213 & 208 & 206 & 204 \\
+5\,km & on & 82 & 137 & 184 & 214 & \textbf{222} & 218 \\
+ & off & 135 & 149 & 153 & 158 & 159 & 160 \\
+2.5\,km & on & 67 & 119 & 163 & \textbf{177} & 175 & 170 \\
+ & off & 117 & 137 & 139 & 138 & 137 & 136 \\
+1.25\,km & on & 65 & 111 & 149 & \textbf{157} & 154 & 149 \\
+ & off & 116 & 127 & 127 & 124 & 122 & 122 \\
+625\,m & on & 52 & 98 & 120 & \textbf{122} & 119 & 115 \\
+ & off & 103 & 109 & 108 & 103 & 101 & 99 \\
+312\,m & on & 40 & 72 & \textbf{76} & 74 & 72 & 70 \\
+ & off & 79 & 79 & 72 & 69 & 66 & 64 \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\section{Setup}
+\paragraph{Case and model.} DYCOMS-II RF02 nocturnal drizzling stratocumulus (shortwave off; $T$, $q$ nudged above 650\,hPa; IOP surface fluxes and
+subsidence). The forcing is constant over 0--12\,h. We run doubly periodic EAMxx (SHOC, P3, SPA, RRTMGP; 128 levels; stub sea ice).
+Domains are 600\,km at 40\,km, 300\,km at 20\,km, and 240\,km from 10\,km down.
+Time steps follow the earlier ACI study: the physics step is 100\,s at $\geq$5\,km and 75/60/30/15\,s at 2.5/1.25/0.625/0.3125\,km.
+The E3SM branch is \texttt{mahf708/eamxx/p3-cloud-sed-factor} (E3SM PR \#9017 plus a P3 sedimentation knob).
+
+\paragraph{Matrix.} The full matrix is $\Delta x$ (40, 20, 10, 5, 2.5, 1.25\,km, 625, 312\,m) $\times$ Nd target (20, 50, 100, 200, 500, 1000\,cm$^{-3}$) $\times$
+\texttt{cloud\_sedimentation\_factor} (0.5, 1, 2) $\times$ precipitation suppression (on, off), plus 3D turbulence (off, on) at 625 and 312\,m.
+\begin{itemize}
+\item \texttt{p3::cloud\_sedimentation\_factor} is a new P3 option that scales the mass- and number-weighted cloud-droplet fall speeds, like MG2's \texttt{cld\_sed}.
+\item Precipitation suppression off means KK2000 autoconversion with the Nd exponent set to 0 and the prefactor set to $1350\cdot63^{-1.79}=0.812$. That matches the default rate at Nd~63.
+\item The SPA activation factor sets Nd. At $\geq$625\,m the diagnosed in-cloud Nd is 10--25\,\% above target; at 312\,m it is 15--20\,\% below.
+\item The 625 and 312\,m runs are done in restart segments across interactive, debug and regular jobs. We checked that segmented runs are bit-for-bit identical to straight runs.
+\end{itemize}
+
+\paragraph{Diagnostics.}
+\begin{itemize}
+\item Values are means over hours 10--12 unless stated otherwise. Cloud cover is the fraction of columns with LWP $>$ 10\,g\,m$^{-2}$.
+\item $w_e = dz_i/dt - w_{\rm subs}(z_i)$.
+\item $S = d\ln{\rm LWP}/d\ln N_d$, computed from the diagnosed Nd.
+\item The LWP spatial variance is computed online with the expression syntax, and cloud-top fields with the new \texttt{aerocom(..)} operator.
+\item The 6\,h results (technical note v1) are consistent with the first 6\,h of these runs, which reproduce them bit-for-bit.
+\end{itemize}
+
+\section{Results}
+\subsection{Nd response at every resolution}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{figH1_nd_response_by_res.png}
+\caption{Nd response at sed$\times$1, all resolutions on shared axes. Top row: suppression on. Bottom row: suppression off.
+}\label{fig:h1}\end{figure}
+
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{fig1_response.png}
+\caption{Every resolution, sed factor and suppression setting. Shade: sed factor. Solid lines: suppression on. Dashed lines: off.}\label{fig:resp}\end{figure}
+
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{fig2_susceptibility.png}
+\caption{Susceptibility on three Nd branches against $\Delta x$.}\label{fig:S}\end{figure}
+
+\subsection{Pathways}
+The pathway figure (Fig.~\ref{fig:path}) takes the difference between runs that differ in one switch only.
+The precipitation-suppression term crosses zero near Nd~63 by construction. Above Nd~100 it falls off steeply with $\Delta x$.
+The sedimentation term changes sign between the coarse and fine regimes.
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{figR1_pathways.png}
+\caption{(a) Precipitation-suppression pathway (sed$\times$1). (b) Sedimentation pathway, with suppression on (solid) and off (dashed). Colour: resolution.}\label{fig:path}\end{figure}
+
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{figR2_we_vs_vsed.png}
+\caption{$w_e$ against the cloud-top fall-speed proxy sed$\times(r_{\rm eff,top}/10\,\mu{\rm m})^2$, for every run with 3D turbulence off.}\label{fig:we}\end{figure}
+
+\subsection{Resolution dependence and cloud morphology}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{figH2_convergence.png}
+\caption{Hour 10--12 means against $\Delta x$ ($\leq$5\,km), sed$\times$1, for every Nd.}\label{fig:conv}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{figH3_lwp_maps.png}
+\caption{LWP at hour 12 over the full 240\,km domain, sed$\times$1, suppression on. Rows: Nd 20/200/1000. Columns: 2.5\,km--312\,m.}\label{fig:maps}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{figR4_lwp_pdf.png}
+\caption{Column-LWP distributions over hours 10--12 at 625\,m and 312\,m.}\label{fig:pdf}\end{figure}
+
+\subsection{3D turbulence}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{figR5_turb3d.png}
+\caption{3D turbulence on minus off at 625\,m (all 36 pairs) and at 312\,m (the 16 pairs complete so far).}\label{fig:t3d}\end{figure}
+
+\subsection{Transience}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{figR3_lwp_trend.png}
+\caption{Linear LWP trend over hours 10--12. The grey band marks $\pm$5\,g\,m$^{-2}$\,h$^{-1}$.}\label{fig:trend}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=0.92\textwidth]{fig3_timeseries.png}
+\caption{Time series at 40\,km and 312\,m for Nd 20 and 1000.}\end{figure}
+
+
+\section{Process-level diagnostics}\label{sec:proc}
+These come from the 15-min domain-mean profiles (hours 10--12), the 3D snapshots at hours 10 and 12 (for resolved $w'$ and $\theta_v'$) and the 15-min column fields.
+All runs have 3D turbulence off. Resolved $w = -\omega/(\rho g)$. Decoupling follows Jones et al.\ (2011): $\Delta q_t$ and $\Delta\theta_l$ between the lowest and highest quarter of the boundary layer.
+The cell scale $\lambda$ is the peak of the radially averaged LWP power spectrum.
+
+\paragraph{Cell scale converges; LWP does not} (Figs.~\ref{fig:x1}, \ref{fig:x8}).
+The dominant LWP wavelength falls from 30\,km (2.5\,km) to 24, 21 and 17\,km (1.25\,km, 625\,m, 312\,m).
+In grid units it rises from 8 to $\approx$37 physics cells, so below 1\,km the cells are no longer grid-locked.
+The aspect ratio $\lambda/z_i$ approaches $\approx$17--20, a typical value for observed mesoscale cells.
+At $\geq$5\,km the domain sets the scale (48\,km = 240\,km/5).
+The spectra at 625\,m and 312\,m peak at nearly the same wavelength.
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{figX1_cell_scale.png}
+\caption{Dominant LWP wavelength, in km, in physics-grid spacings and relative to $z_i$, against $\Delta x$ (sed$\times$1).}\label{fig:x1}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=0.85\textwidth]{figX8_spectra.png}
+\caption{Radially averaged LWP spectra, $k\,P(k)$, normalised, hours 10--12.}\label{fig:x8}\end{figure}
+
+\paragraph{The turbulence grey zone} (Fig.~\ref{fig:x2}).
+At $\geq$10\,km all turbulence is SHOC's, and SHOC's boundary-layer $w$-variance is large (0.33--0.41\,m$^2$\,s$^{-2}$).
+Below 5\,km SHOC's variance collapses to about 0.09\,m$^2$\,s$^{-2}$ and keeps falling with $\Delta x$, while resolved variance grows. Resolved motion makes up
+6--9\,\% of the total at 5--2.5\,km, 17\,\% at 1.25\,km, 37\,\% at 625\,m and 66\,\% at 312\,m. Even at 312\,m a third of the variance is still parameterised.
+Total variance is about 4$\times$ smaller at km scale than in the single-column runs, yet entrainment is higher. The resolved circulation entrains more efficiently than SHOC
+(see also Fig.~\ref{fig:x7}).
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{figX2_grey_zone.png}
+\caption{Resolved share of BL $w$-variance, SHOC $w$-variance and resolved $w$-variance against $\Delta x$ (sed$\times$1, suppression on).}\label{fig:x2}\end{figure}
+
+\paragraph{Sc-like or cumulus-like turbulence} (Fig.~\ref{fig:x3}).
+\begin{itemize}
+\item At km scale, low Nd gives positive resolved $w$ skewness (up to 1--2): narrow, strong updrafts, a cumulus-like, drizzle-decoupled boundary layer.
+\item High Nd gives negative skewness ($-0.6$ to $-0.95$ at 2.5\,km--625\,m), the radiatively driven downdraft signature of a well-mixed Sc layer.
+\item The switch happens near Nd~50--100 and moves to higher Nd with more sedimentation.
+\item At 312\,m the skewness stays positive at every Nd (0.1--0.3 for Nd $\geq$ 100), so its cloud-topped boundary layer looks structurally different. That is a convergence question for 156\,m.
+\item With precipitation suppression off the skewness depends less on Nd.
+\end{itemize}
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{figX3_skewness.png}
+\caption{Resolved $w$ skewness over the boundary layer against Nd, for each sed factor ($\Delta x \leq$5\,km).}\label{fig:x3}\end{figure}
+
+\paragraph{Drizzle-induced decoupling} (Fig.~\ref{fig:x4}).
+At $\leq$5\,km, Nd~20 has $\Delta q_t\approx$1.1--1.6\,g\,kg$^{-1}$ and $\Delta\theta_l\approx$1.4--2.2\,K, which is strongly decoupled.
+Both fall steeply with Nd, to 0.2--0.6\,g\,kg$^{-1}$ and 0--0.7\,K by Nd~1000. This is the classic picture: below-cloud evaporation of drizzle stabilises the subcloud layer.
+In the single-column runs, $q_t$ decreases upward while $\theta_l$ is unstable for Nd $\geq$ 50 ($\Delta\theta_l<0$) across a deep SHOC-mixed cloud layer that starts at about 240\,m (Fig.~\ref{fig:x6}).
+That is a structurally different boundary layer, not a coarse version of the km-scale one.
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{figX4_decoupling.png}
+\caption{Decoupling: $\Delta q_t$ and $\Delta\theta_l$ against Nd (sed$\times$1), and LWP against $\Delta q_t$ for all runs.}\label{fig:x4}\end{figure}
+
+\paragraph{Why precipitation suppression fades with resolution} (Fig.~\ref{fig:x5}).
+At fixed Nd, column rain production (autoconversion plus accretion) falls steeply with $\Delta x$. At Nd~200 it goes from 0.5 (40\,km) to 0.03\,mm\,d$^{-1}$ (312\,m),
+because the clouds get thinner: cloud thickness falls from 600\,m to 330\,m and cloud base rises from 240 to 680\,m.
+The share of that production that evaporates before reaching the surface rises from about 0.4 to 0.93.
+The raining fraction of the domain drops to zero above Nd~100 at $\leq$1.25\,km. With almost no rain to suppress, the suppression pathway has nothing to act on.
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{figX5_rain_budget.png}
+\caption{Column rain production, autoconversion, evaporated share and raining fraction against Nd (sed$\times$1, suppression on).}\label{fig:x5}\end{figure}
+
+\paragraph{Mean structure} (Fig.~\ref{fig:x6}).
+As $\Delta x$ shrinks, the boundary layer deepens ($z_i$: 860\,m at 40\,km to 1010\,m at 312\,m), warms and dries in the mixed layer, and the cloud layer thins and lifts.
+LW cooling at cloud top is sharper and stronger in the single-column runs.
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{figX6_profiles.png}
+\caption{Hour 10--12 mean profiles at Nd 20 (top) and 200 (bottom), sed$\times$1, suppression on. The 40, 20 and 10\,km lines overlap.}\label{fig:x6}\end{figure}
+
+\paragraph{Radiative driving and entrainment efficiency} (Fig.~\ref{fig:x7}).
+BL LW cooling saturates at $\approx$86\,W\,m$^{-2}$ for LWP $>$ 120\,g\,m$^{-2}$, so most runs share almost the same radiative forcing.
+At that forcing, the median $w_e$ is 4.0 (40\,km), 5.1 (5\,km), 6.1 (2.5\,km), 6.6 (1.25\,km) and 7.8\,mm\,s$^{-1}$ (625\,m).
+Entrainment per unit radiative driving therefore roughly doubles from the single-column limit to 625\,m. This is a resolution effect on the entrainment closure, not on the forcing.
+\begin{figure}[H]\centering\includegraphics[width=\textwidth]{figX7_radiation.png}
+\caption{BL LW cooling against LWP, and $w_e$ against BL LW cooling, for all runs.}\label{fig:x7}\end{figure}
+
+\paragraph{A diagnostic bug in P3.} P3's sedimentation tendency outputs \texttt{qc\_sed}, \texttt{qr\_sed} and \texttt{qi\_sed} cannot be used. In the C++ port,
+\texttt{cloud\_/rain\_/ice\_sedimentation} compute \texttt{q\_tend = (q - q\_tend)/dt} and expect \texttt{q\_tend} to hold the pre-sedimentation $q$.
+\texttt{p3\_main} never loads it (the Fortran sets \texttt{qc\_sed = qc} first), so the outputs come out as $\approx q/\Delta t$.
+For example, \texttt{qc\_sed}/\texttt{qc} $=$ 1/(60\,s) at 1.25\,km. Model state is not affected. The fix is to copy \texttt{qc}, \texttt{qr}, \texttt{qi} into the three buffers before the sedimentation calls.
+This also explains the ``nonsense'' \texttt{qc\_sed} noted in the earlier ACI study.
+
+\section{Caveats, status and next steps}
+\begin{itemize}
+\item \textbf{312\,m is 76\,\% done} (658 of 864 model-hours).
+\begin{itemize}
+\item Every run with 3D turbulence off is complete. Of the 36 runs with it on, 20 are still to come.
+\item Perlmutter maintenance runs from 11 to 18 November. Regular jobs sized to finish before it are queued; anything unfinished resumes afterwards from its last restart.
+\item A final version of this report will follow.
+\end{itemize}
+\item \textbf{No convergence.} The step from 625\,m to 312\,m is as large as any coarser step. 156\,m (or a smaller domain at 156\,m) is the open question for discussion.
+\item \textbf{Single realization per run.} Seed ensembles at the km-scale and sub-km high-Nd runs would put error bars on the small negative $S$ values.
+\item \textbf{Diagnostics.}
+\begin{itemize}
+\item Surface precipitation includes cloud-droplet sedimentation.
+\item $w_e$ comes from a linear fit of $z_i$.
+\item The fall-speed proxy stands in for the actual cloud-top sedimentation flux.
+\end{itemize}
+\end{itemize}
+
+\section{Data and code (Perlmutter, world-readable)}
+\begin{itemize}\small
+\item 12\,h runs: \path{/pscratch/sd/m/mahf708/dp_screamxx_sedps_12h/sedps_<res>_nd<Nd>_sed<0p5|1|2>_ps<on|off>[_t3don]/run/}
+\item This report's analysis: \path{/pscratch/sd/m/mahf708/dp_screamxx_sedps_12h/analysis_report4/}
+\begin{itemize}
+\item \texttt{summary\_h10-12.csv} and \texttt{timeseries\_15min.csv}: one row per run (and per 15-min step), with columns for the run settings including \texttt{turb3d}.
+\item \texttt{susceptibility.csv}, \texttt{lwp\_trend\_h10-12.csv}, \texttt{turb3d\_on\_minus\_off.csv} and all figures.
+\end{itemize}
+\item 6\,h runs and technical note v1: \path{/pscratch/sd/m/mahf708/dp_screamxx_sedps/}
+\item Scripts, R tools and LaTeX source: \path{/pscratch/sd/m/mahf708/scmlib/sed-precsupp-study/}
+\begin{itemize}
+\item In R: \texttt{source(".../R/sedps.R"); sedps\_runs("/pscratch/sd/m/mahf708/dp\_screamxx\_sedps\_12h", hours = 12)}.
+\end{itemize}
+\item Code: E3SM \href{https://github.com/mahf708/E3SM/tree/mahf708/eamxx/p3-cloud-sed-factor}{\texttt{mahf708/eamxx/p3-cloud-sed-factor}} and scmlib
+\href{https://github.com/mahf708/scmlib/tree/sed-precsupp-study}{\texttt{sed-precsupp-study}}.
+\end{itemize}
+\end{document}

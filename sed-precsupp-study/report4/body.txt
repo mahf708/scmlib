@@ -1,0 +1,22 @@
+Hi Naser and Johannes,
+
+I'm Claude Code, an AI assistant working on Naser's behalf. Attached is version 4 of the technical report (13 pages), with the summary and process-diagnostics CSVs. It has everything in v3, updated with 5 more 312 m runs (all 36 with 3D turbulence off, plus 16 of 36 with it on; 76% of 312 m model-hours). It also adds a new section of process-level analyses with 8 new figures.
+
+What's new (hour 10-12 means):
+1. Cell scale converges; LWP does not. The dominant LWP wavelength goes 30 -> 24 -> 21 -> 17 km from 2.5 km to 312 m. That rises from 8 to ~37 grid cells, so the cells are no longer grid-locked below 1 km, and the aspect ratio (lambda/zi) approaches ~17-20. The spectra at 625 m and 312 m peak at nearly the same wavelength.
+2. Turbulence grey zone. The resolved share of boundary-layer w-variance goes 0 (>=10 km) -> 6-9% (5-2.5 km) -> 17% (1.25 km) -> 37% (625 m) -> 66% (312 m). In the single-column runs SHOC's w-variance is ~4x larger than the total at km scale, yet those runs entrain less.
+3. Sc-like or cumulus-like turbulence. At km scale, low Nd gives positive resolved w skewness (up to 1-2: drizzle-decoupled and cumulus-like) and high Nd gives negative skewness (-0.6 to -0.95, Sc-like). At 312 m the skewness stays positive at every Nd, so the structure itself is still changing with resolution.
+4. Drizzle-induced decoupling. At Nd 20, dqt is ~1.1-1.6 g/kg and dthl ~1.4-2.2 K across the boundary layer; both fall steeply with Nd.
+5. Why precip suppression fades with resolution. At Nd 200, rain production falls from 0.5 to 0.03 mm/day between 40 km and 312 m, because the clouds thin from 600 to 330 m and cloud base lifts from 240 to 680 m. The evaporated share of that rain rises from ~0.4 to 0.93, so there is almost no rain left to suppress.
+6. Entrainment efficiency. Boundary-layer LW cooling saturates at ~86 W/m2, yet at that forcing w_e goes 4.0 (40 km) -> 6.1 (2.5 km) -> 7.8 mm/s (625 m). Entrainment per unit radiative driving roughly doubles: a resolution effect on the entrainment, not on the forcing.
+7. 3D turbulence is still negligible at 312 m (16 pairs: |dLWP| <= 1 g/m2, w_e 0.03-0.07 mm/s lower).
+8. A diagnostic bug in P3. The qc_sed/qr_sed/qi_sed outputs are ~q/dt, because the C++ port never loads the pre-sedimentation q into the tendency buffer (the Fortran does). Model state is unaffected, and it's a three-line fix. It also explains the "nonsense" qc_sed in the earlier ACI study.
+
+312 m status: 658 of 864 model-hours. Perlmutter maintenance runs Nov 11-18. I moved the unstarted runs to 40 GB nodes and queued short regular jobs sized to finish before it; anything left resumes afterwards.
+
+Perlmutter paths (world-readable):
+- Report and analysis: /pscratch/sd/m/mahf708/dp_screamxx_sedps_12h/analysis_report4/ (sedps_technical_report_v4.pdf, summary_h10-12.csv, explore_scalars.csv, timeseries_15min.csv, susceptibility.csv, all figures)
+- Per-run process diagnostics (profiles, spectra, .npz): /pscratch/sd/m/mahf708/dp_screamxx_sedps_12h/explore/npz/
+- Scripts (analysis/explore.py and explore_figs.py are new): /pscratch/sd/m/mahf708/scmlib/sed-precsupp-study/
+
+-- Claude, on behalf of Naser Mahfouz
