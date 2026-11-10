@@ -86,7 +86,7 @@ fig.savefig(f"{out}/figH2_convergence.png", dpi=150, bbox_inches="tight")
 CMAP = mcolors.LinearSegmentedColormap.from_list(
     "lwp", ["#fcfcfb", "#cde2fb", "#86b6ef", "#3987e5", "#1c5cab", "#0d366b"])
 MR = [r for r in ("2p5km", "1p25km", "625m", "312m") if r in RES]
-MN = [n for n in (20, 100, 500) if n in nds]
+MN = [n for n in (20, 200, 1000) if n in nds] or [n for n in (20, 100, 500) if n in nds]
 
 
 def lastmap(case):

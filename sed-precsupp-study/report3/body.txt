@@ -1,0 +1,25 @@
+Hi Naser and Johannes,
+
+I'm Claude Code, an AI assistant working on Naser's behalf. Attached is version 3 of the technical report (8 pages), built on 68% of the 312 m model-hours, plus the CSVs.
+
+What's new since v2:
+- The 312 m matrix with 3D turbulence off is now complete: all 36 runs, Nd 20-1000 x sed x suppression.
+- 11 of the 36 runs at 312 m with 3D turbulence on are done (Nd 20-100).
+- Everything at 40 km - 625 m was already complete.
+
+Headlines (hour 10-12 means):
+1. The inverted V's peak moves to lower Nd as dx shrinks. With sed x1 and suppression on, LWP peaks at Nd >=1000 at >=10 km, 500 at 5 km, 200 at 2.5 km - 625 m, and 100 at 312 m. At 312 m, LWP goes 40 -> 72 -> 76 -> 74 -> 72 -> 70 g/m2 for Nd 20 -> 1000.
+2. Precip suppression fades with resolution. At Nd 1000, LWP(on) - LWP(off) is +134 g/m2 at 40 km, +58 at 5 km, +34 at 2.5 km, +27 at 1.25 km, +16 at 625 m and +6 at 312 m.
+3. At 312 m the falling branch is entrainment-driven. S for Nd 200 -> 1000 is negative with suppression on (-0.02/-0.04/-0.07 for sed x0.5/1/2) and also with it off (-0.02/-0.05/-0.06), while w_e keeps rising with Nd (8.4 -> 8.6 mm/s).
+4. The low-Nd branch is robust across resolution (S for Nd 20 -> 50 = 0.56/0.73/0.97 at 312 m), but LWP, cloud cover and w_e have not converged between 625 m and 312 m.
+5. 3D turbulence makes almost no difference at 312 m (11 pairs so far: |dLWP| <= 1.0 g/m2, |d cloud cover| <= 0.006, w_e 0.03-0.07 mm/s lower), the same as at 625 m.
+
+Remaining: the other 25 runs at 312 m with 3D turbulence on. Two 16-node regular jobs are expected to start this morning. A final version will follow.
+
+Perlmutter paths (world-readable):
+- Report and analysis: /pscratch/sd/m/mahf708/dp_screamxx_sedps_12h/analysis_report3/
+  (sedps_technical_report_v3.pdf, summary_h10-12.csv, timeseries_15min.csv, susceptibility.csv, lwp_trend_h10-12.csv, turb3d_on_minus_off.csv, figures)
+- 12 h runs: /pscratch/sd/m/mahf708/dp_screamxx_sedps_12h/sedps_*
+- Scripts, R tools and LaTeX source: /pscratch/sd/m/mahf708/scmlib/sed-precsupp-study/
+
+-- Claude, on behalf of Naser Mahfouz
