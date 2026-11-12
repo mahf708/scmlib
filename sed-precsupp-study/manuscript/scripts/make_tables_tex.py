@@ -38,10 +38,27 @@ for dx in DX:
     for b in ("low", "high", "vhigh"):
         for ps in ("on", "off"):
             x = s[(s.dx_km == dx) & (s.precsupp == ps)].iloc[0]
-            row.append(f"${x[f'S_{b}']:.3f}$\\,({x[f'S_{b}_sd']:.3f})")
+            sd = x[f'S_{b}_sd']; row.append(f"${x[f'S_{b}']:.2f}$\\,(" + (f"{sd:.2f}" if sd >= 0.005 else "$<$0.01") + ")")
     nd_max = s[(s.dx_km == dx) & (s.precsupp == "on")].iloc[0].Nd_target_at_max
     row.append(f"{nd_max:.0f}")
     lines.append(" & ".join(row) + " \\\\")
 open(f"{OUT}/tab_S.tex", "w").write("\n".join(lines) + "\n\\bottomhline\n")
+
+# observation comparison (hours 4-6, target Nd 50, s = 1)
+oc = pd.read_csv(f"{T}/obs_comparison.csv")
+lines = []
+for ps in ("on", "off"):
+    for dx in DX:
+        x = oc[(oc.dx_km == dx) & (oc.precsupp == ps)].iloc[0]
+        lines.append(f"{LAB[dx]} & {ps} & {x.LWP_4_6:.0f} & {x.we_4_6_mm_s:.1f} & {x.P_sfc_4_6_mm_d:.2f} & {x.evap_frac_4_6:.2f} & {x.zb_4_6:.0f} & {x.zi_6h:.0f} \\\\")
+    if ps == "on":
+        lines.append("\\noalign{\\vskip 2pt}")
+open(f"{OUT}/tab_obs.tex", "w").write("\n".join(lines) + "\n\\middlehline\n")
+# budget skill by grid spacing
+bs = pd.read_csv(f"{T}/budget_skill.csv")
+lines = []
+for _, x in bs.iterrows():
+    lines.append(f"{LAB[x.dx_km]} & {x.r_raw:.2f} & {x.rmse_raw:.1f} & {x.sd_obs:.1f} & {x.r_anom_all:.2f} & {x.r_anom_10_12:.2f} & {x.rmse_anom_10_12:.1f} & {x.sd_anom_10_12:.1f} \\\\")
+open(f"{OUT}/tab_skill.tex", "w").write("\n".join(lines) + "\n\\bottomhline\n")
 print(open(f"{OUT}/tab_lwp.tex").read())
 print(open(f"{OUT}/tab_S.tex").read())
