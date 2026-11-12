@@ -1,0 +1,77 @@
+OK  twomey1977           Twomey (1 au) 1977 | The Influence of Pollution on the Shortwave Albedo of Clouds | Journal of the Atmospheric Sciences
+OK  twomey1974           Twomey (1 au) 1974 | Pollution and the planetary albedo | Atmospheric Environment (1967)
+OK  albrecht1989         Albrecht (1 au) 1989 | Aerosols, Cloud Microphysics, and Fractional Cloudiness | Science
+OK  ackerman2004         Ackerman (4 au) 2004 | The impact of humidity above stratiform clouds on indirect aerosol climate forcing | Nature
+OK  bretherton2007       Bretherton (3 au) 2007 | Cloud droplet sedimentation, entrainment efficiency, and subtropical stratocumulus albedo | Geophysical Research Letters
+OK  wood2007             Nicholson (4 au) 2007 | Wave Activity on the Tropical Easterly Jet | Journal of the Atmospheric Sciences
+OK  wood2012             Wood (1 au) 2012 | Stratocumulus Clouds | Monthly Weather Review
+OK  gryspeerdt2019       Gryspeerdt (9 au) 2019 | Constraining the aerosol influence on cloud liquid water path | Atmospheric Chemistry and Physics
+OK  glassmeier2021       Glassmeier (6 au) 2021 | Aerosol-cloud-climate cooling overestimated by ship-track data | Science
+OK  mulmenstadt2024gcm   Mülmenstädt (22 au) 2024 | General circulation models simulate negative liquid water path–droplet number correlations | Atmospheric Chemistry and Physics
+OK  mulmenstadt2020      Mülmenstädt (13 au) 2020 | Reducing the aerosol forcing uncertainty using observational constraints on warm rain proc | Science Advances
+OK  mulmenstadt2018      Mülmenstädt (2 au) 2018 | The Radiative Forcing of Aerosol–Cloud Interactions in Liquid Clouds: Wrestling and Embrac | Current Climate Change Reports
+OK  bellouin2020         Bellouin (33 au) 2020 | Bounding Global Aerosol Radiative Forcing of Climate Change | Reviews of Geophysics
+OK  stevens2009          Stevens (2 au) 2009 | Untangling aerosol effects on clouds and precipitation in a buffered system | Nature
+BAD stevens2003          10.1175/BAMS-84-5-579
+OK  ackerman2009         Ackerman (18 au) 2009 | Large-Eddy Simulations of a Drizzling, Stratocumulus-Topped Marine Boundary Layer | Monthly Weather Review
+OK  vanzanten2005        vanZanten (4 au) 2005 | Observations of Drizzle in Nocturnal Marine Stratocumulus | Journal of the Atmospheric Sciences
+OK  stevens2005          Stevens (17 au) 2005 | Evaluation of Large-Eddy Simulations via Observations of Nocturnal Marine Stratocumulus | Monthly Weather Review
+OK  kk2000               Khairoutdinov (2 au) 2000 | A New Cloud Physics Parameterization in a Large-Eddy Simulation Model of Marine Stratocumu | Monthly Weather Review
+OK  morrison2015         Morrison (2 au) 2015 | Parameterization of Cloud Microphysics Based on the Prediction of Bulk Ice Particle Proper | Journal of the Atmospheric Sciences
+OK  bogenschutz2013      Bogenschutz (2 au) 2013 | A simplified PDF parameterization of subgrid‐scale clouds and turbulence for cloud‐resolvi | Journal of Advances in Modeling Earth Sy
+OK  caldwell2021         Caldwell (30 au) 2021 | Convection‐Permitting Simulations With the E3SM Global Atmosphere Model | Journal of Advances in Modeling Earth Sy
+OK  donahue2024          Donahue (23 au) 2024 | To Exascale and Beyond—The Simple Cloud‐Resolving E3SM Atmosphere Model (SCREAM), a Perfor | Journal of Advances in Modeling Earth Sy
+OK  bogenschutz2023      Bogenschutz (4 au) 2023 | Combining regional mesh refinement with vertically enhanced physics to target marine strat | Geoscientific Model Development
+OK  wyngaard2004         Wyngaard (1 au) 2004 | Toward Numerical Modeling in the “Terra Incognita” | Journal of the Atmospheric Sciences
+OK  honnert2020          Honnert (10 au) 2020 | The Atmospheric Boundary Layer and the “Gray Zone” of Turbulence: A Critical Review | Journal of Geophysical Research: Atmosph
+OK  wood2006             Wood (2 au) 2006 | Spatial Variability of Liquid Water Path in Marine Low Cloud: The Importance of Mesoscale  | Journal of Climate
+OK  bretherton1997       Bretherton (2 au) 1997 | Moisture Transport, Lower-Tropospheric Stability, and Decoupling of Cloud-Topped Boundary  | Journal of the Atmospheric Sciences
+OK  jones2011            Jones (3 au) 2011 | Coupled vs. decoupled boundary layers in VOCALS-REx | Atmospheric Chemistry and Physics
+BAD hill2009             10.1175/2008JAS2894.1
+OK  pressel2017          Pressel (5 au) 2017 | Numerics and subgrid‐scale modeling in large eddy simulations of stratocumulus clouds | Journal of Advances in Modeling Earth Sy
+OK  mellado2018          Mellado (4 au) 2018 | DNS and LES for Simulating Stratocumulus: Better Together | Journal of Advances in Modeling Earth Sy
+OK  stevens1998          Stevens (4 au) 1998 | Large-Eddy Simulations of Strongly Precipitating, Shallow, Stratocumulus-Topped Boundary L | Journal of the Atmospheric Sciences
+OK  seifert2015          Seifert (4 au) 2015 | Large‐eddy simulation of the transient and near‐equilibrium behavior of precipitating shal | Journal of Advances in Modeling Earth Sy
+OK  lilly1968            Lilly (1 au) 1968 | Models of cloud‐topped mixed layers under a strong inversion | Quarterly Journal of the Royal Meteorolo
+OK  stevens2002          Simmons (2 au) 2002 | Some aspects of the improvement in skill of numerical weather prediction | Quarterly Journal of the Royal Meteorolo
+OK  feingold2010         Feingold (5 au) 2010 | Precipitation-generated oscillations in open cellular cloud fields | Nature
+OK  wang2009             Wang (2 au) 2009 | Modeling Mesoscale Cellular Structures and Drizzle in Marine Stratocumulus. Part I: Impact | Journal of the Atmospheric Sciences
+OK  kazil2017            Kazil (3 au) 2017 | Mesoscale organization, entrainment, and the properties of a closed‐cell stratocumulus clo | Journal of Advances in Modeling Earth Sy
+OK  possner2020          Possner (4 au) 2020 | Deconvolution of boundary layer depth and aerosol constraints on cloud water path in subtr | Atmospheric Chemistry and Physics
+OK  toll2019             Toll (4 au) 2019 | Weak average liquid-cloud-water response to anthropogenic aerosols | Nature
+OK  michibata2016        Michibata (4 au) 2016 | The source of discrepancies in aerosol–cloud–precipitation interactions between GCM and A- | Atmospheric Chemistry and Physics
+OK  arola2022            Arola (9 au) 2022 | Aerosol effects on clouds are concealed by natural cloud heterogeneity and satellite retri | Nature Communications
+OK  quaas2009            Quaas (38 au) 2009 | Aerosol indirect effects – general circulation model intercomparison and evaluation with s | Atmospheric Chemistry and Physics
+OK  grosvenor2018        Grosvenor (33 au) 2018 | Remote Sensing of Droplet Number Concentration in Warm Clouds: A Review of the Current Sta | Reviews of Geophysics
+OK  terai2020            Terai (4 au) 2020 | The Impact of Resolving Subkilometer Processes on Aerosol‐Cloud Interactions of Low‐Level  | Journal of Advances in Modeling Earth Sy
+OK  forster2021          ? (1 au) 2023 | The Earth’s Energy Budget, Climate Feedbacks and Climate Sensitivity | Climate Change 2021 – The Physical Scien
+OK  zhang2022            Zhang (4 au) 2022 | Albedo susceptibility of northeastern Pacific stratocumulus: the role of covarying meteoro | Atmospheric Chemistry and Physics
+OK  hoffmann2020         Hoffmann (4 au) 2020 | Liquid Water Path Steady States in Stratocumulus: Insights from Process-Level Emulation an | Journal of the Atmospheric Sciences
+OK  hoffmann2024         Hoffmann (3 au) 2024 | The impact of aerosol on cloud water: a heuristic perspective | Atmospheric Chemistry and Physics
+OK  chen2014             Chen (4 au) 2014 | Satellite-based estimate of global aerosol–cloud radiative forcing by marine warm clouds | Nature Geoscience
+OK  small2009            Small (4 au) 2009 | Can aerosol decrease cloud lifetime? | Geophysical Research Letters
+OK  morrison2008         Morrison (2 au) 2008 | A New Two-Moment Bulk Stratiform Cloud Microphysics Scheme in the Community Atmosphere Mod | Journal of Climate
+OK  gettelman2015        Gettelman (2 au) 2015 | Advanced Two-Moment Bulk Microphysics for Global Models. Part I: Off-Line Tests and Compar | Journal of Climate
+OK  pincus2019           Pincus (3 au) 2019 | Balancing Accuracy, Efficiency, and Flexibility in Radiation Calculations for Dynamical Mo | Journal of Advances in Modeling Earth Sy
+OK  taylor2020           Taylor (6 au) 2020 | An Energy Consistent Discretization of the Nonhydrostatic Equations in Primitive Variables | Journal of Advances in Modeling Earth Sy
+OK  hannah2021           Hannah (6 au) 2021 | Separating Physics and Dynamics Grids for Improved Computational Efficiency in Spectral El | Journal of Advances in Modeling Earth Sy
+BAD sandu2008            10.1175/2007JAS2603.1
+OK  chun2023             Chun (4 au) 2023 | Microphysical, macrophysical, and radiative responses of subtropical marine clouds to aero | Atmospheric Chemistry and Physics
+OK  stevens2019dyamond   Stevens (21 au) 2019 | DYAMOND: the DYnamics of the Atmospheric general circulation Modeled On Non-hydrostatic Do | Progress in Earth and Planetary Science
+OK  sato2018             Sato (7 au) 2018 | Aerosol effects on cloud water amounts were successfully simulated by a global cloud-syste | Nature Communications
+OK  morrison2020         Morrison (16 au) 2020 | Confronting the Challenge of Modeling Cloud and Precipitation Microphysics | Journal of Advances in Modeling Earth Sy
+OK  mulmenstadt2024adj   Mülmenstädt (18 au) 2024 | Can general circulation models (GCMs) represent cloud liquid water path adjustments to aer | Atmospheric Chemistry and Physics
+OK  feingold2022         Feingold (3 au) 2022 | Quantifying albedo susceptibility  biases in shallow clouds | Atmospheric Chemistry and Physics
+OK  goren2019            Goren (5 au) 2019 | Anthropogenic Air Pollution Delays Marine Stratocumulus Breakup to Open Cells | Geophysical Research Letters
+OK  ghan2016             Ghan (15 au) 2016 | Challenges in constraining anthropogenic aerosol effects on cloud radiative forcing using  | Proceedings of the National Academy of S
+OK  bryan2003            Bryan (3 au) 2003 | Resolution Requirements for the Simulation of Deep Moist Convection | Monthly Weather Review
+OK  matheou2011          Matheou (5 au) 2011 | On the Fidelity of Large-Eddy Simulation of Shallow Precipitating Cumulus Convection | Monthly Weather Review
+OK  zhou2019a            Putrasahan (6 au) 2019 | Surface Flux Drivers for the Slowdown of the Atlantic Meridional Overturning Circulation i | Journal of Advances in Modeling Earth Sy
+OK  zhou2019b            Zhou (2 au) 2019 | Simulation of Mesoscale Cellular Convection in Marine Stratocumulus: 2. Nondrizzling Condi | Journal of Advances in Modeling Earth Sy
+OK  bretherton2010       Bretherton (3 au) 2010 | Slow Manifolds and Multiple Equilibria in Stratocumulus‐Capped Boundary Layers | Journal of Advances in Modeling Earth Sy
+OK  lu2005               Möller (2 au) 2005 | Influences of Asymmetric Heating on Hurricane Evolution in the MM5 | Journal of the Atmospheric Sciences
+OK  berner2013           Berner (4 au) 2013 | Marine boundary layer cloud regimes and POC formation in a CRM coupled to a bulk aerosol s | Atmospheric Chemistry and Physics
+OK  yamaguchi2017        Yamaguchi (3 au) 2017 | Stratocumulus to Cumulus Transition by Drizzle | Journal of Advances in Modeling Earth Sy
+OK  derode2019           de Roode (14 au) 2019 | Turbulent Transport in the Gray Zone: A Large Eddy Model Intercomparison Study of the CONS | Journal of Advances in Modeling Earth Sy
+OK  mulmenstadt2021      Mülmenstädt (9 au) 2021 | An underestimated negative cloud feedback from cloud lifetime changes | Nature Climate Change
+OK  christensen2022      Christensen (33 au) 2022 | Opportunistic experiments to constrain  aerosol effective radiative forcing | Atmospheric Chemistry and Physics
