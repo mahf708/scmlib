@@ -12,10 +12,12 @@ cd $S
 $PY build_tables.py
 $PY ml_budget.py
 $PY revision_analysis.py
+$PY rev2_analysis.py
+$PY rev2_analysis2.py
 $PY key_numbers.py > $O/tables/key_numbers.txt
 $PY make_tables_tex.py > /dev/null
 module load python
-python make_figures_rev.py 2>&1 | grep -v -i warning || true
+python make_figures_rev2.py 2>&1 | grep -v -i warning || true
 module load texlive/2024
 cd $M
 $PY $S/fetch_bib.py refs/dois.txt refs/extra.bib > refs/refs_raw.bib

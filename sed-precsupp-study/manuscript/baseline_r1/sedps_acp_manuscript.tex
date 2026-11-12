@@ -1,0 +1,431 @@
+\documentclass[acp, manuscript]{copernicus}
+
+\newcommand{\Nd}{N_\mathrm{d}}
+\newcommand{\LWP}{\mathrm{LWP}}
+\newcommand{\we}{w_\mathrm{e}}
+\newcommand{\zi}{z_\mathrm{i}}
+\newcommand{\zb}{z_\mathrm{b}}
+\newcommand{\dx}{\Delta x}
+\newcommand{\Slow}{S_{20\rightarrow50}}
+\newcommand{\Shigh}{S_{100\rightarrow200}}
+\newcommand{\Svhigh}{S_{200\rightarrow1000}}
+\newcommand{\cmthree}{\mathrm{cm^{-3}}}
+\newcommand{\gmm}{\mathrm{g\,m^{-2}}}
+
+\begin{document}
+
+\title{Horizontal resolution dependence of the liquid water path response to droplet number in doubly periodic EAMxx simulations of drizzling stratocumulus}
+
+\Author[1]{}{Claude}
+
+\affil[1]{Anthropic, San Francisco, CA, USA}
+
+\correspondence{Correspondence is handled by Naser Mahfouz, Pacific Northwest National Laboratory, Richland, WA, USA (see Acknowledgements)}
+
+\runningtitle{Resolution dependence of LWP adjustments in drizzling stratocumulus}
+\runningauthor{Claude}
+
+\received{}
+\pubdiscuss{}
+\revised{}
+\accepted{}
+\published{}
+
+\firstpage{1}
+
+\maketitle
+
+\begin{abstract}
+The response of liquid water path (LWP) to cloud droplet number concentration ($\Nd$) in marine stratocumulus results from a competition between precipitation suppression and entrainment, whose representation depends on model grid spacing. We examined it in 288 doubly periodic simulations of the drizzling DYCOMS-II RF02 stratocumulus with the E3SM atmosphere model EAMxx, spanning horizontal grid spacings from 40\,km to 312\,m, target $\Nd$ from 20 to 1000\,$\cmthree$ and three cloud-droplet sedimentation factors, with the $\Nd$ dependence of autoconversion switched on or off. At 10--40\,km, where boundary-layer turbulence is entirely parameterised, LWP increased monotonically with $\Nd$, and the susceptibility $d\ln\LWP/d\ln\Nd$ between 100 and 200\,$\cmthree$ was 0.24--0.27 and vanished without the $\Nd$ dependence of autoconversion. With decreasing grid spacing, entrainment generally increased, cloud base rose, rain production at 200\,$\cmthree$ fell twentyfold, and the LWP maximum moved to about 100\,$\cmthree$ at 312\,m. The weak negative branch above this maximum (susceptibility $-0.04$ to $-0.05$) persisted without the $\Nd$ dependence of autoconversion and steepened with faster sedimentation, consistent with a sedimentation--entrainment feedback, but it is smaller than one hour of LWP drift in these single, transient runs. A mixed-layer budget associates the thinning at fine grid spacing with entrainment warming and drying that exceed the radiative and surface forcing, but it does not resolve the $\Nd$ dependence at sub-kilometre spacing. LWP did not converge, and the turbulence scheme's mixing length was grid-limited at 312\,m. In EAMxx, the sign and magnitude of the simulated LWP adjustment therefore depend on grid spacing across the turbulence grey zone.
+\end{abstract}
+
+%% ====================================================================
+\introduction
+%% ====================================================================
+
+Aerosol--cloud interactions remain the largest source of uncertainty in the effective radiative forcing of the climate system \citep{bellouin2020,forster2021}. An increase in cloud condensation nuclei raises the droplet number concentration $\Nd$ of a liquid cloud and, at fixed liquid water, its albedo \citep{twomey1974,twomey1977}. The cloud then adjusts, and changes in its liquid water path (LWP) and cloud fraction can amplify or offset this Twomey effect \citep{stevens2009,mulmenstadt2018,glassmeier2021}.
+
+In marine stratocumulus, two adjustment pathways of opposite sign dominate. Smaller droplets coalesce less efficiently, which suppresses drizzle and tends to increase LWP \citep[precipitation suppression;][]{albrecht1989}. Smaller droplets also sediment more slowly and evaporate more readily near cloud top, which enhances the entrainment of warm, dry free-tropospheric air and thins the cloud \citep{wang2003,bretherton2007,hill2009,small2009}. \citet{ackerman2004} showed with large-eddy simulations (LES) that the sign of the LWP response depends on the balance between the moistening associated with reduced surface precipitation and the drying associated with entrainment, and therefore on the humidity above the inversion. \citet{bretherton2007} isolated the contribution of droplet sedimentation, which reduces entrainment by removing liquid water from the entrainment zone. Mixed-layer and LES studies relate the competition between these pathways to the time scales of precipitation and entrainment \citep{wood2007,uchida2010,hoffmann2020,hoffmann2024}.
+
+Satellite composites of LWP against $\Nd$ have an inverted-V shape, with LWP increasing with $\Nd$ in clean, precipitating clouds and decreasing in polluted, non-precipitating ones \citep{chen2014,gryspeerdt2019,possner2020}. \citet{gryspeerdt2019} regarded the observed negative slope as an upper bound on the causal effect, because cloud-controlled variations in $\Nd$ and meteorological covariability contribute to it. Pollution tracks show LWP responses of both signs that are weak on average and offset about a quarter of the Twomey cooling \citep{toll2019}, and LES ensembles reproduce the inverted-V shape and indicate long adjustment time scales \citep{glassmeier2019,glassmeier2021}. Present-day spatial co-variability is an imperfect guide to the causal response \citep{ghan2016,arola2022,feingold2022}, and in the E3SM global model present-day correlations are insufficient to predict the change in cloud albedo caused by anthropogenic aerosol \citep{mahfouz2024}. Global climate models (GCMs) generally simulate positive LWP responses \citep{quaas2009,michibata2016,gettelman2015ci,mulmenstadt2020}, although their present-day LWP--$\Nd$ correlations can be negative \citep{mulmenstadt2024gcm}. Using single-column physics of E3SM with modified sedimentation, \citet{mulmenstadt2024adj} found that the sedimentation--entrainment coupling is active in GCM-type physics and concluded that GCM parameterisations may be able to represent it.
+
+Global storm-resolving models (GSRMs) with grid spacings of a few kilometres are now run routinely \citep{stevens2019dyamond,caldwell2021,donahue2024}. At these spacings the energy-containing eddies of the stratocumulus-topped boundary layer, a few hundred metres across, are neither resolved nor fully parameterised. This range is known as the turbulence grey zone \citep{wyngaard2004,honnert2020}, and it poses specific problems for stratocumulus \citep{boutle2014,beare2014,efstathiou2015,derode2019}. Even LES of stratocumulus at grid spacings of tens of metres are sensitive to resolution and numerics, mainly through entrainment \citep{bretherton1999,stevens2005,pressel2017,mellado2018}. In the RF02 single-column model intercomparison of \citet{wyant2007}, LWP after 4--6\,h differed by more than a factor of 5 between models, mainly because of differences in turbulence parameterisation. Multiscale models that resolve cloud-scale \citep{wangm2011} and sub-kilometre \citep{terai2020} processes simulated weaker LWP increases with aerosol than conventional configurations, and a global cloud-system-resolving model simulated LWP decreases with aerosol that it attributed to explicitly simulated condensation and evaporation \citep{sato2018}. Doubly periodic configurations of the Simple Cloud-Resolving E3SM Atmosphere Model (SCREAM) show systematic changes in cloud structure between 5\,km and a few hundred metres \citep{bogenschutz2023,bogenschutz2025}, and regionally refined global configurations show the importance of vertical resolution for stratocumulus \citep{bogenschutz2023rrm}.
+
+To our knowledge, the change in the balance between adjustment pathways across this range of grid spacings has not been quantified within a single model. Such a quantification is needed to interpret aerosol--cloud adjustments in GSRMs and to use kilometre-scale simulations for constraining parameterisations \citep{stanford2026}. Here we use a factorial set of doubly periodic simulations of the drizzling DYCOMS-II RF02 stratocumulus with EAMxx, the atmosphere component of E3SM that implements SCREAM. We ask how the LWP susceptibility to $\Nd$ depends on horizontal grid spacing between 40\,km and 312\,m, how much of it can be attributed to precipitation suppression and to droplet sedimentation, which boundary-layer processes accompany its change with grid spacing, and how close the simulations are to the RF02 observations and published intercomparisons. Following \citet{mulmenstadt2024adj}, we scale the droplet fall speed; in addition, we switch off the $\Nd$ dependence of autoconversion. This mechanism-denial approach allows the two pathways to be separated, subject to the caveats discussed in Sect.~\ref{sec:decomp}.
+
+%% ====================================================================
+\section{Model, case and methods}\label{sec:methods}
+%% ====================================================================
+
+\subsection{Model}
+
+EAMxx is the C++ atmosphere model of the Energy Exascale Earth System Model (E3SM) and implements SCREAM \citep{caldwell2021,donahue2024}. It solves the nonhydrostatic equations with a spectral-element dynamical core on fourth-order elements \citep{taylor2020}. Physics is computed on a separate finite-volume grid with $2\times2$ columns per element \citep[``pg2'';][]{hannah2021}, so that physics columns are spaced 1.5 times the nominal grid spacing $\dx$, defined as the mean spacing of the dynamical-core quadrature points. Turbulence, cloud macrophysics and condensation are represented by the Simplified Higher-Order Closure \citep[SHOC;][]{bogenschutz2013}, an assumed-PDF scheme that diagnoses cloud fraction and liquid water from a prognostic turbulent kinetic energy. SHOC limits its turbulent mixing length to the host grid length, which in this configuration is the nominal $\dx$. Condensation and evaporation of cloud water are part of SHOC's saturation adjustment and do not depend on droplet size. We verified this in the output, where the vapour--liquid exchange of the microphysics scheme equals its rain evaporation at every level.
+
+Microphysics is computed by the Predicted Particle Properties scheme \citep[P3;][]{morrison2015}. Warm rain forms by the autoconversion and accretion rates of \citet{kk2000}, without the subgrid cloud-water variance enhancement of autoconversion used in some GCM schemes \citep{morrison2008,gettelman2015}. Rain fraction is set to one, meaning that rain is assumed to fill the grid cell rather than to overlap with the liquid cloud fraction. Cloud droplets sediment with mass- and number-weighted fall speeds of a gamma size distribution. The P3 sedimentation-tendency diagnostics are not usable in the model version used here, because the tendency buffer is not initialised with the pre-sedimentation mixing ratio; this affects only the diagnostics, not the model state, so the sedimentation flux at cloud top could not be diagnosed. Droplet activation uses a prescribed CCN number concentration from the Simple Prescribed Aerosol option \citep[SPA;][]{mahfouz2025}. In each layer, P3 raises the in-cloud droplet number to at least the prescribed CCN number multiplied by a scaling factor. Radiation is computed by RRTMGP \citep{pincus2019} every third physics step.
+
+We used the doubly periodic configuration of EAMxx \citep[DP-EAMxx, also referred to as DP-SCREAM;][]{bogenschutz2023,bogenschutz2025}, which applies large-scale forcing from an intensive-observation-period (IOP) file to a horizontally periodic domain. All simulations used 128 vertical levels, with a spacing of about 50\,m near the inversion. An optional horizontal (``3D'') turbulence closure, which applies SHOC's eddy diffusivity in the horizontal, was off in the main experiment and was tested at 625\,m and 312\,m (Appendix~\ref{app:t3d}).
+
+Two runtime options were added to P3 for this study. The first is a sedimentation factor $s$ that multiplies the mass- and number-weighted cloud-droplet fall speeds, analogous to the \texttt{cld\_sed} parameter of the MG2 scheme \citep{morrison2008,gettelman2015} and to the sedimentation experiments of \citet{mulmenstadt2024adj}; $s=1$ is the default. The second makes the prefactor and $\Nd$ exponent of the autoconversion rate configurable,
+\begin{equation}
+\left(\frac{\partial q_\mathrm{r}}{\partial t}\right)_\mathrm{auto} = A\, q_\mathrm{c}^{2.47}\, \left(\frac{\Nd}{1\,\cmthree}\right)^{-\beta},
+\label{eq:kk}
+\end{equation}
+where $q_\mathrm{c}$ is the in-cloud cloud water mixing ratio (kg\,kg$^{-1}$) and the rate is in kg\,kg$^{-1}$\,s$^{-1}$. The default values $A=1350$ and $\beta=1.79$ define the configuration with precipitation suppression on. With suppression off, $\beta=0$ and $A=1350\times63^{-1.79}=0.812$, so that the two rates are equal at a diagnosed $\Nd$ of 63\,$\cmthree$, close to the observed RF02 value of about 55\,$\cmthree$ used in the intercomparisons \citep{ackerman2009,wyant2007}. The ratio of the off to the on autoconversion rate at fixed $q_\mathrm{c}$ is $(\Nd/63)^{1.79}$, which is 0.13 at 20\,$\cmthree$ and about 140 at 1000\,$\cmthree$. Switching suppression off therefore removes the direct $\Nd$ control of rain formation but also changes the amount of rain substantially, in opposite directions at low and high $\Nd$.
+
+\subsection{Case}
+
+DYCOMS-II RF02 sampled a nocturnal, heavily drizzling stratocumulus deck over the north-eastern Pacific \citep{stevens2003,vanzanten2005,vanzanten2005b}. The case was the basis of an LES intercomparison \citep{ackerman2009} and a single-column model intercomparison \citep{wyant2007}. The observations give a mean LWP of about $100\pm20\,\gmm$, an entrainment rate of 6.0--7.6\,mm\,s$^{-1}$ \citep{faloona2005}, a mean surface drizzle rate of 0.35\,mm\,d$^{-1}$ and an evaporated fraction of about 73\,\% of the cloud-base precipitation \citep{vanzanten2005,wyant2007}. We used the E3SM single-column IOP file for this case. The initial boundary layer has $\theta_l=288.3$\,K and $q_t=9.45\,\mathrm{g\,kg^{-1}}$ below an inversion at 795\,m, which gives a lifting condensation level of about 400\,m. Surface sensible and latent heat fluxes were prescribed as 16 and 93\,W\,m$^{-2}$, large-scale subsidence was applied with a divergence of $3.75\times10^{-6}$\,s$^{-1}$, and temperature and moisture were nudged towards the initial profiles above 650\,hPa with a time scale of 1\,h. Shortwave radiation was off.
+
+The configuration departs from the intercomparison protocol in three respects. Winds were not nudged and there was no Coriolis force, so the initial wind shear decayed freely. The forcing was held constant for 12\,h, twice the length of the protocol, to examine the evolution of the adjustment. The surface fluxes were prescribed, which removes the feedback of boundary-layer warming and drying on the fluxes; we estimate this feedback in Sect.~\ref{sec:limits}. Unless stated otherwise we analyse hours 10--12, and Sect.~\ref{sec:obs} uses hours 4--6 for comparison with the intercomparisons.
+
+\subsection{Experiment design}
+
+Table~\ref{tab:design} lists the factors. The main matrix crosses eight grid spacings, six target droplet numbers, three sedimentation factors and precipitation suppression on or off, which gives 288 simulations with 3D turbulence off. A further 72 simulations repeated the 625\,m and 312\,m grids with 3D turbulence on; one of them, at 312\,m, target $\Nd=1000\,\cmthree$, $s=2$ with suppression on, did not complete and is excluded, so 71 enter Appendix~\ref{app:t3d}.
+
+Table~\ref{tab:numerics} gives the numerical settings. The domain is 240\,km wide for $\dx\leq10$\,km, and 600 and 300\,km at 40 and 20\,km so that the coarse domains still contain $10\times10$ physics columns. The physics time step decreases from 100\,s at $\dx\geq5$\,km to 15\,s at 312\,m, and the radiation interval correspondingly from 300 to 45\,s. The ratio of physics to dynamics time step is 12 for $\dx\geq2.5$\,km and 24 for $\dx\leq1.25$\,km, chosen for stability of the dynamical core. Time step and radiation interval therefore co-vary with $\dx$, and their effects cannot be separated from those of grid spacing in this experiment. The 625\,m and 312\,m runs were integrated in restart segments, which we verified to be bit-for-bit identical to continuous integrations.
+
+The in-cloud $\Nd$ produced by a given CCN scaling factor depends on the height of the cloud, because the prescribed CCN number decreases with height. For a target of 200\,$\cmthree$, the activation floor decreases from about 345\,$\cmthree$ below 300\,m to about 150\,$\cmthree$ near 900\,m (Appendix~\ref{app:shoc}, Fig.~\ref{fig:shocmix}b). At $\dx\geq10$\,km, where the cloud extends down to about 200\,m, the diagnosed in-cloud $\Nd$ is 21--64\,\% above target, partly because small SHOC cloud fractions near cloud base inflate the in-cloud value. At 312\,m, where the cloud lies between about 650 and 1000\,m, it is between 21\,\% below and 11\,\% above target. The diagnosed in-cloud $\Nd$, defined as the median over cloudy grid cells (cloud water above $10^{-5}\,\mathrm{kg\,kg^{-1}}$) of the 3D snapshots at 10 and 12\,h, changes by less than 17\,\% between 6 and 12\,h at $\dx\leq5$\,km and by up to 25\,\% at $\dx\geq10$\,km.
+
+\begin{table}[t]
+\caption{Experiment factors. Every combination was run for 12\,h with 3D turbulence off (288 runs). The 625\,m and 312\,m grids were repeated with 3D turbulence on (72 runs, of which 71 completed).}\label{tab:design}
+\begin{tabular}{lll}
+\tophline
+Factor & Levels & Implementation \\
+\middlehline
+Grid spacing $\dx$ & 40, 20, 10, 5, 2.5, 1.25\,km; 625, 312\,m & Table~\ref{tab:numerics} \\
+Target $\Nd$ & 20, 50, 100, 200, 500, 1000\,$\cmthree$ & SPA CCN scaling factor (exponent 1) \\
+Sedimentation factor $s$ & 0.5, 1, 2 & multiplies cloud-droplet fall speeds in P3 \\
+Precipitation suppression & on, off & Eq.~(\ref{eq:kk}) with $(A,\beta)=(1350,1.79)$ or $(0.812,0)$ \\
+3D turbulence & off; on at 625 and 312\,m & SHOC eddy diffusivity applied horizontally \\
+\bottomhline
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\caption{Numerical settings. $\dx$ is the nominal (dynamics) grid spacing; physics columns are $1.5\dx$ apart. $N_\mathrm{col}$ is the number of physics columns, $\Delta t_\mathrm{phys}$ the physics time step, $\Delta t_\mathrm{dyn}$ the dynamics time step and $\nu_\mathrm{top}$ the sponge-layer diffusivity.}\label{tab:numerics}
+\begin{tabular}{lrrrrrr}
+\tophline
+$\dx$ & domain (km) & elements & $N_\mathrm{col}$ & $\Delta t_\mathrm{phys}$ (s) & $\Delta t_\mathrm{dyn}$ (s) & $\nu_\mathrm{top}$ (m$^2$\,s$^{-1}$) \\
+\middlehline
+40\,km & 600 & $5\times5$ & 100 & 100 & 8.33 & $1.2\times10^5$ \\
+20\,km & 300 & $5\times5$ & 100 & 100 & 8.33 & $6.0\times10^4$ \\
+10\,km & 240 & $8\times8$ & 256 & 100 & 8.33 & $3.0\times10^4$ \\
+5\,km & 240 & $16\times16$ & 1024 & 100 & 8.33 & $1.5\times10^4$ \\
+2.5\,km & 240 & $32\times32$ & 4096 & 75 & 6.25 & 7500 \\
+1.25\,km & 240 & $64\times64$ & 16\,384 & 60 & 2.50 & 1667 \\
+625\,m & 240 & $128\times128$ & 65\,536 & 30 & 1.25 & 833 \\
+312\,m & 240 & $256\times256$ & 262\,144 & 15 & 0.625 & 417 \\
+\bottomhline
+\end{tabular}
+\belowtable{All runs used 128 levels, radiation every third physics step and one macrophysics--microphysics subcycle per physics step.}
+\end{table}
+
+\subsection{Diagnostics and notation}\label{sec:diag}
+
+Diagnostics were computed from domain-mean profiles averaged over 15\,min, from instantaneous column fields every 15\,min, from 2-hourly 3D snapshots, and from cloud-top fields every 15\,min. The cloud-top fields were produced by an output operator that follows the AeroCom convention of reporting the liquid cloud-top fraction and the fraction-weighted droplet number and effective radius of the uppermost liquid layer. LWP is the domain mean. Cloud cover is reported both as the fraction of columns with LWP above 10\,$\gmm$, and as the maximum-overlap cloud cover computed from SHOC's liquid cloud fraction in the 3D snapshots, which includes subgrid cloud. The inversion height $\zi$ is the height at which the domain-mean liquid potential temperature $\theta_l$ crosses the midpoint between its boundary-layer (below 400\,m) and free-tropospheric (1400\,m) values. Cloud base $\zb$ is the lowest level at which the domain-mean liquid cloud fraction reaches half its maximum; it is quantised by the 25--50\,m level spacing. The entrainment rate is $\we=d\zi/dt-w_\mathrm{s}(\zi)$, where $w_\mathrm{s}$ is the IOP subsidence velocity (negative downward) at the mean $\zi$ and $d\zi/dt$ is a linear fit over hours 8--12. The 4\,h fit is less sensitive than a 2\,h fit to the 50\,m level spacing at the inversion, across which $\zi$ rises by about 70\,m at 40\,km and about 200\,m at 312\,m over 12\,h. Vertical-velocity variance and skewness of the resolved flow were computed on the physics grid from the 3D snapshots at 10 and 12\,h, with $w=-\omega/(\rho g)$, and averaged over the boundary layer. They are compared with SHOC's subgrid variance, which SHOC diagnoses from its turbulent kinetic energy and is therefore not an independent second moment. Decoupling is measured as the difference in $q_t$ between the lowest and highest quarters of the boundary layer \citep{jones2011}. The spectral peak wavelength $\lambda$ of LWP is the maximum of the radially averaged power spectrum \citep{wood2006}; with a 240\,km domain it is quantised at $240/n$\,km.
+
+We define the LWP susceptibility between two otherwise identical runs at target droplet numbers $a$ and $b$ as
+\begin{equation}
+S_{a\rightarrow b} = \frac{\ln\LWP_b-\ln\LWP_a}{\ln N_{\mathrm{d},b}-\ln N_{\mathrm{d},a}},
+\end{equation}
+where LWP is averaged over hours 10--12 and $\Nd$ is the diagnosed in-cloud value. The subscripts refer to the target $\Nd$, while the slope uses the diagnosed $\Nd$. We report three branches, $\Slow$, $\Shigh$ and $\Svhigh$, and denote susceptibilities with precipitation suppression on and off by $S_\mathrm{on}$ and $S_\mathrm{off}$. Because $\Nd$ is diagnosed from snapshots while LWP varies continuously, we recomputed $S$ for each of the eight 15\,min intervals in hours 10--12 with fixed $\Nd$ and report the standard deviation. These 15\,min samples are autocorrelated and come from a single realisation, so this spread measures temporal sampling only and is not an estimate of the uncertainty that an initial-condition ensemble would provide. Comparisons across grid spacings at fixed $\Nd$ use LWP and other quantities interpolated linearly in $\ln\Nd$ to fixed diagnosed values, because the diagnosed $\Nd$ at a given target differs between grid spacings.
+
+\subsection{Factorial decomposition}\label{sec:decomp}
+
+For each grid spacing and branch, we fitted $S_\mathrm{on}(s)=a_\mathrm{on}+b_\mathrm{on}s$ and $S_\mathrm{off}(s)=a_\mathrm{off}+b_\mathrm{off}s$ over $s=0.5$, 1 and 2, and decomposed the susceptibility at $s=1$ as
+\begin{equation}
+S_\mathrm{on}(1) = (a_\mathrm{on}-a_\mathrm{off}) + b_\mathrm{off} + (b_\mathrm{on}-b_\mathrm{off}) + a_\mathrm{off}.
+\label{eq:decomp}
+\end{equation}
+The first term is the precipitation-suppression contribution extrapolated to zero sedimentation, the second the sedimentation contribution in the absence of precipitation suppression, the third the interaction between sedimentation and precipitation suppression, and the fourth a residual that includes radiative effects of the effective radius and any non-linearity in $s$. The sum reproduces $S_\mathrm{on}(1)$ to within the fit error. Three caveats apply. The extrapolation to $s=0$ uses three points with one residual degree of freedom, and $S_\mathrm{off}$ is clearly convex in $s$ on the clean branch at sub-kilometre spacing, so $a_\mathrm{on}$ and $a_\mathrm{off}$ are uncertain there. On and off runs at the same target have slightly different diagnosed $\Nd$, so their slopes span different $\ln\Nd$ intervals. Most importantly, the off configuration is matched at 63\,$\cmthree$ and therefore precipitates heavily at high $\Nd$; at 40\,km and target 1000\,$\cmthree$, surface precipitation is 0.83\,mm\,d$^{-1}$ with suppression off and 0.01\,mm\,d$^{-1}$ with suppression on. The off runs at coarse spacing thus measure the sensitivity to sedimentation in a strongly precipitating state, whereas at 312\,m the off runs precipitate only 0.01--0.17\,mm\,d$^{-1}$. The partition between the first two terms at coarse spacing therefore depends on the choice of the matching $\Nd$ and should be read as specific to this design.
+
+\subsection{Mixed-layer budget}\label{sec:mlb}
+
+To relate the LWP response to boundary-layer processes, we evaluated a bulk budget of the domain-mean boundary layer for every run in 2\,h windows, following mixed-layer theory \citep{lilly1968,stevens2002} and the LWP-tendency framework of \citet{vanderdussen2014}. For a well-mixed layer of depth $\zi$ with conserved variables $\theta_l$ and $q_t$,
+\begin{align}
+\frac{d\theta_l}{dt} &= \frac{1}{\zi}\left[\frac{H}{\rho c_p} + \we\,\Delta\theta_l - \frac{F_\mathrm{rad}}{\rho c_p} + \frac{P}{\rho c_p}\right], \label{eq:thl}\\
+\frac{dq_t}{dt} &= \frac{1}{\zi}\left[\frac{E}{\rho L_v} + \we\,\Delta q_t - \frac{P}{\rho L_v}\right], \label{eq:qt}\\
+\frac{d\zi}{dt} &= \we + w_\mathrm{s}(\zi),
+\end{align}
+where $H$ and $E$ are the surface sensible and latent heat fluxes, $F_\mathrm{rad}$ is the radiative cooling of the layer below $\zi+150$\,m, $P$ is the surface rain rate in energy units, and $\Delta\theta_l$ and $\Delta q_t$ are the differences between the values 100\,m above $\zi$ and the mixed-layer means over 0.1--0.8\,$\zi$. Cloud base was taken as the lifting condensation level of mixed-layer air, so that $d\zb/dt=(\partial\zb/\partial\theta_l)\,d\theta_l/dt+(\partial\zb/\partial q_t)\,dq_t/dt$, with sensitivities of 120--130\,m\,K$^{-1}$ and $-190$ to $-210$\,m\,(g\,kg$^{-1}$)$^{-1}$ computed with the saturation formula of \citet{bolton1980}. Assuming LWP $\propto h^2$ with cloud thickness $h=\zi-\zb$ and fixed adiabatic fraction and cloud cover,
+\begin{equation}
+\frac{d\ln\LWP}{dt} = \frac{2}{h}\left(\frac{d\zi}{dt}-\frac{d\zb}{dt}\right),
+\label{eq:lwpbudget}
+\end{equation}
+which separates into contributions from entrainment (through $\we$ in $d\zi/dt$ and in Eqs.~\ref{eq:thl} and \ref{eq:qt}), subsidence, radiation, surface fluxes and precipitation.
+
+Because $\we$ was diagnosed from the simulated $d\zi/dt$, the budget's $d\zi/dt$ equals the simulated value by construction, and only the cloud-base tendency and the LWP--thickness relation are predicted. The budget should therefore be read as a diagnostic decomposition. It also assumes a well-mixed layer, whereas the low-$\Nd$ boundary layers at $\dx\leq5$\,km are decoupled (Sect.~\ref{sec:grey}) and the sub-kilometre runs have cloud cover well below one. Pooled over all 1440 run-windows with 3D turbulence off, the predicted and simulated tendencies are correlated at 0.89 for $\theta_l$, 0.87 for $q_t$ and 0.88 for LWP. The skill varies strongly with grid spacing (Appendix~\ref{app:budget}, Table~\ref{tab:skill}). For LWP it is high at $\dx\geq5$\,km (correlation 0.79--0.90) and low at sub-kilometre spacing (0.07 at 625\,m and 0.44 at 312\,m, with errors comparable to the signal). For the differences between $\Nd$ levels in hours 10--12, which determine $S$, the correlation is 0.85--0.93 at 40, 20 and 5\,km and $-0.02$ to 0.57 at $\dx\leq2.5$\,km.
+
+%% ====================================================================
+\section{Results}\label{sec:results}
+%% ====================================================================
+
+\subsection{Comparison with RF02 observations and intercomparisons}\label{sec:obs}
+
+Table~\ref{tab:obs} compares hours 4--6 of the runs at target $\Nd=50\,\cmthree$ (diagnosed 42--67\,$\cmthree$) and $s=1$ with the observations and with the intercomparisons, which averaged over the last two of their 6\,h. The runs at $\dx\geq5$\,km have an LWP of 156--159\,$\gmm$, above the observed $100\pm20\,\gmm$ and similar to the DHARMA LES value of 144\,$\gmm$ reported by \citet{wyant2007}. Their entrainment rate of 4.1\,mm\,s$^{-1}$ is below the observed 6.0--7.6\,mm\,s$^{-1}$ and close to the LES value of 4.5\,mm\,s$^{-1}$, and their surface precipitation of 0.12--0.14\,mm\,d$^{-1}$ is below the observed 0.35\,mm\,d$^{-1}$. With decreasing grid spacing, LWP decreases to 98\,$\gmm$ at 312\,m and the entrainment rate increases to 7.7\,mm\,s$^{-1}$, at the upper end of the observed range. Cloud base rises from about 300\,m to 580\,m, compared with the lifting condensation level of about 400\,m of the initial mixed layer. The 625\,m runs are closest to the observations overall, with an LWP of 119\,$\gmm$, an entrainment rate of 6.3\,mm\,s$^{-1}$, surface precipitation of 0.28\,mm\,d$^{-1}$ and an evaporated fraction of 0.73, equal to the observed value. No single grid spacing matches all observed quantities, and LWP, entrainment and precipitation at all spacings lie within the spread of the single-column models, whose LWP ranged from 30 to 162\,$\gmm$ and entrainment rate from 1.5 to 6.8\,mm\,s$^{-1}$ \citep{wyant2007}. \citet{ackerman2009} found that their LES ensemble with drizzle and sedimentation had a steady LWP consistent with the measurements and an entrainment rate at the low end of the measured range, and that it underestimated precipitation. The coarse EAMxx runs share the low entrainment and low precipitation, while the sub-kilometre runs entrain more than the LES. We did not run an LES of the same configuration, so a converged reference with this model physics is not available.
+
+\begin{table}[t]
+\caption{Hours 4--6 at target $\Nd=50\,\cmthree$ and sedimentation factor 1, compared with RF02 observations and published simulations. $P_\mathrm{sfc}$ is surface precipitation and $f_\mathrm{evap}$ the fraction of rain production that evaporates before reaching the surface. Observations: LWP and $f_\mathrm{evap}$ as compiled by \citet{wyant2007}, $\we$ from \citet{faloona2005}, $P_\mathrm{sfc}$ from \citet{vanzanten2005}. LES and SCM values are averages over hours 4--6 from Table~2 of \citet{wyant2007} (standard vertical resolution).}\label{tab:obs}
+\begin{tabular}{llrrrrrr}
+\tophline
+$\dx$ & supp. & LWP ($\gmm$) & $\we$ (mm\,s$^{-1}$) & $P_\mathrm{sfc}$ (mm\,d$^{-1}$) & $f_\mathrm{evap}$ & $\zb$ (m) & $\zi$ at 6\,h (m) \\
+\middlehline
+\input{tables/tab_obs.tex}
+Observations & & $100\pm20$ & 6.0--7.6 & 0.35 & 0.73 & & \\
+DHARMA LES & & 144 & 4.5 & & & & \\
+SCMs (9 models) & & 30--162 & 1.5--6.8 & & & & \\
+\bottomhline
+\end{tabular}
+\end{table}
+
+\subsection{Cloud structure and mean state across grid spacings}\label{sec:morph}
+
+Figure~\ref{fig:maps} shows LWP at hour 12 for $s=1$ with precipitation suppression on. As the grid is refined, the LWP spectral peak shortens from about 30\,km at 2.5\,km to 13--22\,km at 625 and 312\,m, the domain-mean LWP decreases, and clear gaps appear. Interpolated to a diagnosed in-cloud $\Nd$ of 200\,$\cmthree$, LWP is 273\,$\gmm$ at 40\,km, 204\,$\gmm$ at 5\,km and 73\,$\gmm$ at 312\,m, and the maximum-overlap cloud cover decreases from 1.00 at $\dx\geq2.5$\,km to 0.92 at 312\,m. At target $\Nd=20\,\cmthree$ the sub-kilometre clouds break into small cells of high LWP, and the maximum-overlap cloud cover at 312\,m is 0.68 (0.50 with the LWP threshold). The 5\,km fields contain stripe-like structures with a wavelength of about six physics columns, close to the effective resolution of the dynamical core, which suggests that the circulations at this spacing are partly numerical. Between 40\,km and 312\,m at target 200\,$\cmthree$, the inversion rises from 863 to 1016\,m, cloud base rises from 195 to 720\,m, the cloud layer thins from 668 to 296\,m, and the mixed layer becomes 1.8\,K warmer. The 40 and 20\,km runs are nearly indistinguishable. The 10\,km runs differ from them at high $\Nd$ (LWP 312 instead of 342\,$\gmm$ at target 1000\,$\cmthree$), where their column LWP standard deviation reaches up to 27\,$\gmm$ across configurations, compared with at most 5\,$\gmm$ at 20 and 40\,km. Resolved motions carry no measurable vertical-velocity variance at $\dx\geq10$\,km (Sect.~\ref{sec:grey}), so these runs approximate a single-column configuration of the model physics, with the 10\,km runs beginning to develop weak horizontal structure.
+
+\begin{figure}[t]
+\includegraphics[width=\textwidth]{figures/fig01_maps.pdf}
+\caption{Instantaneous LWP at hour 12 over the 240\,km domain for target $\Nd$ of 20, 200 and 1000\,$\cmthree$ (rows) and grid spacings from 5\,km to 312\,m (columns), for sedimentation factor 1 with precipitation suppression on and 3D turbulence off.}\label{fig:maps}
+\end{figure}
+
+\begin{table}[t]
+\caption{Domain-mean LWP ($\gmm$, hours 10--12) for sedimentation factor 1 and 3D turbulence off, at the target $\Nd$ ($\cmthree$) of each column. Bold marks the maximum with precipitation suppression on. Diagnosed in-cloud $\Nd$ at a given target differs between grid spacings (Sect.~2.3).}\label{tab:lwp}
+\begin{tabular}{llrrrrrr}
+\tophline
+$\dx$ & supp. & 20 & 50 & 100 & 200 & 500 & 1000 \\
+\middlehline
+\input{tables/tab_lwp.tex}
+\end{tabular}
+\end{table}
+
+\subsection{LWP response to droplet number}\label{sec:response}
+
+Figure~\ref{fig:response} and Table~\ref{tab:lwp} show the LWP response to $\Nd$. With precipitation suppression on, LWP increases monotonically with $\Nd$ at $\dx\geq10$\,km, from 135 to 342\,$\gmm$ at 40\,km. With decreasing grid spacing, the curve flattens at high $\Nd$ and then turns over. The LWP maximum moves from target $\Nd\geq1000\,\cmthree$ at $\dx\geq10$\,km to 500\,$\cmthree$ at 5\,km, 200\,$\cmthree$ from 2.5\,km to 625\,m, and 100\,$\cmthree$ (diagnosed 84\,$\cmthree$) at 312\,m. The resulting shape resembles the inverted-V shape in satellite composites and LES ensembles \citep{gryspeerdt2019,glassmeier2021}, but in these simulations it appears only at $\dx\leq5$\,km, and the negative slopes are an order of magnitude smaller than the observed ones, which \citet{gryspeerdt2019} regarded as an upper bound on the causal effect.
+
+With precipitation suppression off (Fig.~\ref{fig:response}b), LWP decreases slightly with $\Nd$ at $\dx\geq10$\,km (from 234 to 208\,$\gmm$ at 40\,km) and at 312\,m (from 79 to 64\,$\gmm$). At 5\,km it increases monotonically, from 135 to 160\,$\gmm$, and at 2.5\,km to 625\,m it increases between target 20 and 50\,$\cmthree$ ($\Slow=0.08$--0.20) and decreases slightly at higher $\Nd$. Surface precipitation (Fig.~\ref{fig:response}d) decreases steeply with $\Nd$ when suppression is on, and more steeply at finer spacing; at 312\,m it is 0.011\,mm\,d$^{-1}$ at target 100\,$\cmthree$ and at most 0.002\,mm\,d$^{-1}$ at higher $\Nd$. The entrainment rate (Fig.~\ref{fig:response}c) is 3.1--4.5\,mm\,s$^{-1}$ at $\dx\geq10$\,km and increases with $\Nd$ at $\dx\leq5$\,km whether suppression is on or off. It is not monotonic in $\dx$: at target $\Nd\geq100\,\cmthree$ it is larger at 5\,km (7.0--8.1\,mm\,s$^{-1}$) than at 2.5\,km (5.7--7.3\,mm\,s$^{-1}$), and it increases again towards 312\,m (8.0--8.3\,mm\,s$^{-1}$).
+
+\begin{figure}[t]
+\includegraphics[width=\textwidth]{figures/fig02_response.pdf}
+\caption{Response to $\Nd$ at every grid spacing (colours and symbols) for sedimentation factor 1. (a) LWP with precipitation suppression on; stars mark the maximum. (b) LWP with suppression off. (c) Entrainment rate (8--12\,h fit) and (d) surface precipitation, with suppression on (solid) and off (dashed); values below $10^{-4}$\,mm\,d$^{-1}$ are plotted at the lower axis limit. Values are hour 10--12 means against the diagnosed in-cloud $\Nd$.}\label{fig:response}
+\end{figure}
+
+Figure~\ref{fig:susc} and Table~\ref{tab:S} give the corresponding susceptibilities. With suppression on and $s=1$, $\Shigh$ decreases monotonically as $\dx$ decreases, from 0.27 at 40\,km to 0.20 at 5\,km, 0.11 at 2.5\,km, 0.07 at 1.25\,km, 0.03 at 625\,m and $-0.05$ at 312\,m. The polluted branch $\Svhigh$ changes sign between 5\,km (0.01) and 2.5\,km ($-0.03$) and lies between $-0.03$ and $-0.04$ at finer spacing. The clean branch $\Slow$ increases from 0.39 at $\dx\geq10$\,km to 0.65--0.76 at $\dx\leq2.5$\,km. At sub-kilometre spacing, part of this increase is an increase in cloud cover; at 312\,m the cloud-cover part of $\Slow$ is 0.33 with the maximum-overlap definition (0.53 with the LWP threshold). On the high-$\Nd$ branches cloud cover contributes less than 0.03. The temporal-sampling standard deviation is at most 0.03 at $\dx\leq2.5$\,km and up to 0.1 at $\dx\geq5$\,km, where LWP oscillates on time scales of about 15\,min.
+
+At 312\,m, the negative $\Shigh$ corresponds to an LWP difference of 2.6\,$\gmm$ (3.4\,\%) between targets 100 and 200\,$\cmthree$, and $\Svhigh$ to a difference of 4.1\,$\gmm$ between 200 and 1000\,$\cmthree$. These differences are smaller than the LWP decrease of each run in one hour (Sect.~\ref{sec:time}), and initial-condition spread in domain-mean LWP of stratocumulus simulations is typically of a few per cent. Without an ensemble, the sign of these small susceptibilities at 312\,m is therefore not established. The dependence on $s$ is more systematic. At $\dx\leq2.5$\,km with suppression on, $\Svhigh$ is $-0.01$ to $-0.02$ for $s=0.5$ and $-0.06$ to $-0.09$ for $s=2$ (Fig.~\ref{fig:susc}c). On the moderate branch, $\Shigh$ increases with $s$ at 2.5 and 1.25\,km (from 0.09 to 0.23 and from 0.06 to 0.20) and decreases with $s$ at 312\,m (from $-0.02$ to $-0.08$). With suppression off, $S$ is within $\pm0.13$ of zero at $\dx\geq10$\,km on all branches. At $\dx\leq1.25$\,km and $s\leq1$ it is negative on the two high-$\Nd$ branches ($-0.07$ and $-0.05$ at 312\,m for $s=1$).
+
+\begin{figure}[t]
+\includegraphics[width=\textwidth]{figures/fig03_susceptibility.pdf}
+\caption{LWP susceptibility on the (a) clean, (b) moderate and (c) polluted branches against grid spacing (logarithmic axis). Colours: sedimentation factor. Solid lines and filled circles: precipitation suppression on; dashed lines and open squares: off. Bars show the standard deviation of $S$ over the eight 15\,min intervals in hours 10--12, a measure of temporal sampling only. Symbols are offset horizontally for clarity.}\label{fig:susc}
+\end{figure}
+
+\begin{table}[t]
+\caption{Susceptibility $S=d\ln\LWP/d\ln\Nd$ for sedimentation factor 1 and 3D turbulence off. In parentheses: standard deviation over the eight 15\,min intervals in hours 10--12. The last column is the target $\Nd$ ($\cmthree$) of maximum LWP with suppression on.}\label{tab:S}
+\begin{tabular}{lrrrrrrr}
+\tophline
+ & \multicolumn{2}{c}{$\Slow$} & \multicolumn{2}{c}{$\Shigh$} & \multicolumn{2}{c}{$\Svhigh$} & target $\Nd$ \\
+$\dx$ & on & off & on & off & on & off & at max LWP \\
+\middlehline
+\input{tables/tab_S.tex}
+\end{tabular}
+\end{table}
+
+\subsection{Temporal evolution of the susceptibility}\label{sec:time}
+
+The susceptibilities evolve throughout the 12\,h (Fig.~\ref{fig:time}). At $\dx\geq10$\,km, $\Shigh$ increases from 0.12 in hours 2--4 to 0.24--0.27 in hours 10--12, as the high-$\Nd$ clouds continue to gain the water that low-$\Nd$ clouds lose to precipitation (Fig.~\ref{fig:time}d); at 40\,km and high $\Nd$, LWP is still increasing by up to 15\,$\gmm$\,h$^{-1}$ in hours 10--12. At 1.25\,km and 625\,m, $\Shigh$ also increases slowly (from 0.00 to 0.07 and 0.03), whereas at 312\,m it decreases from 0.00 to $-0.05$. The polluted branch $\Svhigh$ becomes more negative with time at all $\dx\leq2.5$\,km, from about $-0.01$ in hours 2--4 at $\dx\leq1.25$\,km and from 0.04 at 2.5\,km to between $-0.03$ and $-0.04$ in hours 10--12. The clean branch is already large in hours 2--4 at 625 and 312\,m (0.56--0.63) and at 1.25\,km (0.51) and increases slowly. At $\dx\leq2.5$\,km, LWP decreases in 98\,\% of the runs during hours 10--12, by up to 4.4\,$\gmm$\,h$^{-1}$ or 6\,\%\,h$^{-1}$, and none of the susceptibilities at sub-kilometre spacing had levelled off at 12\,h. The adjustment time scales in these runs are therefore longer than the simulation, as in LES of non-precipitating stratocumulus, where LWP continues to adjust over a day or more \citep{glassmeier2021}.
+
+\begin{figure}[t]
+\includegraphics[width=\textwidth]{figures/fig04_time.pdf}
+\caption{(a--c) Susceptibility on the three branches for consecutive 2\,h windows (suppression on, sedimentation factor 1), coloured by grid spacing. (d--f) LWP time series for each target $\Nd$ at 40\,km with suppression on and at 312\,m with suppression on and off. Grey shading marks the analysis window.}\label{fig:time}
+\end{figure}
+
+\subsection{Precipitation suppression, sedimentation and their interaction}\label{sec:attr}
+
+Figure~\ref{fig:decomp} shows the decomposition of Eq.~(\ref{eq:decomp}) at $s=1$. At $\dx\geq10$\,km, the precipitation-suppression term at zero sedimentation is 0.34--0.39 on the moderate branch and 0.07--0.08 on the polluted branch, and the sedimentation term derived from the off runs is small ($-0.02$ to $-0.01$). The interaction term on the moderate branch is $-0.07$ to $-0.08$, because $\Shigh$ with suppression on decreases strongly with $s$ (from 0.35 to 0.20 between $s=0.5$ and 2 at 40\,km), whereas the off runs barely respond. This sensitivity to sedimentation at coarse spacing is larger than at 312\,m ($dS_\mathrm{on}/ds=-0.10$ at 40\,km and $-0.04$ at 312\,m). It is unlikely to act through entrainment, which changes by less than 0.6\,mm\,s$^{-1}$ between $s=0.5$ and 2 at $\dx\geq10$\,km (Fig.~\ref{fig:entrain}a). Deposition of cloud droplets at the surface is also unlikely to explain it, because the estimated deposition at the lowest model level exceeds 0.02\,mm\,d$^{-1}$ only at $\dx\geq10$\,km, target 20\,$\cmthree$, $s=2$ with suppression off (up to 0.25\,mm\,d$^{-1}$, or about 20\,\% of surface precipitation). The sensitivity to sedimentation at coarse spacing therefore depends on the autoconversion formulation, presumably through the vertical redistribution of cloud water relative to where rain forms, but we have not isolated its mechanism. In addition, because of the pivot dependence described in Sect.~\ref{sec:decomp}, the statement that precipitation suppression accounts for the positive response at coarse spacing holds for this design and should not be read as a pivot-independent attribution.
+
+At finer spacing, the precipitation-suppression term on the moderate branch decreases to 0.12 at 5\,km, 0.05--0.10 between 2.5\,km and 625\,m and 0.04 at 312\,m, and on the polluted branch it is 0.00--0.02 at $\dx\leq5$\,km. On the polluted branch at 2.5 and 1.25\,km, the negative $\Svhigh$ comes mainly from the interaction term ($-0.04$ and $-0.05$) and the residual ($-0.01$), while the sedimentation term derived from the off runs is near zero ($+0.01$ and $-0.01$). At 625\,m and 312\,m the sedimentation term ($-0.016$ and $-0.024$), the interaction ($-0.015$ at both) and the residual ($-0.004$ and $-0.016$) all contribute. On this branch, a larger sedimentation factor increases LWP more at target 200 than at 1000\,$\cmthree$, so $\Svhigh$ becomes more negative with $s$, consistent with the mechanism of \citet{bretherton2007}. At 2.5 and 1.25\,km the moderate branch behaves differently, with positive sedimentation and interaction terms (both about 0.05), so that $\Shigh$ increases with $s$.
+
+On the clean branch at $\dx\leq5$\,km, the sedimentation term is positive (0.13 at 5\,km and 0.30--0.34 at $\dx\leq2.5$\,km). At target $\Nd=20\,\cmthree$, cloud-top effective radii are 12--14\,$\mu$m for $s=1$ with suppression on, and a larger sedimentation factor lowers LWP most at the lowest $\Nd$. At these droplet sizes, sedimentation mainly removes cloud water, as drizzle does, and its effect on entrainment is secondary. The clean-branch residual is large and negative at $\dx\leq2.5$\,km ($-0.16$ to $-0.28$), but it is the least well constrained term because $S_\mathrm{off}$ is convex in $s$ ($-0.11$, 0.00 and 0.34 for $s=0.5$, 1 and 2 at 312\,m). We interpret it only as an indication that pathways other than a linear sedimentation effect, possibly including radiative effective-radius effects on thin, broken clouds, contribute on this branch.
+
+\begin{figure}[t]
+\includegraphics[width=\textwidth]{figures/fig05_decomposition.pdf}
+\caption{Decomposition (Eq.~\ref{eq:decomp}) of the susceptibility with suppression on at sedimentation factor 1 (black bars) on the (a) clean, (b) moderate and (c) polluted branches. Blue: precipitation suppression extrapolated to zero sedimentation; orange: sedimentation without precipitation suppression; pink: interaction; grey: residual. The partition at coarse spacing depends on the matching $\Nd$ of the suppression-off configuration (Sect.~\ref{sec:decomp}).}\label{fig:decomp}
+\end{figure}
+
+\subsection{Resolution dependence of the precipitation sink}\label{sec:rain}
+
+The effect of precipitation suppression on LWP is limited by the size of the precipitation sink, and Fig.~\ref{fig:rain} shows that this sink decreases with grid spacing. Rain production (autoconversion plus accretion) at target 200\,$\cmthree$ decreases from 0.55\,mm\,d$^{-1}$ at 40\,km to 0.03\,mm\,d$^{-1}$ at 312\,m (Fig.~\ref{fig:rain}a), as the cloud thins from about 650 to about 300\,m (Fig.~\ref{fig:rain}d) and the KK2000 rates decrease steeply with cloud water. At target 20\,$\cmthree$ the decrease is smaller, from about 2.0 to 1.2\,mm\,d$^{-1}$. As cloud base rises, the fraction of rain production that evaporates below cloud increases, at target 200\,$\cmthree$ from 0.40 at 40\,km to 0.93 at 312\,m (Fig.~\ref{fig:rain}b), consistent with the importance of subcloud evaporation in drizzling stratocumulus \citep{wood2005,wyant2007}. At the same time the entrainment drying flux $-\rho L_v\we\Delta q_t$ roughly doubles, from 67 to 128\,W\,m$^{-2}$ at target 200\,$\cmthree$ (Fig.~\ref{fig:entrain}c). The ratio of surface precipitation to entrainment drying (Fig.~\ref{fig:rain}c), which is the diagnostic that \citet{ackerman2004} used to explain the sign of the LWP response, therefore decreases with grid spacing by a factor of about 4 at target 20\,$\cmthree$ (from 0.65 to 0.18) and by a factor of about 300 at targets 200--1000\,$\cmthree$. The raining fraction of the domain (surface rain above 0.5\,mm\,d$^{-1}$) is below 0.2\,\% at $\dx\leq1.25$\,km for target $\Nd\geq200\,\cmthree$. When surface precipitation is negligible, precipitation suppression has little effect on LWP, and the decrease of LWP with $\Nd$ associated with entrainment dominates \citep{ackerman2004,wood2007,hoffmann2020}. In these simulations, the $\Nd$ at which this transition occurs depends on grid spacing.
+
+\begin{figure}[t]
+\includegraphics[width=\textwidth]{figures/fig06_rain.pdf}
+\caption{Precipitation budget against in-cloud $\Nd$ at every grid spacing (suppression on, sedimentation factor 1). (a) Column rain production (autoconversion plus accretion). (b) Fraction of the production that evaporates before reaching the surface. (c) Ratio of surface precipitation to the entrainment drying flux. (d) Cloud thickness $\zi-\zb$.}\label{fig:rain}
+\end{figure}
+
+\subsection{Entrainment and the boundary-layer budget}\label{sec:entrain}
+
+At target 200\,$\cmthree$ with suppression on, the entrainment rate is 3.7\,mm\,s$^{-1}$ at 40\,km, 7.7\,mm\,s$^{-1}$ at 5\,km, 6.8\,mm\,s$^{-1}$ at 2.5\,km, 7.4\,mm\,s$^{-1}$ at 625\,m and 8.1\,mm\,s$^{-1}$ at 312\,m. The boundary-layer radiative cooling is 80--88\,W\,m$^{-2}$ in all these runs, so the change in $\we$ mostly reflects a change in entrainment efficiency. We define the ratio of entrainment warming to radiative cooling as
+\begin{equation}
+\eta = \frac{\rho c_p\we\Delta\theta_l}{F_\mathrm{rad}}.
+\end{equation}
+At $\dx\geq10$\,km, $\eta$ is 0.45--0.67 (Fig.~\ref{fig:entrain}b). At $\dx\leq5$\,km it exceeds one for target $\Nd$ of 100--200\,$\cmthree$ and above, with the largest values at 5\,km (1.07--1.25 for $\Nd\geq100\,\cmthree$) and at 312\,m (1.2--1.3). When $\eta$ exceeds one, entrainment warming exceeds radiative cooling, and with the surface sensible heat flux the mixed layer warms by 0.07--0.10\,K\,h$^{-1}$ at 312\,m. Entrainment drying at 312\,m (105--131\,W\,m$^{-2}$ for $\Nd\geq50\,\cmthree$) likewise exceeds the prescribed latent heat flux of 93\,W\,m$^{-2}$, whereas at $\dx\geq10$\,km it is 55--78\,W\,m$^{-2}$ (Fig.~\ref{fig:entrain}c). The response of $\we$ to the sedimentation factor at fixed $\Nd$ (Fig.~\ref{fig:entrain}a) is largest at $\dx\leq5$\,km and low $\Nd$, where doubling the fall speed relative to $s=0.5$ reduces $\we$ by 1.1--2.4\,mm\,s$^{-1}$ at target $\Nd\leq50\,\cmthree$; at target $\Nd\geq500\,\cmthree$ the reduction is 0.2--0.8\,mm\,s$^{-1}$. At $\dx\geq10$\,km the reduction is less than 0.6\,mm\,s$^{-1}$ at all $\Nd$. This is the expected sign of the sedimentation--entrainment feedback \citep{bretherton2007,ackerman2009}, and its larger magnitude at fine spacing indicates that the coupling between sedimentation and entrainment is stronger where part of the boundary-layer circulation is resolved.
+
+\begin{figure}[t]
+\includegraphics[width=\textwidth]{figures/fig07_entrainment.pdf}
+\caption{(a) Change in the entrainment rate between sedimentation factors 2 and 0.5 at fixed target $\Nd$ (suppression on). (b) Ratio $\eta$ of entrainment warming to boundary-layer radiative cooling and (c) entrainment drying flux, with the prescribed surface latent heat flux (dotted line), for suppression on and sedimentation factor 1.}\label{fig:entrain}
+\end{figure}
+
+The mixed-layer budget (Sect.~\ref{sec:mlb}) expresses these fluxes as contributions to the LWP tendency (Fig.~\ref{fig:budget}). In every run, radiative cooling and surface fluxes thicken the cloud, and entrainment and subsidence thin it. At 40\,km, where the budget reproduces both the tendencies and their differences between $\Nd$ levels (Table~\ref{tab:skill}), the entrainment contribution is about $-9$\,\%\,h$^{-1}$ at all $\Nd$, and the precipitation contribution decreases in magnitude from $-10$\,\%\,h$^{-1}$ at target 20\,$\cmthree$ to nearly zero at $\Nd\geq500\,\cmthree$. The increase of LWP with $\Nd$ at 40\,km is therefore associated with the removal of the precipitation sink, consistent with Sect.~\ref{sec:attr}. At 312\,m, the entrainment contribution is about three times larger ($-27$ to $-32$\,\%\,h$^{-1}$ for $\Nd\geq50\,\cmthree$), and it is partly offset by larger radiative (21--24\,\%\,h$^{-1}$) and surface-flux (12--13\,\%\,h$^{-1}$) contributions; the precipitation contribution is below 1\,\%\,h$^{-1}$ in magnitude for $\Nd\geq100\,\cmthree$. The budget sum is negative at all $\Nd$ ($-2$ to $-5$\,\%\,h$^{-1}$), consistent in sign and magnitude with the simulated thinning ($-4$ to $-6$\,\%\,h$^{-1}$). At 625\,m the budget sum at high $\Nd$ ($-5.4$ to $-5.7$\,\%\,h$^{-1}$) is more negative than the simulated trend ($-1.9$ to $-2.9$\,\%\,h$^{-1}$). The budget therefore suggests that the general thinning at fine grid spacing is associated with the increase of entrainment relative to the radiative and surface forcing. At $\dx\leq2.5$\,km, however, the net $\Nd$ dependence of the budget sum (about 2\,\%\,h$^{-1}$ at 312\,m) is no larger than the budget error, and the entrainment term itself varies non-monotonically with $\Nd$ ($-29$, $-29$, $-27$, $-31$ and $-32$\,\%\,h$^{-1}$ for targets 50 to 1000\,$\cmthree$ at 312\,m). The budget does not establish which process sets the small negative susceptibilities at sub-kilometre spacing.
+
+\begin{figure}[t]
+\includegraphics[width=\textwidth]{figures/fig08_budget.pdf}
+\caption{Mixed-layer LWP budget (Eq.~\ref{eq:lwpbudget}) for hours 10--12, expressed as contributions to $d\ln\LWP/dt$, at (a) 40\,km, (b) 5\,km, (c) 2.5\,km, (d) 1.25\,km, (e) 625\,m and (f) 312\,m (suppression on, sedimentation factor 1). The black line is the budget sum, with shading of $\pm$ the root-mean-square error of the budget at that grid spacing (Table~\ref{tab:skill}); crosses are the simulated LWP trend. The entrainment rate in the budget is diagnosed over each 2\,h window, whereas Figs.~\ref{fig:response} and \ref{fig:entrain} use the 8--12\,h fit.}\label{fig:budget}
+\end{figure}
+
+\subsection{Subgrid and resolved turbulence}\label{sec:grey}
+
+At $\dx\geq10$\,km, all vertical-velocity variance is parameterised (Fig.~\ref{fig:structure}a), and SHOC's boundary-layer variance lies between 0.28 and 0.41\,m$^2$\,s$^{-2}$. At 5 and 2.5\,km this variance is 0.07--0.11\,m$^2$\,s$^{-2}$, and it decreases to 0.03\,m$^2$\,s$^{-2}$ at 312\,m, while the resolved variance increases. The resolved share of the total is 3--7\,\% at 5\,km, 4--9\,\% at 2.5\,km, 9--19\,\% at 1.25\,km, 28--38\,\% at 625\,m and 54--67\,\% at 312\,m, so that a third of the variance remains subgrid even at 312\,m. Part of this repartition is imposed by the closure. SHOC's mixing length is capped at the nominal grid spacing, and at 312\,m the domain-mean mixing length is within 5\,\% of this cap at 90\,\% of the boundary-layer levels, compared with 25\,\% at 625\,m and none at $\dx\geq1.25$\,km (Appendix~\ref{app:shoc}, Fig.~\ref{fig:shocmix}a). At 312\,m, SHOC's eddy diffusivity is therefore directly limited by the grid spacing throughout the boundary layer. The large change between 10 and 5\,km, where the resolved share is still small, is also not explained by resolved turbulence. At 5\,km SHOC's boundary-layer mean mixing length is about two thirds of its value at 10\,km (Fig.~\ref{fig:shocmix}a), even though the cap is not active, which points to a change in the SHOC solution itself, possibly coupled to the stripe-like circulations noted in Sect.~\ref{sec:morph}. We have not diagnosed this transition further.
+
+The resolved vertical-velocity skewness (Fig.~\ref{fig:structure}b), which is meaningful only at $\dx\leq5$\,km, is positive at low $\Nd$ (up to 1.9 at 312\,m for target 20\,$\cmthree$), indicating narrow, strong updrafts in a drizzle-decoupled boundary layer. At high $\Nd$ it is $-0.7$ to $-1.0$ at 2.5 and 1.25\,km and $-0.3$ to $-0.7$ at 625\,m, the sign expected for radiatively driven downdrafts in a well-mixed stratocumulus layer \citep{wood2012}; the transition occurs at $\Nd\approx50$--$100\,\cmthree$. At 312\,m the skewness stays positive at all $\Nd$ (0.09--0.24 for target $\Nd\geq100\,\cmthree$). With a third of the variance still subgrid and the mixing length at its cap, this may reflect near-grid-scale updrafts. Drizzle decouples the boundary layer at low $\Nd$ (Fig.~\ref{fig:structure}c). At $\dx\leq5$\,km, $\Delta q_t$ is 1.1--1.6\,g\,kg$^{-1}$ at target 20\,$\cmthree$ and 0.21--0.64\,g\,kg$^{-1}$ at 1000\,$\cmthree$, consistent with below-cloud evaporation stabilising the subcloud layer \citep{stevens1998,bretherton1997,jones2011}. In the single-column limit, $q_t$ decreases upward by 1.2--1.7\,g\,kg$^{-1}$ at all $\Nd$ across a deep cloud layer.
+
+The LWP spectral peak changes less between 625 and 312\,m than LWP itself (Fig.~\ref{fig:structure}d; Appendix~\ref{app:spectra}). At 5 and 2.5\,km the peak wavelengths of 48 and 30\,km correspond to 6.4 and 8 physics-column spacings and are probably limited by the effective resolution of the dynamical core. At 625 and 312\,m the peak lies at 13--22\,km, an aspect ratio $\lambda/\zi$ of 13--20. Observed closed mesoscale cells have aspect ratios of up to about 30--40 for boundary layers about 1\,km deep \citep{wood2006}, and LES with large domains also produce cells that are wider than these \citep{kazil2017,zhou2018,zhou2019b}. The sub-kilometre cells are therefore on the narrow side of the observed range, and the 2.5\,km value (33) agrees better with the observations, although it is probably resolution-limited.
+
+Switching on 3D turbulence changes LWP by less than 1.5\,$\gmm$ ($<1.5$\,\%), cloud cover by less than 0.007 and $\we$ by $-0.13$ to $+0.02$\,mm\,s$^{-1}$ at 625\,m and 312\,m (Appendix~\ref{app:t3d}). The 3D turbulence option therefore has a negligible effect on the results, which is expected because SHOC's horizontal diffusion is small compared with the horizontal dissipation of the dynamical core.
+
+\begin{figure}[t]
+\includegraphics[width=\textwidth]{figures/fig09_structure.pdf}
+\caption{Boundary-layer structure (suppression on, sedimentation factor 1). (a) Resolved share of boundary-layer vertical-velocity variance against grid spacing for three target $\Nd$. (b) Resolved vertical-velocity skewness over the boundary layer ($\dx\leq5$\,km). (c) Decoupling $\Delta q_t$ against in-cloud $\Nd$ (dotted lines: $\dx\geq10$\,km). (d) LWP spectral peak wavelength relative to $\zi$ ($\dx\leq5$\,km).}\label{fig:structure}
+\end{figure}
+
+\subsection{Convergence}\label{sec:conv}
+
+None of the bulk quantities converges with grid spacing (Fig.~\ref{fig:conv}). At fixed diagnosed $\Nd$, LWP decreases by 10--23\,\% from 1.25\,km to 625\,m and by a further 21--40\,\% from 625 to 312\,m, the larger decreases occurring at higher $\Nd$. The maximum-overlap cloud cover and the cloud thickness also continue to decrease. For LWP at target $\Nd\geq50\,\cmthree$, the change over the last halving of the grid spacing exceeds that over the previous one by a factor of 1.3--2.0, so the sequence is not in an asymptotic range and an extrapolation to zero grid spacing is not meaningful. The entrainment rate is non-monotonic, with a minimum at 2.5--1.25\,km, as expected in the grey zone where parameterised and resolved contributions trade places \citep{honnert2020,boutle2014}. The clean-branch susceptibility (0.65--0.76 at $\dx\leq2.5$\,km) varies less with grid spacing than the bulk quantities, but it varies with $s$ from 0.56 to 0.97 at 312\,m. The vertical grid (about 50\,m at the inversion, compared with about 5\,m in the RF02 LES; \citealp{ackerman2009}) was held fixed, and vertical resolution at the inversion is known to control entrainment in LES and in SCREAM \citep{stevens2005,bogenschutz2023rrm}. The sign of $\Shigh$ at 312\,m may change with further horizontal or vertical refinement.
+
+\begin{figure}[t]
+\includegraphics[width=\textwidth]{figures/fig10_convergence.pdf}
+\caption{Hour 10--12 means against grid spacing ($\dx\leq5$\,km) at fixed diagnosed in-cloud $\Nd$, interpolated in $\ln\Nd$ (suppression on, sedimentation factor 1). (a) LWP, (b) maximum-overlap cloud cover including SHOC's subgrid cloud fraction, (c) entrainment rate (8--12\,h fit) and (d) cloud thickness.}\label{fig:conv}
+\end{figure}
+
+\subsection{Cloud-top droplet number and within-scene covariability}\label{sec:sat}
+
+Satellite estimates of LWP adjustments use $\Nd$ retrieved from cloud-top effective radius and optical depth under adiabatic assumptions \citep{grosvenor2018}. The model-diagnosed cloud-top $\Nd$ used here is not such a retrieval. It is 44--72\,\% of the in-cloud layer value at $\dx\geq10$\,km and 77--95\,\% at 312\,m, and because this ratio varies little with $\Nd$ at a given grid spacing, susceptibilities computed with cloud-top $\Nd$ differ from those computed with layer $\Nd$ by at most 0.10, 0.04 and 0.01 on the three branches (Fig.~\ref{fig:sat}a). This agreement follows largely from the near-constant ratio and says nothing about retrieval errors.
+
+Within each domain CCN are horizontally uniform, so the spatial covariation of LWP and cloud-top $\Nd$ arises from cloud processes. We regressed column $\ln\LWP$ on column cloud-top $\ln\Nd$ over cloudy columns at each 15\,min instant in hours 10--12, restricting the analysis to $\dx\leq5$\,km because the columns at coarser spacing are nearly identical. The slopes range from $-7.9$ to $+3.4$, with standard errors over instants of at most 0.8 and correlations between $-0.86$ and $+0.56$ (Fig.~\ref{fig:sat}c). At 2.5--5\,km and low $\Nd$ they are negative, because collision--coalescence depletes $\Nd$ in the thickest, drizzling columns (Fig.~\ref{fig:sat}b). At 625 and 312\,m and target $\Nd\geq50\,\cmthree$ they are positive (0.4--3.3), because cloud-top $\Nd$ is reduced in thin, evaporating cloud edges. At 312\,m and target 200\,$\cmthree$, for example, the within-scene slope is $+1.9$, whereas $\Shigh=-0.05$. That cloud-controlled $\Nd$ variability produces spatial LWP--$\Nd$ relationships unrelated to the causal response is well established \citep{gryspeerdt2019,arola2022,mulmenstadt2024gcm,mahfouz2024}. The additional result here is that the sign of this covariation changes with grid spacing, because the relative importance of drizzle depletion in thick cloud and evaporation in thin cloud edges depends on how much of the cloud field is resolved.
+
+\begin{figure}[t]
+\includegraphics[width=\textwidth]{figures/fig11_cloudtop.pdf}
+\caption{(a) Susceptibility computed with model-diagnosed cloud-top $\Nd$ against that computed with in-cloud layer $\Nd$ for all branches and configurations (3D turbulence off), coloured by grid spacing. (b) Mean cloud-top $\Nd$ relative to the scene mean as a function of column LWP, at 2.5\,km and 312\,m for target $\Nd$ of 20 and 200\,$\cmthree$ (hours 10--12). (c) Within-scene regression slope of column $\ln\LWP$ on column cloud-top $\ln\Nd$, with standard errors over the eight instants (suppression on, sedimentation factor 1, $\dx\leq5$\,km).}\label{fig:sat}
+\end{figure}
+
+%% ====================================================================
+\section{Discussion}\label{sec:discussion}
+%% ====================================================================
+
+\subsection{Resolution dependence of the dominant adjustment pathway}
+
+At $\dx\geq10$\,km, where the simulations approximate single-column physics, entrainment in EAMxx is nearly insensitive to droplet sedimentation, the clouds are thick enough to precipitate substantially, and LWP increases monotonically with $\Nd$. This behaviour corresponds to the precipitation-suppression mechanism of \citet{albrecht1989}. At finer grid spacing, entrainment increases ($\eta>1$), and the boundary layer warms, dries and deepens. The cloud thins and its base rises, so that rain production decreases and more of the rain evaporates below cloud. In addition, $\we$ becomes more sensitive to droplet sedimentation (Fig.~\ref{fig:entrain}a). Together these changes shift the LWP maximum from $\Nd\geq1000$ to about 100\,$\cmthree$. This picture is consistent with mixed-layer and LES arguments in which the turning point of the inverted-V relationship is set by the competition between precipitation and entrainment \citep{ackerman2004,wood2007,hoffmann2020,hoffmann2024}. In EAMxx, the balance between these processes depends on horizontal grid spacing across the grey zone.
+
+The extent to which this dependence reflects grey-zone physics rather than specific features of the configuration is not yet clear. Three model-specific factors co-vary with grid spacing in our experiment. SHOC's mixing length is capped at the grid spacing, and this cap is active throughout the boundary layer at 312\,m. The physics time step and radiation interval decrease with grid spacing. The largest change in most quantities occurs between 10 and 5\,km, where the resolved variance is still small and the circulations appear partly numerical. Any of these could contribute to the trends attributed above to grid spacing, and Sect.~\ref{sec:limits} lists the experiments that would separate them.
+
+The weak negative branch at 312\,m deserves particular caution. Its magnitude ($S\approx-0.04$ to $-0.05$) is an order of magnitude smaller than the steady-state adjustments inferred from LES of non-precipitating stratocumulus \citep{glassmeier2021} and smaller than the observed slopes, which are themselves upper bounds \citep{gryspeerdt2019}. Possible reasons include the transience of the runs, the absence of a droplet-size dependence of cloud-top evaporation in SHOC's saturation adjustment \citep{wang2003,hoffmann2019}, the 50\,m vertical spacing at the inversion, and the humidity of the overlying air, which controls the strength of entrainment drying \citep{ackerman2004,chen2014}; in our runs the $q_t$ jump at the inversion is 5.8--6.5\,g\,kg$^{-1}$.
+
+\subsection{Relation to other models}
+
+The closest prior study is that of \citet{terai2020}, who compared an ultra-parameterised multiscale model with 250\,m cloud-resolving grids against a conventional multiscale model with 4\,km grids. They found a weaker LWP increase with aerosol at the finer resolution, caused by weaker LWP increases in non-raining clouds and a smaller raining fraction. Our results show the same tendency for a single case in a doubly periodic configuration, in that the raining fraction and the precipitation-suppression term decrease with grid spacing, and LWP increases with $\Nd$ only weakly or not at all in the non-raining runs at sub-kilometre spacing. \citet{sato2018} attributed the LWP decrease in their global cloud-system-resolving model to explicitly simulated condensation and evaporation responses to aerosol. That pathway is absent from EAMxx, in which condensation is diagnosed by SHOC's saturation adjustment, so the mechanisms in the two models differ.
+
+The comparison with \citet{mulmenstadt2024adj} is instructive. Using E3SM single-column physics, they found that switching sedimentation off removed the LWP decrease and that doubling it made the response more negative, and they concluded that GCM-type physics can represent the sedimentation--entrainment coupling. In our coarse runs, which use SHOC rather than the turbulence scheme of the E3SM GCM, a 50\,m vertical grid and a 100\,s time step, entrainment is nearly insensitive to sedimentation, while the susceptibility with precipitation suppression on is sensitive to it through an interaction with autoconversion. The two results are not in conflict, because the configurations differ, but they show that the sedimentation--entrainment coupling in single-column physics depends on the turbulence scheme and its numerical settings. Our coarse runs are therefore not representative of GCM columns, which use much longer time steps, coarser vertical grids and different turbulence and microphysics schemes, and we do not draw conclusions about GCM behaviour from them. Likewise, GSRMs with other turbulence closures, such as Smagorinsky-type or scale-aware schemes that blend boundary-layer and LES closures \citep{boutle2014,efstathiou2015}, may behave differently in the grey zone. Within EAMxx, the susceptibility at 2.5--5\,km (0.11--0.20 on the moderate branch, about 40--75\,\% of the 40\,km value) lies between the values at 40\,km and 312\,m. These results suggest that estimates of aerosol--cloud adjustments from GSRMs should be accompanied by resolution-sensitivity tests, and they motivate grey-zone-aware turbulence closures. The factorial approach also offers process-level targets, the precipitation-suppression term and the sensitivity to sedimentation, that could help to reduce equifinality in constraining aerosol--cloud parameterisations \citep{stanford2026}.
+
+\subsection{Relation to satellite-based estimates}
+
+Using model-diagnosed cloud-top $\Nd$ instead of layer-mean $\Nd$ changes $S$ by at most 0.1 in these simulations, but this does not test retrieval biases, and satellite analyses also use in-cloud LWP at pixel scale rather than domain means. The within-scene covariation of LWP and cloud-top $\Nd$ with uniform aerosol spans a range of slopes much wider than the susceptibilities and changes sign with grid spacing. This adds a model-based illustration to the concerns raised by \citet{ghan2016}, \citet{gryspeerdt2019}, \citet{arola2022} and \citet{mahfouz2024} that spatial co-variability is not a measure of the adjustment, and it cautions against evaluating the LWP adjustments of kilometre-scale models with satellite statistics that do not account for cloud-controlled $\Nd$ variability.
+
+\subsection{Limitations and required experiments}\label{sec:limits}
+
+The study simulates a single nocturnal, drizzling case with constant forcing and no shortwave radiation. The diurnal cycle modulates adjustments \citep{sandu2008}, and the humidity above the inversion controls the sign of the entrainment response \citep{ackerman2004,chun2023}. Each configuration was run once. The quoted spread in $S$ reflects temporal sampling only, and the small negative susceptibilities at sub-kilometre spacing ($-0.02$ to $-0.09$) require confirmation with initial-condition ensembles of three to five members, for example at target $\Nd$ of 100, 200 and 1000\,$\cmthree$ at 2.5\,km and 312\,m. After 12\,h the sub-kilometre runs are still thinning by 4--6\,\%\,h$^{-1}$, and their susceptibilities have not levelled off, so a subset should be extended to 24\,h or longer \citep{glassmeier2021,bretherton2010}.
+
+The surface fluxes were prescribed. A bulk estimate that scales the latent heat flux with $q_\mathrm{s}(T_\mathrm{s})-q_t$ and the sensible heat flux with $T_\mathrm{s}-T_\mathrm{air}$, calibrated to the prescribed fluxes and the initial mixed layer with a sea surface temperature of 292\,K, suggests that interactive fluxes would have been 88--103 and 6--10\,W\,m$^{-2}$ at 312\,m instead of 93 and 16\,W\,m$^{-2}$, and 77--79 and 17--20\,W\,m$^{-2}$ at $\dx\geq10$\,km. The feedback would thus reduce the warming of the sub-kilometre boundary layers and would slightly increase their moisture supply, but at 312\,m the estimated latent heat flux remains below the entrainment drying of 105--131\,W\,m$^{-2}$. The estimate assumes fixed transfer coefficients and wind speed and should be tested with interactive surface fluxes over a fixed sea surface temperature. The absence of Coriolis force and wind nudging allowed the initial shear to decay, which may affect shear-driven entrainment in a resolution-dependent way.
+
+The finest grid (312\,m, with physics columns 469\,m apart) is much coarser than the RF02 LES, and the vertical spacing at the inversion (about 50\,m) was held fixed. Neither LWP nor $\Shigh$ converged, so the results at 312\,m describe the trend of a grey-zone model and not a converged answer. A converged reference with the same microphysics, for example an LES with KK2000 autoconversion at the same $\Nd$ levels, is not available. The physics time step and radiation interval co-varied with grid spacing, and SHOC's mixing length was capped at the grid spacing at 312\,m. Experiments with a common time step at 40, 5 and 2.5\,km, with a relaxed mixing-length cap at 625 and 312\,m, and with refined vertical spacing near the inversion would separate these effects from grid spacing. The decomposition of the susceptibility depends on the matching $\Nd$ of the suppression-off configuration and on an extrapolation to zero sedimentation. Simulations with $s=0$, with a second matching $\Nd$ (for example 200 or 1000\,$\cmthree$), or with a design in which the $\Nd$ seen by autoconversion and the $\Nd$ seen by sedimentation and radiation are varied independently, would give pivot-independent partial derivatives. The 240\,km domain contains 11--19 cells at sub-kilometre spacing, and at 5 and 2.5\,km the cell scale is probably limited by the effective resolution of the dynamical core.
+
+CCN were prescribed and horizontally uniform, without aerosol processing, scavenging or replenishment, which can matter for drizzle-driven transitions \citep{kazil2011,berner2013,goren2019,yamaguchi2017}. Condensation and evaporation are computed by SHOC's saturation adjustment, so the droplet-size dependence of cloud-top evaporation that contributes to the entrainment pathway in LES \citep{wang2003,bretherton2007,hoffmann2019} is absent. Autoconversion follows KK2000 without a subgrid variance enhancement, so at coarse spacing it uses the mean in-cloud cloud water, whereas at fine spacing resolved variability partly provides such an enhancement; other autoconversion schemes would change the precipitation-suppression term \citep{morrison2020}. Surface precipitation includes the flux of cloud droplets reaching the surface, which we estimate to be negligible except in the coarse runs at target 20\,$\cmthree$ with $s=2$ and suppression off. Finally, because the P3 sedimentation diagnostics were not usable, the sedimentation flux at cloud top was not diagnosed, and the role of sedimentation was inferred from the sedimentation-factor experiments.
+
+%% ====================================================================
+\conclusions\label{sec:conclusions}
+%% ====================================================================
+
+We analysed 288 doubly periodic EAMxx simulations of the DYCOMS-II RF02 drizzling stratocumulus with horizontal grid spacings from 40\,km to 312\,m, target $\Nd$ from 20 to 1000\,$\cmthree$, three cloud-droplet sedimentation factors, and the $\Nd$ dependence of autoconversion switched on or off. Our conclusions are as follows.
+\begin{enumerate}
+\item The LWP response to $\Nd$ depends strongly on grid spacing. At 10--40\,km LWP increased monotonically with $\Nd$ ($\Shigh=0.24$--0.27). With decreasing grid spacing the LWP maximum moved to lower $\Nd$, reaching about 100\,$\cmthree$ at 312\,m, where $\Shigh=-0.05$ and $\Svhigh=-0.04$ in single, still-evolving realisations.
+\item At coarse spacing, removing the $\Nd$ dependence of autoconversion removed the positive response, but the sensitivity to sedimentation interacted strongly with autoconversion, and the partition between the two depends on the matching $\Nd$ of the experiment design. With decreasing grid spacing, the precipitation-suppression contribution on the moderate branch decreased from 0.34--0.39 to 0.04, and the gain in LWP from precipitation suppression at a diagnosed $\Nd$ of 500\,$\cmthree$ decreased from 110 to 6\,$\gmm$.
+\item At sub-kilometre spacing the weak decrease of LWP at high $\Nd$ was also present without the $\Nd$ dependence of autoconversion and became steeper with faster sedimentation on the polluted branch, consistent with a sedimentation--entrainment feedback. Its sign is not established, given its small magnitude, the transience of the runs and the absence of ensembles.
+\item The ratio of entrainment warming to radiative cooling increased from about 0.5 at coarse spacing to 1.2--1.3 at 312\,m, entrainment drying exceeded the prescribed surface moisture supply, and the clouds thinned, lifted and produced less rain, most of which evaporated below cloud. A mixed-layer budget associates the general thinning with this increase in entrainment, but it has little skill for the $\Nd$ dependence at $\dx\leq2.5$\,km.
+\item Neither LWP nor its $\Nd$ response converged, and LWP decreased by 21--40\,\% between 625 and 312\,m at fixed diagnosed $\Nd$. SHOC's mixing length was capped by the grid spacing at 312\,m, the time step co-varied with grid spacing, and 3D turbulence had a negligible effect. The 625\,m runs were closest to the RF02 observations at hours 4--6, but no grid spacing matched all observed quantities.
+\item Susceptibilities computed with model-diagnosed cloud-top $\Nd$ agreed closely with those computed with layer $\Nd$, whereas within-scene LWP--$\Nd$ slopes with uniform aerosol ranged from $-7.9$ to $+3.4$ and changed sign with grid spacing.
+\end{enumerate}
+In EAMxx, the simulated LWP adjustment in drizzling stratocumulus thus depends on how the boundary-layer turbulence is partitioned between the grid and the turbulence scheme, as well as on the microphysics. Initial-condition ensembles, longer and diurnally forced simulations, interactive surface fluxes, tests of time step and mixing-length limits, refined vertical grids, a second matching $\Nd$ for the suppression-off configuration and additional cases are needed to determine how far these results generalise.
+
+%% ====================================================================
+\appendix
+%% ====================================================================
+
+\section{Skill of the mixed-layer budget}\label{app:budget}
+
+Table~\ref{tab:skill} lists the skill of the mixed-layer budget for the LWP tendency at each grid spacing, for the raw tendencies over all 2\,h windows from 2 to 12\,h and for the anomalies relative to the mean over the six $\Nd$ levels at fixed grid spacing, sedimentation factor, suppression setting and window. Figure~\ref{fig:budgetcheck} shows the anomalies. At 40, 20 and 5\,km the budget reproduces both the tendencies and their $\Nd$ dependence. At $\dx\leq2.5$\,km the correlation for the anomalies in hours 10--12 is between $-0.02$ and 0.57, and the root-mean-square error is comparable to or larger than the standard deviation of the anomalies. The largest departures in the raw tendencies occur where the boundary layer is decoupled and cloud base departs from the mixed-layer lifting condensation level. Using the simulated $d\zb/dt$ instead of the estimate from the lifting condensation level degrades the agreement, because $\zb$ is quantised by the vertical grid.
+
+\begin{table}[t]
+\caption{Skill of the mixed-layer budget for $d\LWP/dt$ by grid spacing (3D turbulence off). $r$: correlation between budget and simulated tendency; RMSE and SD in $\gmm$\,h$^{-1}$. ``Raw'': all 2\,h windows (180 per grid spacing). ``Anomaly'': deviations from the mean over the six $\Nd$ levels at fixed grid spacing, sedimentation factor, suppression setting and window, for all windows and for hours 10--12.}\label{tab:skill}
+\begin{tabular}{lrrrrrrr}
+\tophline
+ & \multicolumn{3}{c}{raw} & \multicolumn{1}{c}{anomaly, all} & \multicolumn{3}{c}{anomaly, hours 10--12} \\
+$\dx$ & $r$ & RMSE & SD & $r$ & $r$ & RMSE & SD \\
+\middlehline
+\input{tables/tab_skill.tex}
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\includegraphics[width=\textwidth]{figures/figA1_budget_check.pdf}
+\caption{Anomalies of $d\LWP/dt$ relative to the mean over the six $\Nd$ levels, from the mixed-layer budget against the simulated values, for all 2\,h windows (colour: end of window) at (a) 40\,km, (b) 5\,km, (c) 2.5\,km, (d) 1.25\,km, (e) 625\,m and (f) 312\,m. Each panel gives the correlation for the raw tendencies and for the anomalies.}\label{fig:budgetcheck}
+\end{figure}
+
+\section{SHOC mixing length and activation floor}\label{app:shoc}
+
+Figure~\ref{fig:shocmix}a shows the domain-mean SHOC mixing length in hours 10--12 at target 200\,$\cmthree$. At $\dx\geq10$\,km it reaches about 1600\,m in the upper boundary layer. At 5\,km to 1.25\,km it peaks at 900--1100\,m near 0.85\,$\zi$ and is about 600--800\,m below. At 625\,m it is 480--610\,m, close to the cap of 625\,m, and at 312\,m it equals the cap of 312\,m nearly everywhere in the boundary layer. Figure~\ref{fig:shocmix}b shows the in-cloud $\Nd$ profiles and the activation floor for target 200\,$\cmthree$. The in-cloud $\Nd$ follows the floor, which decreases with height because the prescribed CCN number does, so the diagnosed in-cloud $\Nd$ depends on the height of the cloud layer.
+
+\begin{figure}[t]
+\includegraphics[width=0.75\textwidth]{figures/figA4_shocmix_nd.pdf}
+\caption{(a) Domain-mean SHOC mixing length against $z/\zi$ and (b) in-cloud $\Nd$ (where the domain-mean liquid cloud fraction exceeds 0.2) with the activation floor (dashed), for target $\Nd=200\,\cmthree$, hours 10--12, suppression on and sedimentation factor 1. Dotted lines in (a) mark the grid-spacing cap at 1.25\,km, 625\,m and 312\,m.}\label{fig:shocmix}
+\end{figure}
+
+\section{3D turbulence}\label{app:t3d}
+
+Figure~\ref{fig:t3d} shows the difference between runs with 3D turbulence on and off for the 36 pairs at 625\,m and the 35 completed pairs at 312\,m. LWP changes by between $-1.0$ and $+1.4\,\gmm$, cloud cover by between $-0.005$ and $+0.007$, and the entrainment rate by between $-0.13$ and $+0.02$\,mm\,s$^{-1}$. The only systematic signal is a slight reduction of entrainment. These differences are an order of magnitude smaller than those between successive grid spacings or between $\Nd$ levels.
+
+\begin{figure}[t]
+\includegraphics[width=\textwidth]{figures/figA2_turb3d.pdf}
+\caption{Difference (3D turbulence on minus off) in (a) LWP, (b) cloud cover (LWP above 10\,$\gmm$) and (c) entrainment rate at 625\,m (open symbols) and 312\,m (filled symbols), coloured by sedimentation factor; circles: suppression on, squares: off.}\label{fig:t3d}
+\end{figure}
+
+\section{LWP spectra and distributions}\label{app:spectra}
+
+Figure~\ref{fig:spectra} shows the LWP spectra and column-LWP distributions referred to in Sect.~\ref{sec:grey}. The spectral peak shifts from 48\,km at 5\,km to about 30\,km at 2.5\,km and to 13--22\,km at 625 and 312\,m. The LWP distributions broaden and shift to lower values as the grid is refined, and at target $\Nd=20\,\cmthree$ they develop a large population of clear or nearly clear columns.
+
+\begin{figure}[t]
+\includegraphics[width=\textwidth]{figures/figA3_spectra_pdf.pdf}
+\caption{(a) Normalised radially averaged LWP spectra ($k\,P(k)$, hours 10--12) for target $\Nd=200\,\cmthree$. (b, c) Distributions of column LWP over hours 10--12 for target $\Nd$ of 20 and 1000\,$\cmthree$. Suppression on, sedimentation factor 1. In (b), clear columns at small LWP are off scale.}\label{fig:spectra}
+\end{figure}
+
+\noappendix
+
+%% ====================================================================
+\codedataavailability{\sloppy The model code is the E3SM branch \texttt{mahf708/eamxx/p3-cloud-sed-factor} at \url{https://github.com/mahf708/E3SM/tree/mahf708/eamxx/p3-cloud-sed-factor}, which contains E3SM pull request 9017 (the cloud-top output operator) and the P3 sedimentation-factor option. Run scripts and all analysis scripts used to produce the tables and figures are in the \texttt{sed-precsupp-study} directory of the branch \url{https://github.com/mahf708/scmlib/tree/sed-precsupp-study}. Model output and the derived tables are available from the corresponding contact on request.}
+
+\authorcontribution{Naser Mahfouz and Johannes M\"ulmenst\"adt designed the experiments, and Naser Mahfouz implemented the model modifications and performed the simulations. The author, an AI system (Claude, Anthropic), designed and carried out the analysis and wrote the manuscript at the direction of Naser Mahfouz and Johannes M\"ulmenst\"adt. Human review of the manuscript is pending.}
+
+\competinginterests{The author declares that there are no competing interests.}
+
+\begin{acknowledgements}
+Naser Mahfouz and Johannes M\"ulmenst\"adt (Pacific Northwest National Laboratory) designed and directed this study, and Naser Mahfouz is the contact person for correspondence. The simulations used the Energy Exascale Earth System Model (E3SM) and resources of the National Energy Research Scientific Computing Center (NERSC), a U.S. Department of Energy Office of Science User Facility, on the Perlmutter system. The analysis and the text were produced by an AI system (Claude, Anthropic); all analysis scripts are provided so that the results can be verified.
+\end{acknowledgements}
+
+\bibliographystyle{copernicus}
+\bibliography{sedps_refs}
+
+\end{document}

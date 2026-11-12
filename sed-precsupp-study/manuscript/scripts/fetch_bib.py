@@ -16,7 +16,7 @@ def fetch(doi):
 
 REPL = {"‐": "-", "‑": "-", "‒": "-", "–": "--", "—": "---", "‘": "`", "’": "'",
         "“": "``", "”": "''", " ": " ", "&amp;aring;": "{\\aa}", "&amp;": "\\&", " ": " ", "−": "-"}
-UNI = {"\u00d8": "{\\O}", "\u00e1": "{\\'a}", "\u00e4": "{\\\"a}", "\u00e6": "{\\ae}", "\u00f6": "{\\\"o}", "\u00fc": "{\\\"u}", "&aring;": "{\\aa}"}
+UNI = {"\u00d8": "{\\O}", "\u00e1": "{\\'a}", "\u00e4": "{\\\"a}", "\u00e6": "{\\ae}", "\u00f6": "{\\\"o}", "\u00fc": "{\\\"u}", "&aring;": "{\\aa}", "\u00c4": "{\\\"A}", "\u00d3": "{\\'O}", "\u00d6": "{\\\"O}", "\u00dc": "{\\\"U}", "\u00e3": "{\\~a}", "\u00e9": "{\\'e}", "\u00f3": "{\\'o}"}
 PROTECT = ["DYCOMS-II", "DYCOMS", "LES", "GCMs", "GCM", "E3SM", "SCREAM", "DNS", "VOCALS-REx", "POC", "CRM", "RICO",
            "A-Train", "CAM3", "CAM", "DYAMOND", "PDF", "Earth", "Community Atmosphere Model", "Terra Incognita",
            "Atlantic", "Pacific", "ECHAM", "WRF", "CONSTRAIN", "Part", "I", "II"]

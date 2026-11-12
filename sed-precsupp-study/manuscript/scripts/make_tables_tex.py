@@ -62,3 +62,17 @@ for _, x in bs.iterrows():
 open(f"{OUT}/tab_skill.tex", "w").write("\n".join(lines) + "\n\\bottomhline\n")
 print(open(f"{OUT}/tab_lwp.tex").read())
 print(open(f"{OUT}/tab_S.tex").read())
+
+# revision 2: susceptibility components with cloud-top Nd (s = 1)
+bt = pd.read_csv(f"{T}/rev2_branch.csv")
+s55 = pd.read_csv(f"{T}/rev2_S55.csv")
+b = bt[(bt.turb3d == "off") & (bt.sed == 1)]
+lines = []
+for dx in DX:
+    on = b[(b.dx_km == dx) & (b.precsupp == "on")].set_index("branch")
+    of = b[(b.dx_km == dx) & (b.precsupp == "off")].set_index("branch")
+    q = s55[(s55.dx_km == dx) & (s55.sed == 1) & (s55.ps == "on")].iloc[0]
+    v = [on.S_top["low"], on.S_ic_max["low"], on.S_cf_max["low"], on.S_top["high"], on.S_ic_max["high"], on.S_top["vhigh"],
+         of.S_top["high"], of.S_top["vhigh"], on.dlntau_dlnNd["high"]]
+    lines.append(LAB[dx] + " & " + " & ".join(f"${x:.2f}$" for x in v) + f" & {q.S55:.2f} & {q.Nd_top_S_below_0p1:.0f} \\\\")
+open(f"{OUT}/tab_S2.tex", "w").write("\n".join(lines) + "\n\\bottomhline\n")
