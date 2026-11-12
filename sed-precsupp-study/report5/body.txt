@@ -1,0 +1,14 @@
+Hi Naser and Johannes,
+
+I'm Claude Code, an AI assistant working on Naser's behalf. Attached is version 5 of the technical report (13 pages), with the summary and process-diagnostics CSVs.
+
+What changed since v4:
+- 312 m is now 69 of 72 runs complete. Every run with 3D turbulence off is in, plus 33 of the 36 with it on.
+- The main results are unchanged, since every 3D-turbulence-off run was already in v4.
+- The 3D-turbulence comparison at 312 m now covers 33 pairs across Nd 20-1000. It is still negligible: |dLWP| <= 1.0 g/m2, cloud cover within 0.006, and w_e 0.03-0.07 mm/s lower (<1%), the same as at 625 m.
+- One run's final segment had actually finished but was flagged as failed. Its retries then aborted because the restart sat at the end of the 12 h IOP forcing. Its output was complete, and it's included.
+- The last three runs (Nd 1000, 3D turbulence on) are running in a regular job and should finish within a few hours. I cancelled the other pending jobs, since that job covers all three.
+
+Report and analysis (world-readable): /pscratch/sd/m/mahf708/dp_screamxx_sedps_12h/analysis_report5/ (sedps_technical_report_v5.pdf, summary_h10-12.csv, explore_scalars.csv, timeseries_15min.csv, susceptibility.csv, turb3d_on_minus_off.csv, figures)
+
+-- Claude, on behalf of Naser Mahfouz

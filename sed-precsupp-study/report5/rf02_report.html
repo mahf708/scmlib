@@ -1,0 +1,277 @@
+<title>RF02 Sedimentation–Suppression Study</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: single reading column (~70ch) with full-width figure plates; a compact
+   contents rail at the top; data tables in their own scroll boxes. */
+:root {
+  --bg: #f5f7f9;
+  --paper: #ffffff;
+  --fg: #16212b;
+  --muted: #55636f;
+  --rule: #d8dee4;
+  --accent: #1c5cab;
+  --accent-soft: #e3ecf7;
+  --warn: #9a4d00;
+  --warn-soft: #fbefe2;
+  --font-display: "Libre Franklin", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f161d; --paper: #17212b; --fg: #dde5ec; --muted: #9aa9b6; --rule: #2a3742;
+    --accent: #7fb0ec; --accent-soft: #1b2b3d; --warn: #f0b072; --warn-soft: #2e2116; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f161d; --paper: #17212b; --fg: #dde5ec; --muted: #9aa9b6; --rule: #2a3742;
+  --accent: #7fb0ec; --accent-soft: #1b2b3d; --warn: #f0b072; --warn-soft: #2e2116; color-scheme: dark;
+}
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 64px;
+}
+main { max-width: 980px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+.prose { max-width: 70ch; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; line-height: 1.2; margin: 0; }
+h1 { font-size: clamp(1.7rem, 4vw, 2.4rem); font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 1.45rem; font-weight: 700; padding-top: 8px; border-top: 2px solid var(--fg); }
+h3 { font-size: 1.1rem; font-weight: 600; }
+p { margin: 0; }
+section { display: flex; flex-direction: column; gap: 16px; }
+.eyebrow { font-family: var(--font-display); font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.byline { color: var(--muted); font-size: 0.95rem; }
+header { display: flex; flex-direction: column; gap: 12px; }
+.abstract { background: var(--paper); border: 1px solid var(--rule); padding: 20px 22px; font-size: 1rem; }
+.abstract strong { font-family: var(--font-display); font-size: 0.82rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 6px; }
+nav ol { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px 18px; font-family: var(--font-display); font-size: 0.92rem; }
+nav a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; }
+nav a:hover, nav a:focus-visible { border-bottom-color: var(--accent); }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+ul.findings { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 10px; }
+ul.findings li::marker { color: var(--accent); }
+ul.findings b { font-family: var(--font-display); font-weight: 600; }
+.num { font-family: var(--font-mono); font-size: 0.92em; font-variant-numeric: tabular-nums; }
+figure { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.plate { background: #ffffff; border: 1px solid var(--rule); padding: 10px; }
+.plate img { display: block; width: 100%; height: auto; }
+figcaption { color: var(--muted); font-size: 0.92rem; max-width: 80ch; }
+figcaption b { font-family: var(--font-display); color: var(--fg); font-weight: 600; }
+.tablebox { overflow-x: auto; background: var(--paper); border: 1px solid var(--rule); }
+table { border-collapse: collapse; font-family: var(--font-mono); font-size: 0.86rem; font-variant-numeric: tabular-nums; width: 100%; min-width: 560px; }
+th, td { padding: 6px 10px; text-align: right; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+th { font-family: var(--font-display); font-weight: 600; font-size: 0.8rem; color: var(--muted); }
+td:first-child, th:first-child, td:nth-child(2), th:nth-child(2) { text-align: left; }
+tr.on td { color: var(--fg); }
+tr.off td { color: var(--muted); }
+td.peak { background: var(--accent-soft); color: var(--accent); font-weight: 500; }
+.note { background: var(--warn-soft); border-left: 4px solid var(--warn); padding: 14px 18px; font-size: 0.97rem; }
+.note h3 { color: var(--warn); margin-bottom: 6px; }
+code { font-family: var(--font-mono); font-size: 0.88em; background: var(--accent-soft); padding: 1px 4px; overflow-wrap: anywhere; }
+.paths { display: flex; flex-direction: column; gap: 8px; font-size: 0.95rem; }
+.paths div { display: grid; grid-template-columns: minmax(0, 12rem) minmax(0, 1fr); gap: 12px; }
+.paths span { color: var(--muted); font-family: var(--font-display); font-size: 0.85rem; padding-top: 2px; }
+@media (max-width: 560px) { .paths div { grid-template-columns: minmax(0, 1fr); gap: 2px; } body { font-size: 16px; } }
+.status { display: flex; flex-wrap: wrap; gap: 10px; }
+.chip { font-family: var(--font-display); font-size: 0.85rem; padding: 4px 10px; border: 1px solid var(--rule); background: var(--paper); }
+.chip b { color: var(--accent); }
+</style>
+
+<main>
+  <header>
+    <div class="eyebrow">DP-EAMxx · DYCOMS-II RF02 · technical report v5</div>
+    <h1>Droplet sedimentation, precipitation suppression and resolution in the Nd–LWP response</h1>
+    <p class="byline">Prepared by Claude Code (AI assistant) on behalf of Naser Mahfouz, for Naser Mahfouz and Johannes Mülmenstädt · 11 November 2026</p>
+    <div class="status">
+      <span class="chip"><b>357</b> runs analysed</span>
+      <span class="chip">40 km → 312 m</span>
+      <span class="chip">Nd 20–1000 cm⁻³</span>
+      <span class="chip">12 h, hours 10–12 means</span>
+      <span class="chip">312 m: <b>69 of 72</b> runs</span>
+    </div>
+  </header>
+
+  <div class="abstract prose">
+    <strong>Abstract</strong>
+    We ran DP-EAMxx on the DYCOMS-II RF02 nocturnal drizzling stratocumulus for 12 h. The matrix covers grid spacing from 40 km to 312 m, droplet number Nd from 20 to 1000 cm⁻³, a cloud-droplet sedimentation multiplier (×0.5, 1, 2) and precipitation suppression (KK2000 Nd dependence on or off). Below 1 km it also covers 3D turbulence on or off. At ≥10 km, LWP rises monotonically with Nd, and precipitation suppression explains all of that rise. As Δx shrinks, entrainment increases and depends more strongly on Nd. The suppression gain collapses, from +134 g m⁻² at 40 km to +6 g m⁻² at 312 m, and the LWP maximum moves to lower Nd. The result is an inverted V whose falling branch comes from entrainment: it persists with suppression off, and faster sedimentation strengthens it. Process-level diagnostics show the LWP cell scale converging near 17–20 km while LWP does not. Over the same range the turbulence shifts from parameterised to mostly resolved, and the rain budget nearly vanishes at fine resolution.
+  </div>
+
+  <nav aria-label="Contents">
+    <ol>
+      <li><a href="#key-results">Key results</a></li>
+      <li><a href="#nd-response">Nd response</a></li>
+      <li><a href="#pathways">Pathways</a></li>
+      <li><a href="#resolution">Resolution and morphology</a></li>
+      <li><a href="#process">Process diagnostics</a></li>
+      <li><a href="#turb3d">3D turbulence</a></li>
+      <li><a href="#transience">Transience</a></li>
+      <li><a href="#setup">Setup</a></li>
+      <li><a href="#status">Status and data</a></li>
+    </ol>
+  </nav>
+
+  <section id="key-results">
+    <h2>Key results</h2>
+    <ul class="findings prose">
+      <li><b>The inverted V's peak moves to lower Nd as Δx shrinks.</b> With sed ×1 and suppression on, LWP peaks at Nd ≥ 1000 at ≥ 10 km, 500 at 5 km, 200 from 2.5 km to 625 m, and 100 at 312 m. The slope from Nd 100 to 200 falls monotonically: <span class="num">0.27</span> at 40 km, <span class="num">0.11</span> at 2.5 km, <span class="num">0.03</span> at 625 m and <span class="num">−0.05</span> at 312 m.</li>
+      <li><b>Precipitation suppression fades with resolution.</b> At Nd 1000, LWP with suppression on minus off is <span class="num">+134</span> g m⁻² at 40 km, <span class="num">+58</span> at 5 km, <span class="num">+34</span> at 2.5 km, <span class="num">+16</span> at 625 m and <span class="num">+6</span> at 312 m.</li>
+      <li><b>The falling branch comes from entrainment.</b> At 312 m the slope from Nd 200 to 1000 is negative with suppression on (<span class="num">−0.02 / −0.04 / −0.07</span> for sed ×0.5 / 1 / 2) and also with it off. Meanwhile w<sub>e</sub> keeps rising with Nd.</li>
+      <li><b>The low-Nd branch is robust; LWP is not converged.</b> Below 5 km the slope from Nd 20 to 50 is about 0.6 / 0.7 / 0.9–1.0 for sed ×0.5 / 1 / 2 at every Δx. Between 625 m and 312 m at Nd 100, LWP drops from 120 to 76 g m⁻² and cloud cover from 0.92 to 0.83.</li>
+      <li><b>The cell scale converges.</b> The dominant LWP wavelength approaches 17–20 km (aspect ratio ≈ 17) at 625–312 m.</li>
+      <li><b>The grey zone.</b> The resolved share of boundary-layer w-variance is 0 at ≥ 10 km, 9 % at 2.5 km, 37 % at 625 m and 66 % at 312 m.</li>
+      <li><b>Rain nearly vanishes at fine resolution.</b> At Nd 200, rain production falls from 0.5 to 0.03 mm d⁻¹ between 40 km and 312 m, and up to 93 % of it evaporates. That is why suppression stops mattering.</li>
+      <li><b>Entrainment per unit radiative driving roughly doubles.</b> At saturated LW cooling (≈ 86 W m⁻²), w<sub>e</sub> is 4.0, 6.1 and 7.8 mm s⁻¹ at 40 km, 2.5 km and 625 m.</li>
+      <li><b>3D turbulence is negligible at 625 m and 312 m.</b> |ΔLWP| is under 1.5 g m⁻², with w<sub>e</sub> lower by less than 1 %.</li>
+    </ul>
+
+    <div class="tablebox">
+      <table>
+        <caption style="caption-side: top; text-align: left; padding: 10px; font-family: var(--font-display); font-size: 0.85rem; color: var(--muted);">LWP (g m⁻², hours 10–12), sed ×1, 3D turbulence off. Shaded cells mark the peak with suppression on.</caption>
+        <thead><tr><th>Δx</th><th>suppression</th><th>Nd 20</th><th>50</th><th>100</th><th>200</th><th>500</th><th>1000</th></tr></thead>
+        <tbody>
+          <tr class="on"><td>40 km</td><td>on</td><td>135</td><td>188</td><td>246</td><td>295</td><td>333</td><td class="peak">342</td></tr>
+          <tr class="off"><td></td><td>off</td><td>234</td><td>221</td><td>216</td><td>211</td><td>209</td><td>208</td></tr>
+          <tr class="on"><td>10 km</td><td>on</td><td>134</td><td>186</td><td>240</td><td>281</td><td>308</td><td class="peak">312</td></tr>
+          <tr class="off"><td></td><td>off</td><td>232</td><td>217</td><td>213</td><td>208</td><td>206</td><td>204</td></tr>
+          <tr class="on"><td>5 km</td><td>on</td><td>82</td><td>137</td><td>184</td><td>214</td><td class="peak">222</td><td>218</td></tr>
+          <tr class="off"><td></td><td>off</td><td>135</td><td>149</td><td>153</td><td>158</td><td>159</td><td>160</td></tr>
+          <tr class="on"><td>2.5 km</td><td>on</td><td>67</td><td>119</td><td>163</td><td class="peak">177</td><td>175</td><td>170</td></tr>
+          <tr class="off"><td></td><td>off</td><td>117</td><td>137</td><td>139</td><td>138</td><td>137</td><td>136</td></tr>
+          <tr class="on"><td>1.25 km</td><td>on</td><td>65</td><td>111</td><td>149</td><td class="peak">157</td><td>154</td><td>149</td></tr>
+          <tr class="off"><td></td><td>off</td><td>116</td><td>127</td><td>127</td><td>124</td><td>122</td><td>122</td></tr>
+          <tr class="on"><td>625 m</td><td>on</td><td>52</td><td>98</td><td>120</td><td class="peak">122</td><td>119</td><td>115</td></tr>
+          <tr class="off"><td></td><td>off</td><td>103</td><td>109</td><td>108</td><td>103</td><td>101</td><td>99</td></tr>
+          <tr class="on"><td>312 m</td><td>on</td><td>40</td><td>72</td><td class="peak">76</td><td>74</td><td>72</td><td>70</td></tr>
+          <tr class="off"><td></td><td>off</td><td>79</td><td>79</td><td>72</td><td>69</td><td>66</td><td>64</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="nd-response">
+    <h2>Nd response at every resolution</h2>
+    <figure><div class="plate"><img src="figs/figH1_nd_response_by_res.png" alt="LWP, cloud cover, entrainment and LWP spatial SD against in-cloud Nd for every resolution, with suppression on and off" loading="lazy"></div>
+      <figcaption><b>Figure 1.</b> Nd response at sed ×1, all resolutions on shared axes. Top row: suppression on. Bottom row: suppression off.</figcaption></figure>
+    <figure><div class="plate"><img src="figs/fig1_response.png" alt="Response to Nd for every resolution, sed factor and suppression setting" loading="lazy"></div>
+      <figcaption><b>Figure 2.</b> Every resolution, sed factor and suppression setting. Shade: sed factor. Solid lines: suppression on. Dashed lines: off.</figcaption></figure>
+    <figure><div class="plate"><img src="figs/fig2_susceptibility.png" alt="Susceptibility on three Nd branches against grid spacing" loading="lazy"></div>
+      <figcaption><b>Figure 3.</b> Susceptibility S = d ln LWP / d ln Nd on three Nd branches against Δx.</figcaption></figure>
+  </section>
+
+  <section id="pathways">
+    <h2>Pathways</h2>
+    <p class="prose">Each pathway is isolated by differencing runs that differ in one switch only. The suppression term crosses zero near Nd 63 by construction, since the autoconversion rates match there. Above Nd 100 it falls off steeply with Δx. The sedimentation term changes sign between the single-column regime and the km-scale regime.</p>
+    <figure><div class="plate"><img src="figs/figR1_pathways.png" alt="Precipitation-suppression and sedimentation pathways against Nd by resolution" loading="lazy"></div>
+      <figcaption><b>Figure 4.</b> (a) Precipitation-suppression pathway at sed ×1. (b) Sedimentation pathway with suppression on (solid) and off (dashed). Colour: resolution.</figcaption></figure>
+    <figure><div class="plate"><img src="figs/figR2_we_vs_vsed.png" alt="Entrainment rate against the cloud-top fall-speed proxy for all runs" loading="lazy"></div>
+      <figcaption><b>Figure 5.</b> w<sub>e</sub> against the cloud-top fall-speed proxy sed × (r<sub>eff,top</sub> / 10 µm)². At ≥ 10 km, w<sub>e</sub> switches between two levels near a proxy of 3.5. At ≤ 5 km it falls smoothly with the proxy, and is higher the finer the grid.</figcaption></figure>
+  </section>
+
+  <section id="resolution">
+    <h2>Resolution dependence and cloud morphology</h2>
+    <figure><div class="plate"><img src="figs/figH2_convergence.png" alt="LWP, cloud cover, entrainment and LWP SD against grid spacing for each Nd" loading="lazy"></div>
+      <figcaption><b>Figure 6.</b> Hour 10–12 means against Δx (≤ 5 km), sed ×1, for every Nd.</figcaption></figure>
+    <figure><div class="plate"><img src="figs/figH3_lwp_maps.png" alt="Maps of LWP at hour 12 for Nd 20, 200 and 1000 from 2.5 km to 312 m" loading="lazy"></div>
+      <figcaption><b>Figure 7.</b> LWP at hour 12 over the full 240 km domain, sed ×1, suppression on. Rows: Nd 20 / 200 / 1000. Columns: 2.5 km to 312 m.</figcaption></figure>
+    <figure><div class="plate"><img src="figs/figR4_lwp_pdf.png" alt="Distributions of column LWP at 625 m and 312 m" loading="lazy"></div>
+      <figcaption><b>Figure 8.</b> Column-LWP distributions over hours 10–12 at 625 m and 312 m.</figcaption></figure>
+  </section>
+
+  <section id="process">
+    <h2>Process-level diagnostics</h2>
+    <p class="prose">These come from the 15-min domain-mean profiles (hours 10–12), the 3D snapshots at hours 10 and 12 (resolved w′ and θ<sub>v</sub>′, with w = −ω/ρg) and the 15-min column fields. All runs have 3D turbulence off. Decoupling follows Jones et al. (2011): the q<sub>t</sub> and θ<sub>l</sub> differences between the lowest and highest quarter of the boundary layer. The cell scale is the peak of the radially averaged LWP power spectrum.</p>
+
+    <h3>Cell scale converges; LWP does not</h3>
+    <p class="prose">The dominant LWP wavelength falls from 30 km at 2.5 km to 24, 21 and 17 km at 1.25 km, 625 m and 312 m. In grid units it rises from 8 to about 37 physics cells, so below 1 km the cells are no longer grid-locked. The aspect ratio λ/z<sub>i</sub> approaches 17–20, a typical value for observed mesoscale cells. At ≥ 5 km the domain sets the scale (48 km = 240 km / 5).</p>
+    <figure><div class="plate"><img src="figs/figX1_cell_scale.png" alt="Dominant LWP wavelength against grid spacing" loading="lazy"></div>
+      <figcaption><b>Figure 9.</b> Dominant LWP wavelength in km, in physics-grid spacings, and relative to z<sub>i</sub>, against Δx.</figcaption></figure>
+    <figure><div class="plate"><img src="figs/figX8_spectra.png" alt="Radially averaged LWP spectra by resolution" loading="lazy"></div>
+      <figcaption><b>Figure 10.</b> Radially averaged LWP spectra k·P(k), normalised. The 625 m and 312 m spectra peak at nearly the same wavelength.</figcaption></figure>
+
+    <h3>The turbulence grey zone</h3>
+    <p class="prose">At ≥ 10 km all turbulence is SHOC's, with a boundary-layer w-variance of 0.33–0.41 m² s⁻². Below 5 km SHOC's variance drops to about 0.09 m² s⁻² and keeps falling, while the resolved share grows: 6–9 % at 5–2.5 km, 17 % at 1.25 km, 37 % at 625 m and 66 % at 312 m. Total variance at km scale is about 4× smaller than in the single-column runs, yet entrainment is higher.</p>
+    <figure><div class="plate"><img src="figs/figX2_grey_zone.png" alt="Resolved share, SHOC and resolved w-variance against grid spacing" loading="lazy"></div>
+      <figcaption><b>Figure 11.</b> Resolved share of boundary-layer w-variance, SHOC w-variance and resolved w-variance against Δx.</figcaption></figure>
+
+    <h3>Stratocumulus-like or cumulus-like turbulence</h3>
+    <p class="prose">At km scale, low Nd gives positive resolved w skewness, up to 1–2: narrow, strong updrafts in a cumulus-like, drizzle-decoupled boundary layer. High Nd gives the negative skewness of a radiatively driven Sc layer, −0.6 to −0.95 at 2.5 km–625 m. The switch happens near Nd 50–100 and moves to higher Nd with more sedimentation. At 312 m the skewness stays positive at every Nd (0.1–0.3 for Nd ≥ 100). That is a structural change still under way, and a reason to look at 156 m.</p>
+    <figure><div class="plate"><img src="figs/figX3_skewness.png" alt="Resolved w skewness against Nd for each sed factor" loading="lazy"></div>
+      <figcaption><b>Figure 12.</b> Resolved w skewness over the boundary layer against Nd, for each sed factor (Δx ≤ 5 km).</figcaption></figure>
+
+    <h3>Drizzle-induced decoupling</h3>
+    <p class="prose">At ≤ 5 km, Nd 20 has Δq<sub>t</sub> ≈ 1.1–1.6 g kg⁻¹ and Δθ<sub>l</sub> ≈ 1.4–2.2 K, which is strongly decoupled. Both fall steeply with Nd, to 0.2–0.6 g kg⁻¹ and 0–0.7 K by Nd 1000. The single-column runs instead have a deep, SHOC-mixed cloud layer starting near 240 m. That is a structurally different boundary layer, not a coarse version of the km-scale one.</p>
+    <figure><div class="plate"><img src="figs/figX4_decoupling.png" alt="Decoupling measures against Nd and LWP against decoupling" loading="lazy"></div>
+      <figcaption><b>Figure 13.</b> Δq<sub>t</sub> and Δθ<sub>l</sub> against Nd (sed ×1), and LWP against Δq<sub>t</sub> for all runs.</figcaption></figure>
+
+    <h3>Why precipitation suppression fades with resolution</h3>
+    <p class="prose">At Nd 200, column rain production (autoconversion plus accretion) falls from 0.5 mm d⁻¹ at 40 km to 0.03 at 312 m. The cloud layer thins from 600 m to 330 m and its base rises from 240 m to 680 m. The share of rain that evaporates before reaching the surface rises from about 0.4 to 0.93, and above Nd 100 the raining fraction is zero at ≤ 1.25 km. There is almost no rain left to suppress.</p>
+    <figure><div class="plate"><img src="figs/figX5_rain_budget.png" alt="Rain production, autoconversion, evaporated share and raining fraction against Nd" loading="lazy"></div>
+      <figcaption><b>Figure 14.</b> Column rain production, autoconversion, evaporated share and raining fraction against Nd (sed ×1, suppression on).</figcaption></figure>
+
+    <h3>Mean structure</h3>
+    <p class="prose">As Δx shrinks, the boundary layer deepens (z<sub>i</sub> 860 m at 40 km to 1010 m at 312 m), and the cloud layer thins and lifts. LW cooling at cloud top is sharper and stronger in the single-column runs.</p>
+    <figure><div class="plate"><img src="figs/figX6_profiles.png" alt="Mean profiles at Nd 20 and 200 by resolution" loading="lazy"></div>
+      <figcaption><b>Figure 15.</b> Hour 10–12 mean profiles at Nd 20 (top) and 200 (bottom), sed ×1, suppression on. The 40, 20 and 10 km lines overlap.</figcaption></figure>
+
+    <h3>Radiative driving and entrainment efficiency</h3>
+    <p class="prose">Boundary-layer LW cooling saturates at about 86 W m⁻² for LWP above 120 g m⁻², so most runs share nearly the same radiative forcing. At that forcing the median w<sub>e</sub> is 4.0 (40 km), 5.1 (5 km), 6.1 (2.5 km), 6.6 (1.25 km) and 7.8 mm s⁻¹ (625 m). Entrainment per unit radiative driving roughly doubles from the single-column limit to 625 m.</p>
+    <figure><div class="plate"><img src="figs/figX7_radiation.png" alt="LW cooling against LWP and entrainment against LW cooling" loading="lazy"></div>
+      <figcaption><b>Figure 16.</b> Boundary-layer LW cooling against LWP, and w<sub>e</sub> against LW cooling, for all runs.</figcaption></figure>
+
+    <div class="note prose">
+      <h3>Diagnostic bug in P3</h3>
+      <p>P3's sedimentation tendency outputs <code>qc_sed</code>, <code>qr_sed</code> and <code>qi_sed</code> cannot be used. The C++ sedimentation routines compute <code>q_tend = (q − q_tend)/dt</code>, which expects the buffer to hold the pre-sedimentation q. <code>p3_main</code> never loads it, whereas the Fortran sets <code>qc_sed = qc</code> first. The outputs therefore come out as about q/Δt; for example, <code>qc_sed</code>/<code>qc</code> = 1/(60 s) at 1.25 km. Model state is not affected, and the fix is three lines. This also explains the odd <code>qc_sed</code> values seen in the earlier ACI study.</p>
+    </div>
+  </section>
+
+  <section id="turb3d">
+    <h2>3D turbulence</h2>
+    <p class="prose">At 625 m (36 pairs), |ΔLWP| is under 1.5 g m⁻² and |Δcloud cover| under 0.007. At 312 m (33 of 36 pairs, Nd 20–1000), |ΔLWP| ≤ 1.0 g m⁻² and |Δcloud cover| ≤ 0.006. The one consistent signal is w<sub>e</sub>, which is 0.02–0.07 mm s⁻¹ lower (under 1 %).</p>
+    <figure><div class="plate"><img src="figs/figR5_turb3d.png" alt="Differences from turning on 3D turbulence at 625 m and 312 m" loading="lazy"></div>
+      <figcaption><b>Figure 17.</b> 3D turbulence on minus off at 625 m and 312 m.</figcaption></figure>
+  </section>
+
+  <section id="transience">
+    <h2>Transience</h2>
+    <p class="prose">At ≤ 2.5 km, LWP changes by at most 4.5 g m⁻² h⁻¹ over hours 10–12. At 40–10 km it is still rising at high Nd with suppression on, by up to +18 g m⁻² h⁻¹.</p>
+    <figure><div class="plate"><img src="figs/figR3_lwp_trend.png" alt="LWP trend over hours 10 to 12 against Nd by resolution" loading="lazy"></div>
+      <figcaption><b>Figure 18.</b> Linear LWP trend over hours 10–12. The grey band marks ±5 g m⁻² h⁻¹.</figcaption></figure>
+    <figure><div class="plate"><img src="figs/fig3_timeseries.png" alt="Time series at 40 km and 312 m for Nd 20 and 1000" loading="lazy"></div>
+      <figcaption><b>Figure 19.</b> Time series at 40 km and 312 m for Nd 20 and 1000.</figcaption></figure>
+  </section>
+
+  <section id="setup">
+    <h2>Setup</h2>
+    <div class="prose" style="display:flex;flex-direction:column;gap:12px">
+      <p><b>Case.</b> DYCOMS-II RF02 nocturnal drizzling stratocumulus: shortwave off; T and q nudged above 650 hPa; IOP surface fluxes and subsidence. The forcing is constant over 0–12 h. We run doubly periodic EAMxx (SHOC, P3, SPA, RRTMGP; 128 levels).</p>
+      <p><b>Domains and steps.</b> The domain is 600 km at 40 km, 300 km at 20 km, and 240 km from 10 km down. The physics step is 100 s at ≥ 5 km and 75, 60, 30 and 15 s at 2.5, 1.25, 0.625 and 0.3125 km.</p>
+      <p><b>Factors.</b></p>
+      <ul>
+        <li>Δx: 8 levels, 40 km to 312 m.</li>
+        <li>Nd target: 20 to 1000 cm⁻³. The diagnosed Nd is 10–25 % above target at ≥ 625 m and 15–20 % below at 312 m.</li>
+        <li><code>p3::cloud_sedimentation_factor</code>: 0.5, 1, 2. This is a new P3 option that scales the cloud-droplet fall speeds, like MG2's <code>cld_sed</code>.</li>
+        <li>Precipitation suppression: on, or off (KK2000 Nd exponent 0, prefactor 0.812, so the rates match at Nd 63).</li>
+        <li>3D turbulence: on or off, at 625 m and 312 m only.</li>
+      </ul>
+      <p><b>Diagnostics.</b> Hour 10–12 means. Cloud cover is the fraction of columns with LWP above 10 g m⁻². w<sub>e</sub> = dz<sub>i</sub>/dt − w<sub>subs</sub>(z<sub>i</sub>). The sub-km runs ran in restart segments, which we checked are bit-for-bit identical to straight runs.</p>
+    </div>
+  </section>
+
+  <section id="status">
+    <h2>Status and data</h2>
+    <p class="prose">312 m is 98 % done: 69 of 72 runs. Every run with 3D turbulence off is complete. The last three (Nd 1000, 3D turbulence on) are running in a regular job and should finish within a few hours. Open questions are 156 m and seed ensembles for the small negative susceptibilities.</p>
+    <div class="paths">
+      <div><span>Full report (PDF)</span><code>/pscratch/sd/m/mahf708/dp_screamxx_sedps_12h/analysis_report5/sedps_technical_report_v5.pdf</code></div>
+      <div><span>Analysis CSVs and figures</span><code>/pscratch/sd/m/mahf708/dp_screamxx_sedps_12h/analysis_report5/</code></div>
+      <div><span>Per-run diagnostics</span><code>/pscratch/sd/m/mahf708/dp_screamxx_sedps_12h/explore/npz/</code></div>
+      <div><span>12 h runs</span><code>/pscratch/sd/m/mahf708/dp_screamxx_sedps_12h/sedps_&lt;res&gt;_nd&lt;Nd&gt;_sed&lt;f&gt;_ps&lt;on|off&gt;[_t3don]/run/</code></div>
+      <div><span>Scripts and R tools</span><code>/pscratch/sd/m/mahf708/scmlib/sed-precsupp-study/</code></div>
+      <div><span>Code</span><span style="font-family:var(--font-body);font-size:0.95rem;color:var(--fg)"><a href="https://github.com/mahf708/E3SM/tree/mahf708/eamxx/p3-cloud-sed-factor" style="color:var(--accent)">E3SM branch</a> · <a href="https://github.com/mahf708/scmlib/tree/sed-precsupp-study" style="color:var(--accent)">scmlib branch</a></span></div>
+    </div>
+  </section>
+</main>
