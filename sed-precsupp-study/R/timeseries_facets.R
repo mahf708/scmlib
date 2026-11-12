@@ -1,4 +1,4 @@
-## Time series of LWP, in-cloud Nd and cloud fraction, coloured by target Nd and
+## Time series of LWP, in-cloud Nd, cloud fraction, inversion height and cloud-top/base height, coloured by target Nd and
 ## faceted by precipitation suppression x sedimentation factor, one page per
 ## grid spacing (12 h runs, 3D turbulence off).  As requested by J. Muelmenstaedt:
 ##   ggplot(aes(x = time, col = target_cdnc)) + geom_line() + facet_grid(precsupp ~ sed_factor)
@@ -11,7 +11,13 @@ dir.create(out, showWarnings = FALSE, recursive = TRUE)
 
 res.levels <- c("40km", "20km", "10km", "5km", "2p5km", "1p25km", "625m", "312m")
 res.labels <- c("40 km", "20 km", "10 km", "5 km", "2.5 km", "1.25 km", "625 m", "312 m")
-df <- read.csv(csv) %>%
+heights.csv <- file.path(dirname(csv), "heights", "heights_15min.csv")
+df <- read.csv(csv)
+if (file.exists(heights.csv)) {   # cloud-top/base heights from ts_heights.py
+    hgt <- read.csv(heights.csv)
+    df <- left_join(df, hgt, by = c("case", "time_h"))
+}
+df <- df %>%
     filter(turb3d == "off") %>%
     mutate(res = factor(res, res.levels, res.labels),
            target_cdnc = factor(Nd_target),
@@ -22,7 +28,10 @@ long <- df %>%
     transmute(res, time = time_h, target_cdnc, precsupp, sed_factor,
               `LWP (g m-2)` = LWP_inst_gm2,
               `in-cloud Nd (cm-3)` = Nd_layer_cm3,
-              `cloud fraction (LWP > 10 g m-2)` = cloud_cover) %>%
+              `cloud fraction (LWP > 10 g m-2)` = cloud_cover,
+              `inversion height (m)` = zi_m,
+              `cloud-top height (m)` = if ("z_top_aerocom_m" %in% names(df)) z_top_aerocom_m else NA_real_,
+              `cloud-base height (m)` = if ("z_base_qc_m" %in% names(df)) z_base_qc_m else NA_real_) %>%
     pivot_longer(-c(res, time, target_cdnc, precsupp, sed_factor), names_to = "var", values_to = "val") %>%
     filter(is.finite(val))
 cdnc.cols <- c("20" = "#fde725", "50" = "#7ad151", "100" = "#22a884", "200" = "#2a788e",
